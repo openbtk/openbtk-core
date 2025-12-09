@@ -26,9 +26,9 @@ echo Committing files...
 git commit -m "Initial release of OpenBTK v0.1.0"
 
 echo.
-echo Pushing to GitHub (You may need to sign in)...
+echo Pushing to GitHub (Force overwriting remote to sync with local)...
 git branch -M main
-git push -u origin main
+git push -u origin main --force
 
 echo.
 echo Done!
