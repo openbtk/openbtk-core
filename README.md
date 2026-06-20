@@ -86,21 +86,12 @@ steps:
     params: { device: "cpu" }
 ```
 
-## Documentation
 
-- [Vision](docs/VISION.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Data Modality Specs](docs/DATA_MODALITY_SPEC.md)
-- [API Design](docs/API_DESIGN.md)
-- [Coding Standards](docs/CODING_STANDARDS.md)
-- [Glossary](docs/GLOSSARY.md)
-- [Implementation Plan](docs/IMPLEMENTATION_PLAN.md)
 
 ## Contributing
 
-This project is under active initial development. See
-[docs/IMPLEMENTATION_PLAN.md](docs/IMPLEMENTATION_PLAN.md) for the task
-breakdown and `CLAUDE.md` for AI-agent contribution context.
+This project is under active initial development.
+
 
 ## License
 
