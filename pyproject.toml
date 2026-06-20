@@ -1,0 +1,193 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openbtk"
+version = "0.1.0"
+description = "Open Toolkit for Biomedical AI — a biomedical-domain-aware framework for building AI pipelines across EHR, clinical text, imaging, biosignals, genomics, video, and audio."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.11"
+authors = [
+    { name = "OpenBTK Contributors" },
+]
+keywords = [
+    "biomedical", "healthcare", "clinical-nlp", "medical-imaging",
+    "genomics", "ehr", "fhir", "llm", "rag", "ai",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Healthcare Industry",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Medical Science Apps.",
+]
+
+dependencies = [
+    "pydantic>=2.5",
+    "numpy>=1.26",
+    "structlog>=24.0",
+    "pyyaml>=6.0",
+    "httpx>=0.27",
+    "langgraph>=0.2",
+    "langchain-core>=0.3",
+    "importlib-metadata>=7.0",
+]
+
+[project.optional-dependencies]
+clinical_text = [
+    "scispacy>=0.5",
+    "medspacy>=1.0",
+    "presidio-analyzer>=2.2",
+    "presidio-anonymizer>=2.2",
+    "transformers>=4.40",
+    "torch>=2.3",
+    "peft>=0.10",
+    "biopython>=1.83",
+]
+imaging = [
+    "pydicom>=2.4",
+    "SimpleITK>=2.3",
+    "monai>=1.3",
+    "openslide-python>=4.0",
+    "nibabel>=5.2",
+]
+biosignals = [
+    "wfdb>=4.1",
+    "mne>=1.7",
+    "neurokit2>=0.2",
+    "pyedflib>=0.1",
+    "scipy>=1.13",
+]
+genomics = [
+    "pysam>=0.22",
+    "cyvcf2>=0.30",
+    "scanpy>=1.10",
+    "anndata>=0.10",
+    "biopython>=1.83",
+    "pyensembl>=2.3",
+]
+video = [
+    "opencv-python>=4.10",
+    "decord>=0.6",
+    "av>=12.0",
+]
+audio = [
+    "librosa>=0.10",
+    "torchaudio>=2.3",
+]
+ehr_emr = [
+    "fhir.resources>=7.1",
+    "hl7apy>=1.3",
+]
+retrieval = [
+    "faiss-cpu>=1.8",
+    "chromadb>=0.5",
+]
+llms = [
+    "openai>=1.30",
+    "anthropic>=0.30",
+]
+all = [
+    "openbtk[clinical_text,imaging,biosignals,genomics,video,audio,ehr_emr,retrieval,llms]",
+]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-asyncio>=0.23",
+    "pytest-mock>=3.14",
+    "mypy>=1.10",
+    "ruff>=0.4",
+    "pre-commit>=3.7",
+    "faker>=25.0",
+    "types-PyYAML>=6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/openbtk/openbtk"
+Documentation = "https://openbtk.readthedocs.io"
+Repository = "https://github.com/openbtk/openbtk"
+Issues = "https://github.com/openbtk/openbtk/issues"
+
+[project.scripts]
+openbtk = "openbtk.cli.main:app"
+
+[project.entry-points."openbtk.providers"]
+# Third-party packages register here in their own pyproject.toml
+
+[tool.hatch.build.targets.wheel]
+packages = ["openbtk"]
+
+# ---------------------------------------------------------------------------
+# Ruff
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+src = ["openbtk", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "N", "UP", "ANN", "B", "SIM", "TCH", "RUF"]
+ignore = ["ANN101", "ANN102"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["ANN"]
+"openbtk/cli/**" = ["ANN"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["openbtk"]
+
+# ---------------------------------------------------------------------------
+# Mypy
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+ignore_missing_imports = true
+exclude = ["tests/", "build/", "dist/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "scispacy.*", "medspacy.*", "presidio_analyzer.*", "presidio_anonymizer.*",
+    "pydicom.*", "SimpleITK.*", "monai.*", "openslide.*", "nibabel.*",
+    "wfdb.*", "mne.*", "neurokit2.*", "pyedflib.*",
+    "pysam.*", "cyvcf2.*", "scanpy.*", "anndata.*", "pyensembl.*",
+    "decord.*", "av.*", "librosa.*", "torchaudio.*",
+    "fhir.*", "hl7apy.*", "faiss.*", "chromadb.*",
+    "langgraph.*", "langchain_core.*",
+]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# Pytest
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = "-ra -q --strict-markers"
+markers = [
+    "slow: marks tests as slow (require model downloads, skipped by default)",
+    "integration: marks tests as integration tests",
+]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["openbtk"]
+omit = ["*/tests/*", "*/cli/*"]
+
+[tool.coverage.report]
+fail_under = 85
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
+]

@@ -1,0 +1,106 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+.installed.cfg
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets / credentials — NEVER commit these
+*.env
+.env.*
+*.key
+*.pem
+secrets.yaml
+credentials.json
+.secrets.baseline
+
+# ---------------------------------------------------------------------------
+# Biomedical data files — NEVER commit real or even synthetic large data
+# ---------------------------------------------------------------------------
+data/
+*.csv
+*.tsv
+*.parquet
+
+# Clinical text / EHR
+*.cda
+*.hl7
+
+# Imaging
+*.dcm
+*.dicom
+*.nii
+*.nii.gz
+*.svs
+
+# Biosignals
+*.edf
+*.bdf
+*.hea
+*.dat
+*.wav
+
+# Genomics
+*.vcf
+*.vcf.gz
+*.bam
+*.sam
+*.bcf
+*.fastq
+*.fastq.gz
+*.fasta
+*.h5ad
+*.loom
+
+# Video
+*.mp4
+*.avi
+*.mov
+
+# Model artifacts / caches
+*.pt
+*.pth
+*.bin
+*.safetensors
+.cache/
+models/
+
+
+# Exceptions — allow small fixture files explicitly added
+!tests/fixtures/**/*.json
+!tests/fixtures/**/sample_*.txt
+
+# Ignore documentation, spec files, and local agent context
+docs/
+specs/
+CLAUDE.md
+claude.md
