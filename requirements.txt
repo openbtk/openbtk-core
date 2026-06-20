@@ -1,6 +1,0 @@
-torch
-transformers
-pydantic
-pillow
-numpy
-librosa
