@@ -31,7 +31,7 @@ across **every modality**.
 |---|---|---|
 | Clinical Text | 🚧 In progress | scispacy, medspacy, presidio, transformers |
 | EHR / EMR | 📋 Planned | fhir.resources, hl7apy, OMOP CDM |
-| Medical Imaging | 📋 Planned | pydicom, SimpleITK, MONAI, openslide |
+| Medical Imaging | 📋 Planned | pydicom, SimpleITK,VTK, MITK, MONAI, openslide |
 | Biosignals (ECG/EEG/EMG) | 📋 Planned | wfdb, mne, neurokit2, pyedflib |
 | Genomics | 📋 Planned | pysam, cyvcf2, scanpy, biopython |
 | Surgical Video | 📋 Planned | opencv, decord, av |
@@ -40,10 +40,7 @@ across **every modality**.
 ## Install
 
 ```bash
-pip install openbtk                  # core only
-pip install openbtk[clinical_text]   # + clinical NLP stack
-pip install openbtk[imaging]         # + medical imaging stack
-pip install openbtk[all]             # everything
+pip install openbtk                  
 ```
 
 ## Quick Start
