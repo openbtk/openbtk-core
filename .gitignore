@@ -46,7 +46,10 @@ credentials.json
 # ---------------------------------------------------------------------------
 # Biomedical data files — NEVER commit real or even synthetic large data
 # ---------------------------------------------------------------------------
-data/
+# Leading slash matters: an unanchored "data/" matches at ANY depth, so it also
+# excluded src/data/ and would exclude src/openbtk/data/. That silently kept the
+# entire v1 clinical_text module out of version control. Keep this anchored.
+/data/
 *.csv
 *.tsv
 *.parquet
@@ -99,8 +102,16 @@ models/
 !tests/fixtures/**/*.json
 !tests/fixtures/**/sample_*.txt
 
-# Ignore documentation, spec files, and local agent context
+# ---------------------------------------------------------------------------
+# Local-only: specification, planning and agent context
+# ---------------------------------------------------------------------------
+# Kept out of version control by choice. NOTE: these therefore exist on one
+# machine only and are NOT recoverable from git if lost — back them up separately.
 docs/
 specs/
 CLAUDE.md
 claude.md
+
+# Build artefacts
+site/
+.claude/settings.local.json
