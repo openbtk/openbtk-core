@@ -46,7 +46,10 @@ credentials.json
 # ---------------------------------------------------------------------------
 # Biomedical data files — NEVER commit real or even synthetic large data
 # ---------------------------------------------------------------------------
-data/
+# Leading slash: repo-root data directory ONLY. An unanchored "data/" also
+# matched src/data/, which silently excluded the entire modality package from
+# version control.
+/data/
 *.csv
 *.tsv
 *.parquet
@@ -99,8 +102,18 @@ models/
 !tests/fixtures/**/*.json
 !tests/fixtures/**/sample_*.txt
 
-# Ignore documentation, spec files, and local agent context
+# ---------------------------------------------------------------------------
+# Local-only: specification, planning and agent context
+# ---------------------------------------------------------------------------
+# Kept out of version control by choice. NOTE: these files therefore exist on
+# one machine only and are NOT recoverable from git if deleted — back them up
+# separately.
 docs/
 specs/
 CLAUDE.md
 claude.md
+
+# Build artefacts
+docs/_build/
+site/
+.claude/settings.local.json
