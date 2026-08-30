@@ -1,0 +1,76 @@
+# Run: pre-commit install
+# See docs/09_CODING_STANDARDS.md section 13.
+
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.6.9
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        args: [--strict]
+        additional_dependencies: [pydantic>=2.5, types-PyYAML, numpy, structlog]
+        exclude: ^tests/
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        exclude: ^tests/fixtures/
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-toml
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: mixed-line-ending
+        args: [--fix=lf]          # Windows is the primary dev environment
+      - id: check-added-large-files
+        args: [--maxkb=1000]
+      - id: check-merge-conflict
+      - id: detect-private-key
+      - id: check-case-conflict   # Windows/macOS are case-insensitive; Linux is not
+
+  # -------------------------------------------------------------------------
+  # Project-specific guards. Each exists because of a specific v1 failure.
+  # -------------------------------------------------------------------------
+  - repo: local
+    hooks:
+      - id: forbidden-package-names
+        name: "no 'opentbtk' typo, no 'src.' imports (ADR-0003)"
+        entry: >-
+          bash -c 'if grep -rnE "opentbtk|from src\.|import src\." --include="*.py"
+          --include="*.md" --include="*.toml" --include="*.yml"
+          --exclude-dir=.git --exclude-dir=.venv
+          src tests docs README.md 2>/dev/null
+          | grep -v "tests/packaging/test_install.py"
+          | grep -v "docs/"; then
+          echo "Forbidden package name found. The package is openbtk, always."; exit 1; fi'
+        language: system
+        pass_filenames: false
+
+      - id: no-load-all-in-docs
+        name: "no load_all() in docs or examples (ADR-0004)"
+        entry: >-
+          bash -c 'if grep -rn "load_all(" README.md notebooks 2>/dev/null; then
+          echo "load_all() materialises a corpus; examples must model streaming."; exit 1; fi'
+        language: system
+        pass_filenames: false
+
+      - id: import-linter
+        name: "layer boundaries (import-linter)"
+        # PYTHONIOENCODING is required on Windows: import-linter renders through
+        # `rich`, which falls back to cp1252 when stdout is not a terminal (as it
+        # is not under pre-commit) and dies on its own box-drawing characters.
+        # Without this the hook fails spuriously on Windows while CI stays green.
+        entry: bash -c 'PYTHONIOENCODING=utf-8 lint-imports'
+        language: system
+        pass_filenames: false
