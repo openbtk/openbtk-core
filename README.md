@@ -13,15 +13,18 @@ regulator and your IRB will ask for.
 
 > ## 🚧 Status: pre-implementation
 >
-> **There is no working code yet, and nothing is published to PyPI.**
+> **`0.0.1` on PyPI is a placeholder. It installs and imports; it does nothing.**
+> It exists to reserve the name and to exercise the release pipeline. Do not
+> build on it.
 >
 > The project is being rebuilt from scratch. A previous attempt produced ~5,200 lines
 > that were never executable — three conflicting package names coexisted in one
 > repository, and no test was ever run against an installed dependency. That code is
-> preserved on the `legacy/v1-snapshot` branch and has been cleared from `dev`.
+> preserved on the `legacy/v1-snapshot` branch.
 >
-> The current phase — specification, architecture and planning — is complete.
+> Specification, architecture and planning are complete; the core framework is next.
 > This README will list features when features exist, and not before.
+> See [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
@@ -84,7 +87,7 @@ Contributions open at **v0.1**.
 
 ## License
 
-Apache 2.0.
+Apache 2.0 — see [LICENSE](LICENSE).
 
 ## Disclaimer
 
