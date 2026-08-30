@@ -114,11 +114,18 @@ jobs:
       - run: pip install build twine
       - run: python -m build
       - run: twine check --strict dist/*
-      - name: Wheel contains the package
-        run: python -c "
-          import zipfile, glob, sys;
-          w = glob.glob('dist/*.whl')[0];
-          names = zipfile.ZipFile(w).namelist();
-          assert any(n.startswith('openbtk/') for n in names), names[:20];
-          assert 'openbtk/py.typed' in names, 'py.typed missing from wheel';
-          print('wheel OK:', w)"
+      - name: Wheel is correctly laid out
+        run: |
+          python - <<'PY'
+          import glob
+          import zipfile
+
+          wheel = glob.glob("dist/*.whl")[0]
+          names = zipfile.ZipFile(wheel).namelist()
+
+          assert any(n.startswith("openbtk/") for n in names), names[:20]
+          assert not any(n.startswith("src/") for n in names), "src/ prefix leaked into the wheel"
+          assert "openbtk/py.typed" in names, "py.typed missing from the wheel"
+          assert any("licenses/LICENSE" in n for n in names), "LICENSE missing from the wheel"
+          print("wheel OK:", wheel)
+          PY
