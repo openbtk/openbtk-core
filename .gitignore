@@ -102,16 +102,5 @@ models/
 !tests/fixtures/**/*.json
 !tests/fixtures/**/sample_*.txt
 
-# ---------------------------------------------------------------------------
-# Local-only: specification, planning and agent context
-# ---------------------------------------------------------------------------
-# Kept out of version control by choice. NOTE: these therefore exist on one
-# machine only and are NOT recoverable from git if lost — back them up separately.
-docs/
-specs/
-CLAUDE.md
-claude.md
-
 # Build artefacts
 site/
-.claude/settings.local.json
