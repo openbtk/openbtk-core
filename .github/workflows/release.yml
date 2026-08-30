@@ -1,0 +1,144 @@
+name: Release
+
+# Production releases ship from `main` only. Tag `main` after the dev -> main PR
+# merges; a tag on any other branch is rejected below.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Refuse to release from anywhere but main. A tag is not branch-scoped, so
+  # without this a tag pushed on dev would publish to PyPI. PyPI versions are
+  # immutable -- there is no undo.
+  # ---------------------------------------------------------------------------
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Tag must be an ancestor of main
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor "${{ github.sha }}" origin/main; then
+            echo "::error::Tag ${{ github.ref_name }} is not on main. Releases ship from main only."
+            exit 1
+          fi
+          echo "Tag ${{ github.ref_name }} is on main."
+
+  build:
+    needs: guard
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0          # hatch-vcs derives the version from tags
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check --strict dist/*
+
+      - id: v
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Built version matches the tag
+        run: |
+          BUILT=$(ls dist/*.whl | sed -E 's/.*openbtk-([^-]+)-py3.*/\1/')
+          if [ "$BUILT" != "${{ steps.v.outputs.version }}" ]; then
+            echo "::error::Tag says ${{ steps.v.outputs.version }} but wheel is $BUILT"
+            exit 1
+          fi
+
+      - name: Generate SBOM
+        run: |
+          pip install cyclonedx-bom
+          cyclonedx-py environment -o sbom.json
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: |
+            dist/
+            sbom.json
+
+  test-pypi:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/openbtk
+    permissions:
+      id-token: write            # OIDC -- Trusted Publishing, no API token
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: dist, path: .}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          skip-existing: true
+
+  # The point of this pipeline: install the real artefact from TestPyPI across
+  # the full matrix BEFORE it can reach PyPI, where it becomes permanent.
+  verify:
+    needs: [build, test-pypi]
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.12", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install from TestPyPI
+        shell: bash
+        run: |
+          pip install --index-url https://test.pypi.org/simple/ \
+                      --extra-index-url https://pypi.org/simple/ \
+                      "openbtk==${{ needs.build.outputs.version }}"
+      - name: Smoke test the published artefact
+        shell: bash
+        run: |
+          python -c "import openbtk; print(openbtk.__version__)"
+          python -c "import openbtk, pathlib; assert (pathlib.Path(openbtk.__file__).parent / 'py.typed').is_file()"
+
+  pypi:
+    needs: verify
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi                 # protected: requires manual approval
+      url: https://pypi.org/p/openbtk
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: dist, path: .}
+      - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          attestations: true
+
+  github-release:
+    needs: [build, pypi]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with: {name: dist, path: .}
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*
+            sbom.json
+          generate_release_notes: true
+          prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || startsWith(github.ref_name, 'v0.0.') }}

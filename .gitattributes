@@ -1,0 +1,18 @@
+# Normalise line endings on commit. The primary development environment for this
+# project is Windows; without this, CRLF leaks into the repository and every
+# Linux/macOS CI checkout shows spurious whole-file diffs.
+* text=auto eol=lf
+
+# Binary — never normalise
+*.png   binary
+*.jpg   binary
+*.gz    binary
+*.parquet binary
+*.dcm   binary
+*.nii   binary
+*.bam   binary
+*.pt    binary
+*.safetensors binary
+
+# Generated — exclude from diffs and language statistics
+
