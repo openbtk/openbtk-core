@@ -38,7 +38,13 @@ classifiers = [
 # ---------------------------------------------------------------------------
 dependencies = [
     "pydantic>=2.5",
-    "numpy>=1.26",
+    # <2.5: numpy 2.5.0 dropped Python 3.11 support and its bundled .pyi
+    # stubs adopted PEP 695 syntax (the `type X = ...` statement), which is
+    # a hard mypy parse error under python_version=3.11 (verified against
+    # openbtk's actual floor -- see [tool.mypy] below, and
+    # https://github.com/python/mypy/issues/18701). Revisit this bound when
+    # openbtk's own minimum Python version moves to 3.12+.
+    "numpy>=1.26,<2.5",
     "structlog>=24.0",
     "pyyaml>=6.0",
     "httpx>=0.27",

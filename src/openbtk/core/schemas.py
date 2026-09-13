@@ -186,3 +186,80 @@ class SearchResult(BaseModel):
     source: SourceRef | None = Field(
         None, description="Provenance back to the originating record, if known."
     )
+
+
+class CodeSystem(StrEnum):
+    """A clinical terminology or unit-of-measure system.
+
+    Named exactly per docs/11_GLOSSARY.md's "Naming Conventions Derived From
+    This Glossary" section, which is authoritative for this enum. Note:
+    docs/05_DATA_MODALITY_SPEC.md's CodedEvent.system comment lists a
+    different set (SNOMED, ICD10, ICD10CM, RXNORM, LOINC, CPT -- both ICD10
+    and ICD10CM, no UCUM). That is a documentation inconsistency to reconcile
+    when the EHR module is built (M6), not a second source of truth -- the
+    glossary's dedicated naming section wins here.
+    """
+
+    SNOMED = "SNOMED"
+    LOINC = "LOINC"
+    ICD10CM = "ICD10CM"
+    RXNORM = "RXNORM"
+    CPT = "CPT"
+    UCUM = "UCUM"
+
+
+class Concept(BaseModel):
+    """A single resolved terminology concept.
+
+    Example:
+        >>> c = Concept(
+        ...     code="73211009", system=CodeSystem.SNOMED, display="Diabetes mellitus"
+        ... )
+        >>> c.system.value
+        'SNOMED'
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    code: str = Field(..., min_length=1, description="The code within its system.")
+    system: CodeSystem = Field(
+        ..., description="The terminology system this code belongs to."
+    )
+    display: str = Field(
+        ..., min_length=1, description="Human-readable name for this code."
+    )
+
+
+class Message(BaseModel):
+    """One turn in a conversation passed to an LLM provider.
+
+    Example:
+        >>> Message(role="user", content="Summarise this note.").role
+        'user'
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    role: Literal["system", "user", "assistant"] = Field(
+        ..., description="Who this message is from."
+    )
+    content: str = Field(..., description="The message text.")
+
+
+class LLMResponse(BaseModel):
+    """The result of one LLM generation call.
+
+    Deliberately minimal for now: just the generated text. Cost/token
+    accounting (docs/03_ARCHITECTURE.md section 4.4's TokenUsage) is
+    aggregated at the RunManifest level once core/provenance.py's second
+    increment lands (see that module's docstring) -- this is not the place
+    to pre-invent that shape.
+
+    Example:
+        >>> LLMResponse(text="The patient has type 2 diabetes.").text
+        'The patient has type 2 diabetes.'
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    text: str = Field(..., description="The generated text.")

@@ -103,14 +103,21 @@ class ComponentProvenance(BaseModel):
         ... )
         >>> cp.model_identity is None
         True
+        >>> ComponentProvenance(
+        ...     registry_key="", class_name="Unregistered", package_version="0.1.0"
+        ... ).registry_key
+        ''
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     registry_key: str = Field(
         ...,
-        min_length=1,
-        description="The registry key this component was created under.",
+        description=(
+            "The registry key this component was created under, or an empty "
+            "string if the component was constructed without going through "
+            "the registry (e.g. a test fixture)."
+        ),
     )
     class_name: str = Field(..., min_length=1, description="The concrete class name.")
     package_version: str = Field(
