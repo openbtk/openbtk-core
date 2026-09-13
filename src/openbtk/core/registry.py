@@ -30,7 +30,6 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-import structlog
 from pydantic import BaseModel, ConfigDict, Field
 
 from openbtk.core.base import (
@@ -49,8 +48,9 @@ from openbtk.core.base import (
     Component,
 )
 from openbtk.core.errors import RegistryError
+from openbtk.core.logging import get_logger
 
-log = structlog.get_logger(__name__)
+log = get_logger(__name__)
 
 # Bound to Component, not Any -- every registrable class is a Component.
 # Imported eagerly (not TYPE_CHECKING) because TypeVar's `bound` argument is
