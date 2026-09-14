@@ -1,0 +1,57 @@
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "mkdocs.yml"
+      - "mkdocs/**"
+      - "src/**"
+      - ".github/workflows/docs.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: docs-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[docs]"
+      # Strict mode deliberately off -- see mkdocs.yml's own comment on a
+      # known mkdocstrings/autorefs false positive against doctest output.
+      - name: Build
+        run: mkdocs build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0        # mike needs the full history of gh-pages
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[docs]"
+      - name: Configure git identity for mike's commits
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # No tagged release exists yet (v0.1.0 is still pending, task 4.6) --
+      # deployed under a "dev" version, not aliased to "latest", so the
+      # site never implies a stable release that hasn't shipped.
+      - name: Deploy docs (dev)
+        run: mike deploy --push --update-aliases dev
+      - name: Make dev the default version shown at the site root
+        run: mike set-default --push dev

@@ -75,7 +75,7 @@ class ModelIdentity(BaseModel):
     Example:
         >>> ModelIdentity(
         ...     name="NeuML/pubmedbert-base-embeddings",
-        ...     revision="a1b2c3d4e5f6",
+        ...     revision="a1b2c3d4e5f6",  # pragma: allowlist secret
         ...     source="huggingface",
         ... ).source
         'huggingface'

@@ -38,12 +38,11 @@ class TestModelIdentity:
             ModelIdentity(name="gpt-4o", revision=floating_tag, source="api")
 
     def test_accepts_a_real_commit_sha(self) -> None:
+        fake_sha = "a1b2c3d4e5f67890abcdef"  # pragma: allowlist secret -- example SHA
         identity = ModelIdentity(
-            name="meta-llama/Llama-3-8B",
-            revision="a1b2c3d4e5f67890abcdef",
-            source="huggingface",
+            name="meta-llama/Llama-3-8B", revision=fake_sha, source="huggingface"
         )
-        assert identity.revision == "a1b2c3d4e5f67890abcdef"
+        assert identity.revision == fake_sha
 
     def test_is_frozen(self) -> None:
         identity = ModelIdentity(name="x", revision="abc123", source="api")

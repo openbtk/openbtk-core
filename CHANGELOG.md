@@ -9,10 +9,83 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
-+ Pipelines**. Not yet released.
+**M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
++ Pipelines**, and **M4 — v0.1 Release (in progress)**. Not yet released.
 
-### Fixed
+**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
+chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
+memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
+a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
+its own documented P1/optional status in the roadmap, not newly descoped.
+
+### Added — M4 (packaging and contribution docs, task 4.3/4.4)
+- `CONTRIBUTING.md` — real dev-environment setup, the exact lint/type/test
+  commands CI runs, coding conventions, and the PR process.
+- `CODE_OF_CONDUCT.md` — Contributor Covenant v2.1, with a GitHub-based
+  enforcement path (private security advisory or direct maintainer
+  contact) rather than inventing a conduct-reporting email that does not
+  exist yet.
+- `README.md` rewritten to describe only what has actually shipped
+  (M1–M3), replacing the pre-implementation placeholder — the exact
+  "README discipline" the roadmap itself calls out, after v1 shipped a
+  README advertising features and a quick-start that didn't work.
+  Includes a real quick-start (load → de-identify → segment → chunk
+  through the real `Pipeline` API) and the checked-in de-id F1 and memory
+  benchmark numbers, not projections.
+- `tests/unit/test_readme.py`: extracts and actually executes every
+  ` ```python ` block in `README.md` in CI, so a quick-start going stale
+  is a test failure, not a silent drift — the same guarantee
+  `--doctest-modules` gives every docstring `Example`, applied to the
+  README for the first time.
+
+### Added — M4 (docs site, task 4.5)
+- `mkdocs.yml` + `mkdocs/` — a real, build-verified MkDocs Material site
+  (home, quick start, and an API reference generated from the actual
+  source docstrings via `mkdocstrings`, not hand-duplicated). Lives in
+  `mkdocs/`, not `docs/` — this repository's own `docs/` is the
+  deliberately git-excluded internal design-doc folder (confirmed via
+  `git ls-files`), so a public site generated in CI could never read from
+  it regardless of intent.
+- `.github/workflows/docs.yml` — builds on every push to `main` that
+  touches the site or the source, and deploys with `mike` under a `dev`
+  version (not aliased to `latest`, since no tagged release exists yet).
+  Both the build and the `mike deploy`/`set-default` invocations were
+  exercised directly (a local, unpushed `mike deploy dev` really produces
+  a `gh-pages` commit) before being written into the workflow, not
+  assumed to work from reading `mike`'s docs alone.
+- Disclosed, not silently worked around: `mkdocs build --strict` fails on
+  two real but harmless `mkdocs_autorefs` false positives, where a
+  doctest `Example`'s own OUTPUT line (a plain Python list-of-strings
+  literal) is misread as an attempted cross-reference. The rendered pages
+  are correct either way; `docs.yml` builds without `--strict` for this
+  reason, recorded as a comment in `mkdocs.yml` itself.
+
+### Fixed — M4
+- `pyproject.toml`'s `[project.urls]` pointed at
+  `github.com/openbtk/openbtk` — the actual repository is
+  `openbtk/openbtk-core`. Found while writing accurate install
+  instructions for the README, not assumed correct.
+- `.pre-commit-config.yaml`'s `ruff`/`ruff-format` hooks were pinned to
+  `v0.6.9`, which predates ruff's `TCH`→`TC` rule-selector rename —
+  `pre-commit install` (exactly what `CONTRIBUTING.md` now tells every
+  new contributor to run) failed outright on `pyproject.toml`'s own
+  `"TC"` entry. Bumped to `v0.16.5`, matching what the project's own dev
+  dependency actually resolves to.
+- `.pre-commit-config.yaml`'s `mypy` hook's `additional_dependencies`
+  listed a bare, unpinned `numpy` — pulling in numpy ≥2.5's PEP 695-syntax
+  stubs, a hard mypy parse error under this hook's own `python_version =
+  3.11`, the exact failure mode `pyproject.toml`'s own `numpy>=1.26,<2.5`
+  constraint already exists to prevent for the main dependency list.
+  Pinned the hook's copy to match.
+- Several pre-existing `detect-secrets` false positives (a doctest's
+  example commit SHA, test fixtures proving secret redaction and env-var
+  interpolation work) had no `pragma: allowlist secret` marker —
+  `detect-secrets` had never actually been run as part of this project's
+  own verification before now. Marked, and refactored the two duplicated
+  literals into named constants so one marker covers all uses.
+  `pre-commit run --all-files` is clean end to end for the first time.
+
+### Fixed — M3
 - `MIMICNotesLoader`'s real tests (unit and contract suite) had no gate for
   pandas actually being installed, unlike every spaCy/medspaCy/transformers-
   dependent test elsewhere (all gated behind `OPENBTK_SLOW_TESTS`). CI's own
@@ -30,14 +103,6 @@ recorded here.
   absent) is unaffected, in its own un-gated class. Verified green in both
   a zero-extras venv (625 passed, up from 10 failed) and the full-extras
   venv (636 passed, unchanged) before this fix was considered done.
-
-**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
-chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
-memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
-a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
-its own documented P1/optional status in the roadmap, not newly descoped.
-
-### Fixed — M3
 - `openbtk.deid.engine.DeidEngine(mode=...)` crashed outright
   (`AttributeError` in `_compute_config_hash`) when `mode` was passed as a
   plain string rather than a `DeidMode` enum member — exactly what every
