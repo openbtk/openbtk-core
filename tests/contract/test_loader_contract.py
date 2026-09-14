@@ -30,6 +30,7 @@ behaviour belongs (see tests/unit/data/clinical_text/test_loaders.py).
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any
 
@@ -45,6 +46,21 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from openbtk.core.base import BaseLoader
+
+# CI's own test-core job installs with zero optional extras (NFR-10) --
+# a loader whose .load() genuinely needs one (MIMICNotesLoader needs
+# pandas) cannot be driven through this generic suite there. Skipped per
+# key rather than assumed always installed; found by actually reproducing
+# a genuinely clean venv, not assumed from the lazy-import design alone.
+_MISSING_DEPENDENCY_BY_KEY: dict[str, str] = {}
+if importlib.util.find_spec("pandas") is None:
+    _MISSING_DEPENDENCY_BY_KEY["loader.clinical_text.mimic_notes"] = "pandas"
+
+
+def _skip_if_missing_dependency(key: str) -> None:
+    dependency = _MISSING_DEPENDENCY_BY_KEY.get(key)
+    if dependency is not None:
+        pytest.skip(f"{key}: requires the 'text' extra ({dependency})")
 
 
 def _new_instance(key: str) -> BaseLoader[Any, Any]:
@@ -83,6 +99,7 @@ def _make_source(key: str, tmp_path: Path) -> Any:
 class TestLoaderContract:
     def test_load_returns_iterator(self, key: str, tmp_path: Path) -> None:
         """load() returns a genuine Iterator, not a list (ADR-0004)."""
+        _skip_if_missing_dependency(key)
         loader = _new_instance(key)
         result = loader.load(_make_source(key, tmp_path))
         assert isinstance(result, Iterator), (
@@ -121,6 +138,7 @@ class TestLoaderContract:
     def test_records_validate_against_schema(self, key: str, tmp_path: Path) -> None:
         """Every yielded record is a real Pydantic model instance, not a
         bare dict/tuple -- callers are entitled to rely on typed access."""
+        _skip_if_missing_dependency(key)
         loader = _new_instance(key)
         records = list(loader.load(_make_source(key, tmp_path)))
         assert records, f"{key}: yielded nothing for a two-item source"
@@ -130,6 +148,7 @@ class TestLoaderContract:
         """The base class's load_all() default (list(self.load(source)))
         must agree with load() itself -- it is a documented memory hazard,
         not an alternate code path with its own semantics."""
+        _skip_if_missing_dependency(key)
         loader = _new_instance(key)
         # Two independent, identical sources: an iterator-shaped source is
         # single-use by nature, so _make_source is called twice to get two

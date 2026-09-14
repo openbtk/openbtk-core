@@ -4,10 +4,22 @@ Covers what tests/contract/test_loader_contract.py deliberately does not:
 loader-specific bad-source behaviour, missing-dependency naming, and real
 per-loader laziness (see that file's module docstring for why these are
 not generically parametrizable).
+
+``TestMIMICNotesLoader``'s real (non-mocked) tests need pandas actually
+installed. Found the hard way: CI's own ``test-core`` job installs with
+zero optional extras (NFR-10 -- "zero-extras install ... runs core
+successfully"), and every real venv used to develop this file so far
+happened to have the ``text`` extra installed too, so this gap went
+undetected until deliberately reproduced in a genuinely clean venv.
+``TestMIMICNotesLoader`` is skipped outright there; the one test that
+verifies the missing-dependency error path itself (which mocks
+``require()`` and never needs pandas to truly be absent) lives in its own
+un-gated class below so it still runs everywhere.
 """
 
 from __future__ import annotations
 
+import importlib.util
 from typing import TYPE_CHECKING
 
 import pytest
@@ -22,6 +34,8 @@ from openbtk.data.clinical_text.loaders import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+_HAS_PANDAS = importlib.util.find_spec("pandas") is not None
 
 
 class TestPlainTextLoader:
@@ -135,6 +149,7 @@ class TestJSONLLoader:
         assert first.text == "first"
 
 
+@pytest.mark.skipif(not _HAS_PANDAS, reason="requires the 'text' extra (pandas)")
 class TestMIMICNotesLoader:
     def test_loads_every_row(self, tmp_path: Path) -> None:
         path = tmp_path / "notes.csv"
@@ -193,6 +208,12 @@ class TestMIMICNotesLoader:
     def test_missing_file_raises_loader_error(self, tmp_path: Path) -> None:
         with pytest.raises(LoaderError, match="Could not read"):
             list(MIMICNotesLoader().load(str(tmp_path / "missing.csv")))
+
+
+class TestMIMICNotesLoaderMissingDependency:
+    """Deliberately NOT gated by ``_HAS_PANDAS`` -- this is the one test
+    that must run precisely when pandas might be absent, real or
+    simulated, and it never touches real pandas either way."""
 
     def test_missing_pandas_raises_missing_dependency_error(
         self, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
