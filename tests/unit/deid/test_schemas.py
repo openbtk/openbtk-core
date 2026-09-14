@@ -10,6 +10,7 @@ from openbtk.deid.schemas import (
     DeidMode,
     DeidReport,
     DeidResult,
+    DeidStatus,
     Detection,
     PHICategory,
     RiskEstimate,
@@ -44,6 +45,20 @@ class TestPHICategory:
 class TestDeidMode:
     def test_exactly_five_modes(self) -> None:
         assert len(DeidMode) == 5
+
+
+class TestDeidStatus:
+    def test_exactly_four_states(self) -> None:
+        assert len(DeidStatus) == 4
+
+    def test_unknown_is_the_documented_default_sentinel(self) -> None:
+        """docs/05_DATA_MODALITY_SPEC.md section 1.1:
+        deid_status: DeidStatus = DeidStatus.UNKNOWN."""
+        assert DeidStatus.UNKNOWN.value == "unknown"
+
+    def test_members_are_lowercase(self) -> None:
+        for member in DeidStatus:
+            assert member.value == member.value.lower()
 
 
 class TestDetection:

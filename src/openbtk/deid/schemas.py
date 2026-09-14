@@ -77,6 +77,28 @@ class DeidMode(StrEnum):
     DATE_SHIFT = "date_shift"
 
 
+class DeidStatus(StrEnum):
+    """What state a record's PHI is in -- lives here, not in any one
+    modality's own schemas module, because both ``clinical_text`` and
+    ``ehr`` need it (docs/05_DATA_MODALITY_SPEC.md sections 1.1 and 2.1)
+    and the layering rule (docs/03_ARCHITECTURE.md section 2) keeps the two
+    modalities independent of each other -- a shared concept belongs in a
+    module both already depend on downward, not in either one's own
+    package.
+
+    Making PHI state part of the type (docs/05_DATA_MODALITY_SPEC.md
+    section 1.1) is cheap and prevents a whole class of accident: a
+    pipeline step can refuse to send a ``RAW`` record to an off-site
+    provider by checking one field, rather than trusting that de-id
+    happened somewhere upstream.
+    """
+
+    UNKNOWN = "unknown"
+    RAW = "raw"
+    DEIDENTIFIED = "deidentified"
+    SURROGATE = "surrogate"
+
+
 class Detection(BaseModel):
     """One PHI span found by a recognizer or the merger.
 
