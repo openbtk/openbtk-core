@@ -4,15 +4,12 @@ These are release blockers (docs/07_TEST_CHARTER.md section 3.5): a failure
 here stops a release regardless of schedule. Corresponds to the threats in
 docs/06_SECURITY_COMPLIANCE.md section 1.
 
-Scope note for M1: the doc's illustrative template
-(docs/07_TEST_CHARTER.md section 3.5) references run_full_pipeline(),
-labelled_phi_corpus, RunManifest.model_dump_json(), and DeidReport -- none of
-which exist yet. RunManifest is core/provenance.py's deferred second
-increment; DeidReport and the pipeline executor belong to M2/M3. What this
-file CAN test now is every PHI-adjacent surface that already exists: error
-context, logging, fixture hygiene, and (as an honest xfail, not a silent
-omission) the offsite-provider policy enforcement the architecture
-docstrings describe but that has not actually been wired up anywhere yet.
+Scope note from M1 (closed as of M3, tasks 3.6/3.7): the doc's illustrative
+template (docs/07_TEST_CHARTER.md section 3.5) references
+run_full_pipeline(), labelled_phi_corpus, RunManifest.model_dump_json(), and
+DeidReport. At M1 none of RunManifest, DeidReport or the pipeline executor
+existed yet. All three now do -- see test_phi_in_run_manifest.py for the
+test that gap was deferring to.
 """
 
 from __future__ import annotations

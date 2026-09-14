@@ -12,6 +12,20 @@ recorded here.
 **M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
 (in progress)**. Not yet released.
 
+### Fixed — M3
+- `openbtk.deid.engine.DeidEngine(mode=...)` crashed outright
+  (`AttributeError` in `_compute_config_hash`) when `mode` was passed as a
+  plain string rather than a `DeidMode` enum member — exactly what every
+  registry/config-driven construction supplies, since `StepConfig.params`
+  is JSON-safe only. Worse than a crash: `Transform`'s `self._mode is
+  DeidMode.REDACT`-style identity checks would have silently never matched
+  a plain string, falling through to the wrong (`DATE_SHIFT`) branch, had
+  the crash not caught it first. Found by actually constructing
+  `preprocessor.general.deidentify` through the real pipeline executor
+  (task 3.8), not assumed. Fixed by coercing `mode` via `DeidMode(mode)`
+  at the top of `DeidEngine.__init__` — idempotent for a real enum member,
+  and raises a clear `DeidError` for a genuinely invalid string.
+
 ### Added — M3 (clinical text + pipelines, tasks 3.1–3.7)
 - `openbtk.core.provenance`: `RunManifest`, `StepProvenance`, `DataDigest`,
   `GuardrailOutcome`, `TokenUsage` (ADR-0005's remaining provenance
@@ -42,6 +56,25 @@ recorded here.
   (`Pipeline(...).add(Step(...)).guard(...).run()`), plus
   `Pipeline.from_yaml`/`from_config`. Both surfaces converge on the same
   `PipelineConfig` before the executor ever sees them.
+
+### Added — M3 (task 3.8 — integration tests)
+- `tests/integration/test_clinical_text_pipeline.py`: load → deid → segment
+  → chunk, end-to-end, through the REAL executor and REAL `clinical_text`
+  components (`PlainTextLoader`, `DeidPreprocessor`, `SectionSegmenter`,
+  `SectionAwareChunker`) — not test doubles, unlike
+  `tests/unit/pipelines/test_executor.py`'s own suite. Since
+  `Pipeline.run()` returns only a `RunManifest`, never the processed data,
+  a small test-local guardrail attached at `"after:chunk"` captures chunk
+  text in-process for the test's own assertions — a legitimate use of the
+  documented guardrail-attachment mechanism, not a bypass. Covers both
+  `DeidMode.REDACT` and `DeidMode.SURROGATE` end to end, and a real
+  guardrail `BLOCK` halting the real pipeline.
+- `tests/security/test_phi_in_run_manifest.py`: the adversarial,
+  release-blocker test docs/07_TEST_CHARTER.md §3.5 names directly
+  (`test_no_phi_in_run_manifest`), deferred at M1 pending `RunManifest`
+  and the executor — both now exist. Runs the full labelled synthetic PHI
+  corpus through the real pipeline and asserts none of its planted
+  identifiers appear anywhere in the serialised manifest.
 
 ### Added — M3 (clinical text, tasks 3.1–3.5)
 - `openbtk.deid.schemas.DeidStatus` (`UNKNOWN`/`RAW`/`DEIDENTIFIED`/`SURROGATE`) —

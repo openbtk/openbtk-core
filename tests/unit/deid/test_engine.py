@@ -160,6 +160,39 @@ class TestRecallBiasFiltering:
             DeidEngine(recall_bias="nonexistent")  # type: ignore[arg-type]
 
 
+class TestModeAcceptsAPlainString:
+    """Every registry/config-driven construction supplies `mode` as a
+    plain string (StepConfig.params is JSON-safe only -- never a live
+    DeidMode member; docs/03_ARCHITECTURE.md section 7.3's own worked YAML
+    example writes `mode: surrogate` as bare text). Confirmed by direct
+    reproduction that, without coercion, this crashed outright
+    (AttributeError in _compute_config_hash) rather than merely behaving
+    oddly -- Transform's `self._mode is DeidMode.REDACT`-style identity
+    checks also silently never match a plain string, which this test
+    guards against regressing."""
+
+    def test_a_plain_string_mode_does_not_raise(self) -> None:
+        engine = DeidEngine(mode="redact", recognizers=["engine_test_probe"])  # type: ignore[arg-type]
+        result = engine.deidentify("Ref: 98765", patient_id="p1")
+        assert result.text == "Ref: [REDACTED]"
+
+    def test_a_plain_string_mode_behaves_identically_to_the_real_enum_member(
+        self,
+    ) -> None:
+        by_string = DeidEngine(
+            mode="surrogate",  # type: ignore[arg-type]
+            recognizers=["engine_test_probe"],
+        ).deidentify("Ref: 98765", patient_id="p1")
+        by_enum = DeidEngine(
+            mode=DeidMode.SURROGATE, recognizers=["engine_test_probe"]
+        ).deidentify("Ref: 98765", patient_id="p1")
+        assert by_string.text == by_enum.text
+
+    def test_an_unknown_mode_string_raises_deid_error(self) -> None:
+        with pytest.raises(DeidError, match="Unknown mode"):
+            DeidEngine(mode="not_a_real_mode")  # type: ignore[arg-type]
+
+
 class TestResidualRisk:
     def test_zero_detections_reports_medium_risk_with_an_honest_rationale(self) -> None:
         engine = DeidEngine(mode=DeidMode.REDACT, recognizers=["rule"])
