@@ -115,7 +115,7 @@ def test_reference_loader_raises_loader_error_on_bad_source() -> None:
 def test_reference_loader_error_context_contains_no_phi() -> None:
     """Even when the source itself contains something PHI-shaped, a raised
     error's message and context never echo it back."""
-    phi_like_value = "SSN-123-45-6789-PATIENT-JANE-DOE"
+    phi_like_value = "SSN-123-45-6789-PATIENT-JANE-DOE"  # phi-fixture-ok: adversarial
     loader = ReferenceLoader()
     # A str IS iterable char-by-char, so this doesn't hit the bad-source path
     # -- included only to show it's not the intended failure trigger below.

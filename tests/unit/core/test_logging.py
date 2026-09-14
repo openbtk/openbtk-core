@@ -67,10 +67,12 @@ class TestRedactionDefault:
         log = get_logger("test.module")
         out = _capture(
             lambda: log.info(
-                "test.event", record_id="MRN-00012345", patient_id="PT-999"
+                "test.event",
+                record_id="MRN-00012345",  # phi-fixture-ok: adversarial, proves hashing
+                patient_id="PT-999",
             )
         )
-        assert out["record_id"] != "MRN-00012345"
+        assert out["record_id"] != "MRN-00012345"  # phi-fixture-ok: adversarial
         assert out["patient_id"] != "PT-999"
         assert len(out["record_id"]) == 16
 
