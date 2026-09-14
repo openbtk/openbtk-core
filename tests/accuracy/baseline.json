@@ -1,0 +1,90 @@
+{
+  "note": "Checked-in baseline for tests/accuracy/test_deid_f1.py, computed against the DEFAULT_SEED labelled_phi_corpus using DeidEngine(recognizers=[\"rule\"]). name and geographic_subdivision are 0.0 recall by design at M2 -- RuleRecognizer does not attempt them (ADR-0006: that is NERRecognizer's job, task 2.4, not yet built). This is an honest floor, not a target: updating this file to reflect a real improvement (e.g. once NER lands) requires a PR that states why (docs/07_TEST_CHARTER.md section 3.6).",
+  "overall": {
+    "f1": 0.9333333333333333,
+    "precision": 1.0,
+    "recall": 0.875
+  },
+  "per_category": {
+    "account_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "certificate_license_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "date": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "device_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "email": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "fax_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "geographic_subdivision": {
+      "f1": 0.0,
+      "precision": 1.0,
+      "recall": 0.0
+    },
+    "health_plan_beneficiary_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "ip_address": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "medical_record_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "name": {
+      "f1": 0.0,
+      "precision": 1.0,
+      "recall": 0.0
+    },
+    "other_unique_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "phone_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "ssn": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "url": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "vehicle_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  }
+}

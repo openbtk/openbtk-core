@@ -42,7 +42,7 @@ _PATTERNS: dict[PHICategory, re.Pattern[str]] = {
     # check in _classify_phone_or_fax, not by the pattern itself.
     PHICategory.PHONE_NUMBER: re.compile(r"\(\d{3}\)\s\d{3}-\d{4}"),
     PHICategory.MEDICAL_RECORD_NUMBER: re.compile(r"\bMRN-?\d{4,}\b", re.IGNORECASE),
-    PHICategory.HEALTH_PLAN_BENEFICIARY_NUMBER: re.compile(r"\b[A-Z]{2}\d{6}\b"),
+    PHICategory.HEALTH_PLAN_BENEFICIARY_NUMBER: re.compile(r"\b[A-Z0-9]{2}\d{6}\b"),
     PHICategory.CERTIFICATE_LICENSE_NUMBER: re.compile(r"\bLIC-[A-Z0-9]{6}\b"),
     PHICategory.VEHICLE_IDENTIFIER: re.compile(r"\b[A-Z0-9]{3}-\d{4}\b"),
     PHICategory.DEVICE_IDENTIFIER: re.compile(r"\bSN-[A-Z0-9]{8}\b"),
