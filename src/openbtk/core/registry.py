@@ -91,6 +91,16 @@ _VALID_CATEGORIES = frozenset(
         "guardrail",
         "dataset",
         "terminology",
+        # "recognizer" backs openbtk.deid.recognizers.base.BaseRecognizer
+        # (ADR-0006) and its own RECOGNIZER_REGISTRY -- NOT one of the 12
+        # global registries below, and deliberately not added to
+        # _ALL_REGISTRIES/get_registry(): core must never import from
+        # openbtk.deid (layering, docs/03_ARCHITECTURE.md section 2), so the
+        # registry instance itself lives in openbtk.deid.recognizers.base,
+        # constructed with this Registry class. Reserving the category
+        # string here is the same pattern already used for "finetuner":
+        # the grammar knows the name before any registry backs it.
+        "recognizer",
     }
 )
 _VALID_SCOPES = frozenset(

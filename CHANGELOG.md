@@ -9,9 +9,72 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework.** Not yet released.
+**M1 — Core framework** and **M2 — De-identification (in progress)**. Not yet released.
 
-### Added
+### Added — M2 (de-identification, flagship)
+- `openbtk.deid.schemas`: `PHICategory` (the 18 HIPAA Safe Harbor
+  identifier categories), `DeidMode`, `Detection`, `RiskEstimate`,
+  `DeidReport`, `DeidResult`. No schema here can hold a matched PHI value —
+  `Detection` omits the detected text by construction.
+- `tests/fixtures/labelled_phi_corpus.py`: a deterministic, seeded,
+  synthetic corpus with ground-truth PHI spans, covering 16 of 18
+  categories (the other two, `FULL_FACE_PHOTO` and `BIOMETRIC_IDENTIFIER`,
+  are not text-representable at all).
+- `openbtk.deid.recognizers.base.BaseRecognizer` — the pluggable
+  detection extension point — plus its own `RECOGNIZER_REGISTRY`, and
+  `RuleRecognizer`, a regex-based recognizer covering the 14
+  format-detectable categories (SSN, email, URL, IPv4, date, phone/fax,
+  MRN, health plan ID, account number, license number, vehicle ID, device
+  ID, and a generic unique-identifier pattern). Deliberately does not
+  attempt `NAME` or `GEOGRAPHIC_SUBDIVISION` — no reliable regex shape
+  exists for either; that is NER's job.
+- `openbtk.deid.recognizers.ner.NERRecognizer` — spaCy-based NER (`en_core_web_sm`,
+  chosen over a scispaCy biomedical model, which targets scientific
+  entities rather than PERSON/GPE — see the module's own docstring) for
+  `NAME` and `GEOGRAPHIC_SUBDIVISION`. Optional (`pip install openbtk[text]`
+  + `python -m spacy download en_core_web_sm`), lazily imported — never
+  loaded by `openbtk.deid`'s default `DeidEngine()` configuration, and
+  requested explicitly via `recognizers=["rule", "ner"]`. A new
+  `OPENBTK_SLOW_TESTS=1` gate (`tests/conftest.py`) skips its
+  model-requiring tests by default, activating the `slow` marker
+  `pyproject.toml` had declared but not yet enforced.
+- `DeidEngine._shield_rule_detections_from_ner` — ADR-0006's own named
+  mitigation ("high-precision rules run first and their spans are excluded
+  from NER re-examination"), implemented after measuring that without it,
+  spaCy's false-positive PERSON spans on structured "Label: VALUE" text
+  (license numbers, URLs, even bare field labels) measurably regressed
+  already-perfect rule-covered categories via `SpanMerger`'s "widest span
+  wins" policy.
+- `openbtk.deid.merger.SpanMerger` — the accuracy-bearing component:
+  resolves overlapping detections (widest span wins, confidences combine
+  by noisy-OR, ties break by recognizer priority).
+- `openbtk.deid.consistency.ConsistencyStore` — stable, HMAC-keyed
+  original-to-surrogate mapping that never stores the original value.
+- `openbtk.deid.transforms.Transform` — applies `REDACT` / `TAG` / `HASH`
+  / `SURROGATE` / `DATE_SHIFT` to detected spans. Date shifting is
+  per-patient and interval-preserving, verified via a Hypothesis property
+  test.
+- `openbtk.deid.engine.DeidEngine` — the one-call public API
+  (`DeidEngine(...).deidentify(text, patient_id=...)`), wiring
+  recognizers → merge → recall-bias filtering → transform → report.
+- `tests/accuracy/`: two checked-in, real-measured F1 baselines. The
+  zero-extras default (`recognizers=("rule",)`): 14 of 16
+  text-representable categories at a perfect 1.0 F1, zero false positives,
+  overall F1 0.933. The full ensemble (`recognizers=["rule", "ner"]`,
+  `@pytest.mark.slow`): `NAME` recall 0.0 → 0.96 (precision drops to ~0.38
+  — a real, disclosed trade-off, not hidden); `GEOGRAPHIC_SUBDIVISION`
+  recall 0.0 → ~0.08 (Faker street addresses are not a shape
+  `en_core_web_sm` reliably recognizes); every rule-covered category
+  unaffected (1.0, protected by the shield above); overall F1 0.922.
+- Additional `tests/security/` coverage: `DeidReport` and de-identified-text
+  leak tests against the labelled corpus, including a quantitative,
+  slow-gated measurement of the full ensemble's real (partial) leak
+  reduction.
+
+**Remaining gap, tracked explicitly:** the opt-in `LLMVerifier` (task 2.9)
+is not yet built.
+
+### Added — M1 (core framework)
 - Exception hierarchy (`openbtk.core.errors`): one root `OpenBTKError` with
   structured, PHI-free `.context`, plus specific subclasses per failure mode
   (`ConfigError`, `RegistryError`, `PolicyError`, `LoaderError`,
