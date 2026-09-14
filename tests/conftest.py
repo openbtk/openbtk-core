@@ -49,11 +49,20 @@ def pytest_collection_modifyitems(
     remembering a flag every invocation.
     """
     del config
-    if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
-        return
     skip_slow = pytest.mark.skip(
         reason="requires model download; set OPENBTK_SLOW_TESTS=1"
     )
+    skip_benchmark = pytest.mark.skip(
+        reason="nightly only; set OPENBTK_RUN_BENCHMARKS=1"
+    )
+    run_slow = os.environ.get("OPENBTK_SLOW_TESTS") == "1"
+    run_benchmarks = os.environ.get("OPENBTK_RUN_BENCHMARKS") == "1"
     for item in items:
-        if "slow" in item.keywords:
+        if "slow" in item.keywords and not run_slow:
             item.add_marker(skip_slow)
+        # Same activate-a-declared-but-previously-unenforced-marker pattern
+        # as "slow" above: pyproject.toml has declared "benchmark: performance
+        # test, nightly only" since M1, but task 3.9 (tests/benchmark/test_memory.py)
+        # is the first test to actually carry it.
+        if "benchmark" in item.keywords and not run_benchmarks:
+            item.add_marker(skip_benchmark)

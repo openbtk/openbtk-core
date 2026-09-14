@@ -56,6 +56,18 @@ recorded here.
   (`Pipeline(...).add(Step(...)).guard(...).run()`), plus
   `Pipeline.from_yaml`/`from_config`. Both surfaces converge on the same
   `PipelineConfig` before the executor ever sees them.
+- `tests/benchmark/test_memory.py` (task 3.9, NFR-01): a real, checked-in
+  measurement, not a projection — 10,000,000 synthetic notes streamed
+  through the real four-stage pipeline (JSONL load → deid → segment →
+  chunk), peak RSS **0.056 GB**, against a 4 GB target. Nightly only
+  (`@pytest.mark.benchmark`, skipped by default; `OPENBTK_RUN_BENCHMARKS=1`
+  to opt in). Peak RSS measured with stdlib/`ctypes` only (no new
+  dependency): `resource.getrusage` on Linux/macOS, `GetProcessMemoryInfo`
+  on Windows, written as a single `sys.platform`-branched function so
+  mypy's platform-narrowing type-checks each branch only on its own
+  platform — verified directly against `--platform win32/linux/darwin`,
+  since CI's `mypy --strict` runs on `ubuntu-latest` while this was
+  authored and run on Windows.
 
 ### Added — M3 (task 3.8 — integration tests)
 - `tests/integration/test_clinical_text_pipeline.py`: load → deid → segment
