@@ -12,6 +12,12 @@ recorded here.
 **M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
 + Pipelines**, and **M4 — v0.1 Release (in progress)**. Not yet released.
 
+**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
+chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
+memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
+a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
+its own documented P1/optional status in the roadmap, not newly descoped.
+
 ### Added — M4 (packaging and contribution docs, task 4.3/4.4)
 - `CONTRIBUTING.md` — real dev-environment setup, the exact lint/type/test
   commands CI runs, coding conventions, and the PR process.
@@ -57,7 +63,7 @@ recorded here.
   literals into named constants so one marker covers all uses.
   `pre-commit run --all-files` is clean end to end for the first time.
 
-### Fixed
+### Fixed — M3
 - `MIMICNotesLoader`'s real tests (unit and contract suite) had no gate for
   pandas actually being installed, unlike every spaCy/medspaCy/transformers-
   dependent test elsewhere (all gated behind `OPENBTK_SLOW_TESTS`). CI's own
@@ -75,14 +81,6 @@ recorded here.
   absent) is unaffected, in its own un-gated class. Verified green in both
   a zero-extras venv (625 passed, up from 10 failed) and the full-extras
   venv (636 passed, unchanged) before this fix was considered done.
-
-**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
-chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
-memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
-a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
-its own documented P1/optional status in the roadmap, not newly descoped.
-
-### Fixed — M3
 - `openbtk.deid.engine.DeidEngine(mode=...)` crashed outright
   (`AttributeError` in `_compute_config_hash`) when `mode` was passed as a
   plain string rather than a `DeidMode` enum member — exactly what every
