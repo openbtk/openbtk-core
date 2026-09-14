@@ -58,6 +58,11 @@ text = [
     "presidio-analyzer>=2.2",
     "presidio-anonymizer>=2.2",
     "transformers>=4.40",
+    # openbtk.deid.recognizers.ner: general-purpose PERSON/GPE/LOC/FAC NER.
+    # Deliberately spaCy's own small English pipeline, not a scispaCy
+    # biomedical model -- see that module's docstring for why (scispaCy's
+    # off-the-shelf models target scientific entities, not names/places).
+    "spacy>=3.8",
 ]
 ehr = [
     "fhir.resources>=7.1",

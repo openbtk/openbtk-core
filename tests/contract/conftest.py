@@ -29,6 +29,7 @@ every check, not to be interesting.
 
 from __future__ import annotations
 
+import os
 import re
 from collections.abc import Iterator
 from typing import TYPE_CHECKING, Any, ClassVar, Literal
@@ -81,6 +82,24 @@ from openbtk.core.schemas import (
 )
 from openbtk.deid.recognizers.base import RECOGNIZER_REGISTRY, BaseRecognizer
 from openbtk.deid.schemas import Detection, PHICategory
+
+if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
+    # openbtk.deid.recognizers.ner is never imported by
+    # openbtk.deid.recognizers.__init__ (that module's own docstring: it
+    # would force every caller of openbtk.deid to pay for spaCy and a
+    # downloaded model). Left unimported, "recognizer.general.ner" simply
+    # never exists during collection, so it never reaches the parametrize
+    # below no matter which test files happen to import it later --
+    # collection order is NOT something to rely on here (verified: tests/
+    # contract is collected before tests/unit/deid, so a bare `import
+    # openbtk.deid.recognizers.ner` anywhere under tests/unit/deid/ arrives
+    # too late to be seen by this module's own parametrize evaluation).
+    # Importing it here, gated on the same env var
+    # tests/conftest.py's slow-test skip uses, is what makes "no
+    # exemptions" (CLAUDE.md rule 12) actually true for a model-backed
+    # recognizer once a developer opts in, rather than only true by
+    # accident of directory naming.
+    from openbtk.deid.recognizers import ner as _ner  # noqa: F401
 
 # ---------------------------------------------------------------------------
 # Shared fixture schemas -- deliberately NOT importing from any modality

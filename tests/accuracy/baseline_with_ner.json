@@ -1,0 +1,90 @@
+{
+  "note": "Checked-in baseline for the FULL ensemble (recognizers=[\"rule\", \"ner\"]), requires pip install openbtk[text] + python -m spacy download en_core_web_sm. Gated behind OPENBTK_SLOW_TESTS=1 (tests/accuracy/test_deid_f1_with_ner.py). Computed against the DEFAULT_SEED labelled_phi_corpus. NAME recall improves dramatically (0.0 -> 0.96) at a real precision cost (spaCy generic NER mistakes structured Label: VALUE text -- license numbers, URLs, even bare field labels -- for PERSON entities); GEOGRAPHIC_SUBDIVISION improves only marginally (0.0 -> 0.08) since Faker street addresses are not a shape en_core_web_sm recognizes well as GPE/LOC/FAC. DeidEngine shields rule detections from being overridden by overlapping NER ones (ADR-0006's own named mitigation), which is what keeps certificate_license_number and url at a perfect 1.0 despite NER's false positives elsewhere. This is an honest floor, not a target: a real biomedical/clinical-tuned NER model would very likely do better, especially on GEOGRAPHIC_SUBDIVISION. Updating this file requires a PR that states why (docs/07_TEST_CHARTER.md section 3.6).",
+  "overall": {
+    "f1": 0.9215686274509804,
+    "precision": 0.9038461538461539,
+    "recall": 0.94
+  },
+  "per_category": {
+    "account_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "certificate_license_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "date": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "device_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "email": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "fax_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "geographic_subdivision": {
+      "f1": 0.14814814814814814,
+      "precision": 1.0,
+      "recall": 0.08
+    },
+    "health_plan_beneficiary_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "ip_address": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "medical_record_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "name": {
+      "f1": 0.5393258426966292,
+      "precision": 0.375,
+      "recall": 0.96
+    },
+    "other_unique_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "phone_number": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "ssn": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "url": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    },
+    "vehicle_identifier": {
+      "f1": 1.0,
+      "precision": 1.0,
+      "recall": 1.0
+    }
+  }
+}

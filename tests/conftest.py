@@ -1,4 +1,5 @@
-"""Root conftest: fixtures shared across every test package.
+"""Root conftest: fixtures and collection hooks shared across every test
+package.
 
 docs/07_TEST_CHARTER.md section 3.5 uses ``labelled_phi_corpus`` as a
 fixture name directly in its example test signatures
@@ -16,11 +17,43 @@ than rebuilding it per test.
 
 from __future__ import annotations
 
+import os
+from typing import TYPE_CHECKING
+
 import pytest
 
 from fixtures.labelled_phi_corpus import LabelledPHICorpus, build_labelled_phi_corpus
+
+if TYPE_CHECKING:
+    from collections.abc import Sequence
 
 
 @pytest.fixture(scope="session")
 def labelled_phi_corpus() -> LabelledPHICorpus:
     return build_labelled_phi_corpus()
+
+
+def pytest_collection_modifyitems(
+    config: pytest.Config, items: Sequence[pytest.Item]
+) -> None:
+    """Activates the ``slow`` marker pyproject.toml declares but does not
+    yet enforce ("requires model downloads (skipped unless
+    OPENBTK_SLOW_TESTS=1)"): openbtk.deid.recognizers.ner's real
+    detect()-calling tests are the first thing that needs it, and every
+    future model-backed recognizer (task 2.9's LLM verifier included) gets
+    the same behaviour for free.
+
+    Deliberately an env var, not a CLI flag: CI and local "just run the
+    fast suite" both want the same zero-configuration default, and a
+    developer who wants the slow tests sets one variable rather than
+    remembering a flag every invocation.
+    """
+    del config
+    if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
+        return
+    skip_slow = pytest.mark.skip(
+        reason="requires model download; set OPENBTK_SLOW_TESTS=1"
+    )
+    for item in items:
+        if "slow" in item.keywords:
+            item.add_marker(skip_slow)

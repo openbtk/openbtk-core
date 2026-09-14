@@ -51,6 +51,16 @@ class BaseRecognizer(Component):
     (docs/04_API_DESIGN.md section 5). ``"ensemble"`` is reserved for
     ``SpanMerger``'s own output and is never a single recognizer's value."""
 
+    requires_model_download: ClassVar[bool] = False
+    """True for a recognizer whose ``detect()`` needs a downloaded model
+    (e.g. ``NERRecognizer``), as opposed to one that's ready the moment
+    it's constructed (``RuleRecognizer``). Lets test infrastructure (the
+    contract suite, CI) skip exercising ``detect()`` for such a recognizer
+    unless ``OPENBTK_SLOW_TESTS=1`` is set, without needing to know about
+    each concrete recognizer by name. Constructing an instance is always
+    cheap regardless -- CLAUDE.md rule 11 still applies; this flag is about
+    ``detect()``, never about ``__init__``."""
+
     @abstractmethod
     def detect(self, text: str) -> list[Detection]:
         """Find every PHI span this recognizer can find in ``text``.

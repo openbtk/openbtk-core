@@ -211,9 +211,73 @@ class TestConfigHash:
 
 class TestUnavailableRecognizer:
     def test_requesting_an_unbuilt_recognizer_fails_loudly_not_silently(self) -> None:
-        """ "ner" and "llm_verifier" are honest gaps at M2 (tasks 2.4/2.9) --
-        constructing an engine that requests one must raise immediately,
-        not silently skip it and run with a smaller ensemble than asked
-        for."""
-        with pytest.raises(RegistryError, match="ner"):
-            DeidEngine(recognizers=["ner"])
+        """ "llm_verifier" is an honest gap (task 2.9) -- constructing an
+        engine that requests it must raise immediately, not silently skip
+        it and run with a smaller ensemble than asked for."""
+        with pytest.raises(RegistryError, match="llm_verifier"):
+            DeidEngine(recognizers=["llm_verifier"])
+
+    def test_requesting_ner_lazily_imports_and_succeeds(self) -> None:
+        """ "ner" is NOT in _DEFAULT_RECOGNIZERS (it needs a downloaded
+        model), but requesting it explicitly must actually work -- this is
+        the regression guard for _resolve_recognizer's lazy submodule
+        import, independent of whether the real spaCy model is installed
+        in this environment (constructing a recognizer does no I/O)."""
+        engine = DeidEngine(recognizers=["ner"])
+        assert engine is not None
+
+
+class TestShieldRuleDetectionsFromNer:
+    """Unit-level coverage of DeidEngine._shield_rule_detections_from_ner,
+    the ADR-0006-named mitigation ("high-precision rules run first and
+    their spans are excluded from NER re-examination") that
+    tests/accuracy/test_deid_f1_with_ner.py's corpus-level numbers depend
+    on. Hand-built Detection objects -- no model required."""
+
+    @staticmethod
+    def _det(method: str, category: PHICategory, start: int, end: int) -> Detection:
+        return Detection(
+            category=category,
+            span=TextSpan(start=start, end=end, label=category.value, confidence=0.9),
+            confidence=0.9,
+            method=method,
+        )
+
+    def test_ner_detection_overlapping_a_rule_detection_is_dropped(self) -> None:
+        rule_det = self._det("rule", PHICategory.URL, 0, 10)
+        ner_det = self._det("ner", PHICategory.NAME, 5, 15)  # overlaps [5, 10)
+        result = DeidEngine._shield_rule_detections_from_ner([rule_det, ner_det])
+        assert result == [rule_det]
+
+    def test_non_overlapping_ner_detection_survives(self) -> None:
+        rule_det = self._det("rule", PHICategory.URL, 0, 10)
+        ner_det = self._det("ner", PHICategory.NAME, 20, 30)
+        result = DeidEngine._shield_rule_detections_from_ner([rule_det, ner_det])
+        assert rule_det in result
+        assert ner_det in result
+
+    def test_touching_but_not_overlapping_ner_detection_survives(self) -> None:
+        """Half-open [start, end) semantics, same as SpanMerger: a rule
+        span ending at 10 and an NER span starting at 10 share no
+        character."""
+        rule_det = self._det("rule", PHICategory.URL, 0, 10)
+        ner_det = self._det("ner", PHICategory.NAME, 10, 20)
+        result = DeidEngine._shield_rule_detections_from_ner([rule_det, ner_det])
+        assert ner_det in result
+
+    def test_two_overlapping_ner_detections_are_both_kept(self) -> None:
+        """The shield only ever removes "ner" detections that overlap a
+        "rule" one -- ner-vs-ner overlap is SpanMerger's job entirely,
+        unaffected by this pre-filter."""
+        ner_a = self._det("ner", PHICategory.NAME, 0, 10)
+        ner_b = self._det("ner", PHICategory.GEOGRAPHIC_SUBDIVISION, 5, 15)
+        result = DeidEngine._shield_rule_detections_from_ner([ner_a, ner_b])
+        assert result == [ner_a, ner_b]
+
+    def test_no_rule_detections_at_all_is_a_no_op(self) -> None:
+        ner_det = self._det("ner", PHICategory.NAME, 0, 10)
+        result = DeidEngine._shield_rule_detections_from_ner([ner_det])
+        assert result == [ner_det]
+
+    def test_empty_input_returns_empty_output(self) -> None:
+        assert DeidEngine._shield_rule_detections_from_ner([]) == []

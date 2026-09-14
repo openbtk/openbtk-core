@@ -27,7 +27,24 @@ recorded here.
   MRN, health plan ID, account number, license number, vehicle ID, device
   ID, and a generic unique-identifier pattern). Deliberately does not
   attempt `NAME` or `GEOGRAPHIC_SUBDIVISION` — no reliable regex shape
-  exists for either; that is NER's job (not yet built).
+  exists for either; that is NER's job.
+- `openbtk.deid.recognizers.ner.NERRecognizer` — spaCy-based NER (`en_core_web_sm`,
+  chosen over a scispaCy biomedical model, which targets scientific
+  entities rather than PERSON/GPE — see the module's own docstring) for
+  `NAME` and `GEOGRAPHIC_SUBDIVISION`. Optional (`pip install openbtk[text]`
+  + `python -m spacy download en_core_web_sm`), lazily imported — never
+  loaded by `openbtk.deid`'s default `DeidEngine()` configuration, and
+  requested explicitly via `recognizers=["rule", "ner"]`. A new
+  `OPENBTK_SLOW_TESTS=1` gate (`tests/conftest.py`) skips its
+  model-requiring tests by default, activating the `slow` marker
+  `pyproject.toml` had declared but not yet enforced.
+- `DeidEngine._shield_rule_detections_from_ner` — ADR-0006's own named
+  mitigation ("high-precision rules run first and their spans are excluded
+  from NER re-examination"), implemented after measuring that without it,
+  spaCy's false-positive PERSON spans on structured "Label: VALUE" text
+  (license numbers, URLs, even bare field labels) measurably regressed
+  already-perfect rule-covered categories via `SpanMerger`'s "widest span
+  wins" policy.
 - `openbtk.deid.merger.SpanMerger` — the accuracy-bearing component:
   resolves overlapping detections (widest span wins, confidences combine
   by noisy-OR, ties break by recognizer priority).
@@ -40,18 +57,22 @@ recorded here.
 - `openbtk.deid.engine.DeidEngine` — the one-call public API
   (`DeidEngine(...).deidentify(text, patient_id=...)`), wiring
   recognizers → merge → recall-bias filtering → transform → report.
-- `tests/accuracy/`: a de-identification F1 regression gate against a
-  checked-in baseline computed from a real run (not hand-typed) —
-  14 of 16 text-representable categories score a perfect 1.0 F1, zero
-  false positives overall.
+- `tests/accuracy/`: two checked-in, real-measured F1 baselines. The
+  zero-extras default (`recognizers=("rule",)`): 14 of 16
+  text-representable categories at a perfect 1.0 F1, zero false positives,
+  overall F1 0.933. The full ensemble (`recognizers=["rule", "ner"]`,
+  `@pytest.mark.slow`): `NAME` recall 0.0 → 0.96 (precision drops to ~0.38
+  — a real, disclosed trade-off, not hidden); `GEOGRAPHIC_SUBDIVISION`
+  recall 0.0 → ~0.08 (Faker street addresses are not a shape
+  `en_core_web_sm` reliably recognizes); every rule-covered category
+  unaffected (1.0, protected by the shield above); overall F1 0.922.
 - Additional `tests/security/` coverage: `DeidReport` and de-identified-text
-  leak tests against the labelled corpus.
+  leak tests against the labelled corpus, including a quantitative,
+  slow-gated measurement of the full ensemble's real (partial) leak
+  reduction.
 
-**Known gaps, tracked explicitly, not silently deferred:** `NERRecognizer`
-(task 2.4) and the opt-in `LLMVerifier` (task 2.9) are not yet built — real
-model-backed name/address detection remains open, and is marked with
-`xfail(strict=True)` tests wherever the gap is externally observable
-(de-identified text still contains undetected names/addresses today).
+**Remaining gap, tracked explicitly:** the opt-in `LLMVerifier` (task 2.9)
+is not yet built.
 
 ### Added — M1 (core framework)
 - Exception hierarchy (`openbtk.core.errors`): one root `OpenBTKError` with

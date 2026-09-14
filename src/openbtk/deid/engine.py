@@ -25,7 +25,9 @@ zero-detections case -- "found nothing" is never reported as proof of
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
+import importlib
 import json
 import uuid
 from typing import TYPE_CHECKING, Literal
@@ -60,9 +62,12 @@ _RECALL_BIAS_THRESHOLDS: dict[RecallBias, float] = {
 this module's docstring: a documented default, not a tuned one."""
 
 _DEFAULT_RECOGNIZERS: tuple[str, ...] = ("rule",)
-"""ADR-0006's example config includes "ner"; only "rule" exists as of M2 --
-requesting "ner" or "llm_verifier" today raises RegistryError naming the
-missing key, which is the honest failure mode until tasks 2.4/2.9 land."""
+"""ADR-0006's example config includes "ner" too; requesting it opts in
+explicitly rather than being on by default, since it needs a downloaded
+spaCy model (openbtk.deid.recognizers.ner's own docstring) that a bare
+`pip install openbtk[text]` doesn't fetch automatically. "llm_verifier"
+(task 2.9) doesn't exist yet -- requesting it raises RegistryError naming
+the missing key, the honest failure mode until it's built."""
 
 
 class DeidEngine:
@@ -99,9 +104,65 @@ class DeidEngine:
     def _resolve_recognizer(name: str) -> BaseRecognizer:
         """Recognizer short names (docs/04_API_DESIGN.md section 5's
         `recognizers=["rule", "ner"]`) map to `recognizer.general.<name>` --
-        every recognizer registered so far uses the "general" scope."""
+        every recognizer registered so far uses the "general" scope.
+
+        A recognizer module beyond `rule` (e.g. `ner`) is never imported by
+        `openbtk.deid.recognizers.__init__` -- that would force every
+        caller of `openbtk.deid`, including the default test suite, to pay
+        for spaCy and a downloaded model whether or not "ner" is ever
+        requested. So resolving a name not yet registered tries importing
+        `openbtk.deid.recognizers.<name>` first, as the one place that
+        opt-in actually happens. A name that isn't a real module (e.g. the
+        not-yet-built "llm_verifier") falls through to RECOGNIZER_REGISTRY's
+        own RegistryError, unchanged.
+        """
         key = f"recognizer.general.{name}"
+        if not RECOGNIZER_REGISTRY.is_registered(key):
+            # let RECOGNIZER_REGISTRY.create() raise its own RegistryError
+            # for a name that isn't a real module either
+            with contextlib.suppress(ModuleNotFoundError):
+                importlib.import_module(f"openbtk.deid.recognizers.{name}")
         return RECOGNIZER_REGISTRY.create(key)
+
+    @staticmethod
+    def _shield_rule_detections_from_ner(
+        detections: list[Detection],
+    ) -> list[Detection]:
+        """Drop any "ner" detection that overlaps a "rule" detection.
+
+        ADR-0006 names this exact mitigation ("high-precision rules run
+        first and their spans are excluded from NER re-examination where
+        safe") for performance; it turns out to matter just as much for
+        correctness. Measured directly against the labelled corpus: a
+        general-purpose NER model over structured "Label: VALUE" text
+        (license numbers, URLs, even a field label like "License:" alone)
+        produces wide, wrong PERSON spans that -- left unfiltered --
+        overlap and, per SpanMerger's documented "widest span wins" policy,
+        WIN OVER a correct, narrow, high-confidence rule detection. Without
+        this shield, adding NER measurably regressed already-perfect
+        categories (certificate_license_number, url) instead of only
+        adding NAME/GEOGRAPHIC_SUBDIVISION coverage -- caught by
+        tests/accuracy/, not assumed away.
+
+        Rule detections are never dropped by this filter, only NER ones;
+        two NER detections overlapping each other, or a "rule" overlapping
+        another "rule", still go to SpanMerger exactly as before.
+        """
+        rule_spans = [
+            (d.span.start, d.span.end) for d in detections if d.method == "rule"
+        ]
+        if not rule_spans:
+            return detections
+
+        def _overlaps_a_rule_span(detection: Detection) -> bool:
+            return any(
+                detection.span.start < end and start < detection.span.end
+                for start, end in rule_spans
+            )
+
+        return [
+            d for d in detections if d.method != "ner" or not _overlaps_a_rule_span(d)
+        ]
 
     def _compute_config_hash(self) -> str:
         # Deliberately NOT the consistency key -- this hash identifies the
@@ -140,6 +201,7 @@ class DeidEngine:
         raw_detections: list[Detection] = []
         for recognizer in self._recognizers:
             raw_detections.extend(recognizer.detect(text))
+        raw_detections = self._shield_rule_detections_from_ner(raw_detections)
 
         merged = self._merger.merge(raw_detections)
         threshold = _RECALL_BIAS_THRESHOLDS[self._recall_bias]

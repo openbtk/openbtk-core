@@ -3,13 +3,24 @@ satisfy (ADR-0006, CLAUDE.md rule 12 -- no exemptions).
 
 Parametrized over RECOGNIZER_REGISTRY.list_keys(): registering a recognizer
 anywhere automatically enrolls it here. At M2, that means
-tests/contract/conftest.py's ReferenceRecognizer plus RuleRecognizer once it
-registers itself.
+tests/contract/conftest.py's ReferenceRecognizer plus RuleRecognizer, and
+-- only when OPENBTK_SLOW_TESTS=1 (this module's own conftest.py imports it
+conditionally) -- NERRecognizer too.
+
+A key whose class has ``requires_model_download = True`` is skip-marked
+here, defensively, whenever OPENBTK_SLOW_TESTS isn't set -- a second layer
+on top of conftest.py's conditional import, in case some future change
+ever causes such a recognizer to be registered outside that guard. This is
+NOT how the "no exemptions" guarantee is normally kept (conftest.py's
+conditional import is): it exists so an accidental registration degrades
+to a clear skip instead of an opaque ``DeidError`` about a missing model in
+an unrelated test run.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+import os
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -23,6 +34,7 @@ if TYPE_CHECKING:
     from openbtk.deid.recognizers.base import BaseRecognizer
 
 _SAMPLE_TEXT = "Patient MRN-4821093, phone (555) 234-5678."  # phi-fixture-ok: synthetic
+_SLOW_TESTS_ENABLED = os.environ.get("OPENBTK_SLOW_TESTS") == "1"
 
 
 def _new_instance(key: str) -> BaseRecognizer:
@@ -32,7 +44,25 @@ def _new_instance(key: str) -> BaseRecognizer:
     return RECOGNIZER_REGISTRY.create(key)
 
 
-@pytest.mark.parametrize("key", RECOGNIZER_REGISTRY.list_keys())
+def _parametrized_keys() -> list[Any]:
+    params: list[Any] = []
+    for key in RECOGNIZER_REGISTRY.list_keys():
+        cls = RECOGNIZER_REGISTRY.get(key)
+        if cls.requires_model_download and not _SLOW_TESTS_ENABLED:
+            params.append(
+                pytest.param(
+                    key,
+                    marks=pytest.mark.skip(
+                        reason="requires model download; set OPENBTK_SLOW_TESTS=1"
+                    ),
+                )
+            )
+        else:
+            params.append(key)
+    return params
+
+
+@pytest.mark.parametrize("key", _parametrized_keys())
 class TestRecognizerContract:
     def test_detect_returns_a_list(self, key: str) -> None:
         result = _new_instance(key).detect(_SAMPLE_TEXT)
