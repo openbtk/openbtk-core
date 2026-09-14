@@ -101,10 +101,19 @@ if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
     # accident of directory naming.
     from openbtk.deid.recognizers import ner as _ner  # noqa: F401
 
+# Unconditional (unlike the NER import above): importing this package costs
+# nothing regardless of which loaders a caller ends up using -- none of its
+# three loaders need their optional dependency merely to be *defined*, only
+# to actually load (see that package's own __init__.py docstring). Ensures
+# PlainTextLoader/JSONLLoader/MIMICNotesLoader are always registered before
+# tests/contract/test_loader_contract.py's parametrize evaluates.
+from openbtk.data import clinical_text as _clinical_text  # noqa: F401
+
 # ---------------------------------------------------------------------------
-# Shared fixture schemas -- deliberately NOT importing from any modality
-# module (none exist yet); the contract layer tests base-class BEHAVIOUR,
-# not any modality's specific schema.
+# Shared fixture schemas -- deliberately NOT importing modality-specific
+# SCHEMAS from any modality module; the contract layer tests base-class
+# BEHAVIOUR, not any modality's specific schema. (The modality import right
+# above is only for its registration side effect.)
 # ---------------------------------------------------------------------------
 
 
