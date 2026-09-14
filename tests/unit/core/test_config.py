@@ -120,9 +120,15 @@ class TestFrozenAndForbidExtra:
             PipelineConfig(name="p", steps=[])
 
 
+# A synthetic, unassigned placeholder value standing in for a real secret --
+# proves env-var interpolation actually resolves a value, never a real
+# credential.
+_FAKE_INTERPOLATED_SECRET = "sk-real-secret-12345"  # pragma: allowlist secret
+
+
 class TestEnvVarInterpolation:
     def test_interpolates_a_real_env_var(self, tmp_path: Path) -> None:
-        os.environ["OPENBTK_TEST_PROBE_TOKEN"] = "sk-real-secret-12345"
+        os.environ["OPENBTK_TEST_PROBE_TOKEN"] = _FAKE_INTERPOLATED_SECRET
         try:
             yaml_file = tmp_path / "pipeline.yaml"
             yaml_file.write_text(
@@ -133,7 +139,7 @@ class TestEnvVarInterpolation:
                 "    params: {api_key: '${OPENBTK_TEST_PROBE_TOKEN}', plain: literal}\n"
             )
             cfg = PipelineConfig.from_yaml(yaml_file)
-            assert cfg.steps[0].params["api_key"] == "sk-real-secret-12345"
+            assert cfg.steps[0].params["api_key"] == _FAKE_INTERPOLATED_SECRET
             assert cfg.steps[0].params["plain"] == "literal"
         finally:
             del os.environ["OPENBTK_TEST_PROBE_TOKEN"]

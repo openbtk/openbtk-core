@@ -108,9 +108,9 @@ docs = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/openbtk/openbtk"
-Repository = "https://github.com/openbtk/openbtk"
-Issues = "https://github.com/openbtk/openbtk/issues"
+Homepage = "https://github.com/openbtk/openbtk-core"
+Repository = "https://github.com/openbtk/openbtk-core"
+Issues = "https://github.com/openbtk/openbtk-core/issues"
 
 [project.entry-points."openbtk.providers"]
 # Third-party packages register components here in their own pyproject.toml.

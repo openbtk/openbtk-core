@@ -474,6 +474,12 @@ class TestUnsupportedShapes:
         assert manifest.status == "failed"
 
 
+# A synthetic, unassigned, human-readable placeholder for a real API key --
+# never a real credential -- used only to prove the executor's secret
+# redaction actually fires.
+_FAKE_API_KEY = "sk-real-secret-value"  # pragma: allowlist secret
+
+
 class TestSecretRedaction:
     def test_a_credential_shaped_param_is_redacted_in_the_manifest(self) -> None:
         pipeline = Pipeline("test").add(
@@ -481,11 +487,11 @@ class TestSecretRedaction:
                 "load",
                 "loader.general.pipeline_test_lines",
                 source=[],
-                api_key="sk-real-secret-value",
+                api_key=_FAKE_API_KEY,
             )
         )
         manifest = pipeline.run()
-        assert "sk-real-secret-value" not in str(manifest.config)
+        assert _FAKE_API_KEY not in str(manifest.config)
         steps_list = manifest.config["steps"]
         assert isinstance(steps_list, list)
         first_step = steps_list[0]
