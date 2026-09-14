@@ -5,6 +5,12 @@ The single most architecturally important guarantee in this codebase
 large record can produce thousands of chunks; returning a list satisfies
 mypy and silently defeats the whole streaming memory guarantee the project
 is built around.
+
+``_make_record`` is the same per-key fixture extension point the loader
+contract suite's ``_make_source`` already established: M3's
+``SectionAwareChunker`` needs a real ``ClinicalTextRecord`` (it reads
+``record.sections``, which a generic ``FixtureRecord`` has no reason to
+carry), not the shared reference fixture's generic record type.
 """
 
 from __future__ import annotations
@@ -27,12 +33,23 @@ def _new_instance(key: str) -> BaseChunker[Any, Any]:
     return CHUNKER_REGISTRY.create(key)
 
 
+def _make_record(key: str, text: str) -> Any:
+    """A valid, minimal record for `key`, matching whatever RecordT that
+    chunker actually declares. Falls back to the shared generic
+    FixtureRecord for any key not listed here."""
+    if key.startswith("chunker.clinical_text."):
+        from openbtk.data.clinical_text.schemas import ClinicalTextRecord
+
+        return ClinicalTextRecord(record_id="r1", source="synthea", text=text)
+    return FixtureRecord(record_id="r1", text=text)
+
+
 @pytest.mark.parametrize("key", CHUNKER_REGISTRY.list_keys())
 class TestChunkerContract:
     def test_chunk_returns_iterator(self, key: str) -> None:
         """chunk() returns a genuine Iterator, not a list (ADR-0004)."""
         chunker = _new_instance(key)
-        record = FixtureRecord(record_id="r1", text="one two three")
+        record = _make_record(key, "one two three")
         result = chunker.chunk(record)
         assert isinstance(result, Iterator), (
             f"{key}: chunk() returned {type(result).__name__}, not an "
@@ -45,13 +62,13 @@ class TestChunkerContract:
         """A record below the minimum chunkable length yields zero chunks --
         that is valid, not an error (docs/04_API_DESIGN.md section 3)."""
         chunker = _new_instance(key)
-        record = FixtureRecord(record_id="r1", text="")
+        record = _make_record(key, "")
         chunks = list(chunker.chunk(record))
         assert chunks == []
 
     def test_chunks_validate_against_schema(self, key: str) -> None:
         chunker = _new_instance(key)
-        record = FixtureRecord(record_id="r1", text="alpha beta")
+        record = _make_record(key, "alpha beta")
         chunks = list(chunker.chunk(record))
         assert chunks, f"{key}: yielded nothing for a non-empty record"
         assert all(isinstance(c, BaseModel) for c in chunks)

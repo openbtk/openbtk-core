@@ -82,6 +82,24 @@ class DeidEngine:
         consistency_key: bytes | None = None,
         consistency_store: ConsistencyStore | None = None,
     ) -> None:
+        # DeidMode(mode) is idempotent for an already-real DeidMode member
+        # (enum construction from an existing member returns that member),
+        # and coerces a plain string -- which is exactly what every
+        # registry/config-driven construction supplies (StepConfig.params
+        # is JSON-safe only, never a live enum member; docs/03_ARCHITECTURE.md
+        # section 7.3's own worked YAML example passes `mode: surrogate` as
+        # a bare string). Without this, Transform's `self._mode is
+        # DeidMode.REDACT`-style identity checks silently never match a
+        # plain string, and _compute_config_hash's `self._mode.value`
+        # crashes outright -- both confirmed by direct reproduction, not
+        # assumed.
+        try:
+            mode = DeidMode(mode)
+        except ValueError as e:
+            raise DeidError(
+                f"Unknown mode {mode!r}.",
+                context={"mode": str(mode), "valid": [m.value for m in DeidMode]},
+            ) from e
         if recall_bias not in _RECALL_BIAS_THRESHOLDS:
             raise DeidError(
                 f"Unknown recall_bias {recall_bias!r}.",

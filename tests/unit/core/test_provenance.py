@@ -1,17 +1,29 @@
-"""Unit tests for openbtk.core.provenance (ModelIdentity, ComponentProvenance).
+"""Unit tests for openbtk.core.provenance: ModelIdentity, ComponentProvenance,
+DataDigest, TokenUsage, GuardrailOutcome, StepProvenance, RunManifest.
 
 Coverage gaps from the contract suite baseline: the floating-tag rejection
 validator is never exercised there (no reference implementation constructs
 a ModelIdentity), and ComponentProvenance's frozen/extra=forbid enforcement
-is never adversarially tested.
+is never adversarially tested. RunManifest and its parts have no contract
+suite at all (they are not a Component base class) -- tested directly here.
 """
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
+
 import pytest
 from pydantic import ValidationError
 
-from openbtk.core.provenance import ComponentProvenance, ModelIdentity
+from openbtk.core.provenance import (
+    ComponentProvenance,
+    DataDigest,
+    GuardrailOutcome,
+    ModelIdentity,
+    RunManifest,
+    StepProvenance,
+    TokenUsage,
+)
 
 
 class TestModelIdentity:
@@ -93,3 +105,162 @@ class TestComponentProvenance:
         dumped = cp.model_dump_json()
         restored = ComponentProvenance.model_validate_json(dumped)
         assert restored == cp
+
+
+class TestDataDigest:
+    def test_sha256_defaults_to_none(self) -> None:
+        assert DataDigest(uri="./notes", record_count=0).sha256 is None
+
+    def test_rejects_negative_record_count(self) -> None:
+        with pytest.raises(ValidationError):
+            DataDigest(uri="./notes", record_count=-1)
+
+    def test_rejects_empty_uri(self) -> None:
+        with pytest.raises(ValidationError):
+            DataDigest(uri="", record_count=0)
+
+    def test_is_frozen(self) -> None:
+        digest = DataDigest(uri="./notes", record_count=3)
+        with pytest.raises(ValidationError):
+            digest.record_count = 4  # type: ignore[misc]
+
+
+class TestTokenUsage:
+    def test_all_fields_default_to_zero(self) -> None:
+        usage = TokenUsage()
+        assert (usage.prompt_tokens, usage.completion_tokens, usage.total_tokens) == (
+            0,
+            0,
+            0,
+        )
+
+    def test_rejects_negative_tokens(self) -> None:
+        with pytest.raises(ValidationError):
+            TokenUsage(prompt_tokens=-1)
+
+
+class TestGuardrailOutcome:
+    def test_blocked_and_warned_default_to_zero(self) -> None:
+        outcome = GuardrailOutcome(
+            guardrail_key="guardrail.general.phi_leakage",
+            at="after:deid",
+            checked_count=10,
+        )
+        assert (outcome.blocked_count, outcome.warned_count) == (0, 0)
+
+    def test_sample_messages_default_to_empty_list(self) -> None:
+        outcome = GuardrailOutcome(
+            guardrail_key="guardrail.general.phi_leakage",
+            at="after:deid",
+            checked_count=0,
+        )
+        assert outcome.sample_messages == []
+
+    def test_rejects_negative_checked_count(self) -> None:
+        with pytest.raises(ValidationError):
+            GuardrailOutcome(
+                guardrail_key="guardrail.general.phi_leakage",
+                at="after:deid",
+                checked_count=-1,
+            )
+
+
+class TestStepProvenance:
+    def _component(self) -> ComponentProvenance:
+        return ComponentProvenance(
+            registry_key="loader.clinical_text.plain_text",
+            class_name="PlainTextLoader",
+            package_version="0.1.0",
+        )
+
+    def test_error_defaults_to_none(self) -> None:
+        sp = StepProvenance(
+            step_id="load",
+            component=self._component(),
+            records_in=0,
+            records_out=3,
+            status="success",
+        )
+        assert sp.error is None
+
+    def test_rejects_status_outside_success_or_failed(self) -> None:
+        with pytest.raises(ValidationError):
+            StepProvenance(
+                step_id="load",
+                component=self._component(),
+                records_in=0,
+                records_out=0,
+                status="partial",
+            )
+
+    def test_rejects_negative_counts(self) -> None:
+        with pytest.raises(ValidationError):
+            StepProvenance(
+                step_id="load",
+                component=self._component(),
+                records_in=-1,
+                records_out=0,
+                status="success",
+            )
+
+
+class TestRunManifest:
+    def _manifest(self, **overrides: object) -> RunManifest:
+        defaults: dict[str, object] = {
+            "run_id": "a1b2c3",
+            "status": "success",
+            "config": {"name": "probe", "steps": []},
+            "started_at": datetime(2026, 1, 1, tzinfo=UTC),
+        }
+        defaults.update(overrides)
+        return RunManifest(**defaults)
+
+    def test_manifest_version_defaults_to_1_0_0(self) -> None:
+        assert self._manifest().manifest_version == "1.0.0"
+
+    def test_ended_at_defaults_to_none(self) -> None:
+        assert self._manifest().ended_at is None
+
+    def test_steps_and_digests_and_outcomes_default_to_empty(self) -> None:
+        manifest = self._manifest()
+        assert manifest.steps == []
+        assert manifest.input_digests == []
+        assert manifest.guardrail_outcomes == []
+
+    def test_token_usage_defaults_to_none(self) -> None:
+        assert self._manifest().token_usage is None
+
+    def test_rejects_status_outside_the_three_known_values(self) -> None:
+        with pytest.raises(ValidationError):
+            self._manifest(status="cancelled")
+
+    def test_is_frozen(self) -> None:
+        manifest = self._manifest()
+        with pytest.raises(ValidationError):
+            manifest.status = "failed"  # type: ignore[misc]
+
+    def test_round_trips_through_json_with_nested_steps(self) -> None:
+        manifest = self._manifest(
+            steps=[
+                StepProvenance(
+                    step_id="load",
+                    component=ComponentProvenance(
+                        registry_key="loader.general.x",
+                        class_name="X",
+                        package_version="0.1.0",
+                    ),
+                    records_in=0,
+                    records_out=3,
+                    status="success",
+                )
+            ]
+        )
+        restored = RunManifest.model_validate_json(manifest.model_dump_json())
+        assert restored == manifest
+
+    def test_config_never_needs_to_be_a_pipelineconfig_instance(self) -> None:
+        """RunManifest.config is a plain, JSON-safe snapshot -- see this
+        module's own docstring for why (a layering cycle, not a stylistic
+        choice)."""
+        manifest = self._manifest(config={"anything": ["json", "safe", 1, None]})
+        assert manifest.config == {"anything": ["json", "safe", 1, None]}

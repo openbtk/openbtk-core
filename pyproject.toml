@@ -63,6 +63,11 @@ text = [
     # biomedical model -- see that module's docstring for why (scispaCy's
     # off-the-shelf models target scientific entities, not names/places).
     "spacy>=3.8",
+    # openbtk.data.clinical_text.loaders.MIMICNotesLoader: chunked CSV
+    # reading (docs/05_DATA_MODALITY_SPEC.md section 1.2). Also listed
+    # under `ehr` (its own, larger reason there); duplicated here
+    # deliberately since clinical_text must not depend on the ehr extra.
+    "pandas>=2.2",
 ]
 ehr = [
     "fhir.resources>=7.1",
@@ -244,7 +249,7 @@ markers = [
     "slow: requires model downloads (skipped unless OPENBTK_SLOW_TESTS=1)",
     "network: requires network access",
     "gpu: requires CUDA",
-    "benchmark: performance test, nightly only",
+    "benchmark: performance test, nightly only (skipped unless OPENBTK_RUN_BENCHMARKS=1)",
     "credentialed: needs user-supplied restricted data (i2b2/MIMIC); always skipped in CI",
 ]
 filterwarnings = ["error", "ignore::DeprecationWarning"]

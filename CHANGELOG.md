@@ -9,7 +9,135 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework** and **M2 — De-identification (in progress)**. Not yet released.
+**M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
++ Pipelines**. Not yet released.
+
+**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
+chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
+memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
+a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
+its own documented P1/optional status in the roadmap, not newly descoped.
+
+### Fixed — M3
+- `openbtk.deid.engine.DeidEngine(mode=...)` crashed outright
+  (`AttributeError` in `_compute_config_hash`) when `mode` was passed as a
+  plain string rather than a `DeidMode` enum member — exactly what every
+  registry/config-driven construction supplies, since `StepConfig.params`
+  is JSON-safe only. Worse than a crash: `Transform`'s `self._mode is
+  DeidMode.REDACT`-style identity checks would have silently never matched
+  a plain string, falling through to the wrong (`DATE_SHIFT`) branch, had
+  the crash not caught it first. Found by actually constructing
+  `preprocessor.general.deidentify` through the real pipeline executor
+  (task 3.8), not assumed. Fixed by coercing `mode` via `DeidMode(mode)`
+  at the top of `DeidEngine.__init__` — idempotent for a real enum member,
+  and raises a clear `DeidError` for a genuinely invalid string.
+
+### Added — M3 (clinical text + pipelines, tasks 3.1–3.7)
+- `openbtk.core.provenance`: `RunManifest`, `StepProvenance`, `DataDigest`,
+  `GuardrailOutcome`, `TokenUsage` (ADR-0005's remaining provenance
+  primitives, deferred since M1 pending `PipelineConfig`). `RunManifest.config`
+  is a serialised `dict` snapshot, not a `PipelineConfig` object — typing it
+  that way would make `core.provenance` import `core.config`, which imports
+  `core.registry`, which imports `core.base`, which imports
+  `core.provenance` — a real layering cycle. `GuardrailOutcome` aggregates
+  per (guardrail, attachment point) rather than one entry per record, to
+  keep a manifest itself bounded at real corpus scale.
+- `openbtk.pipelines.executor` — the streaming DAG executor
+  (docs/03_ARCHITECTURE.md §7): topologically orders steps, streams records
+  through them lazily (`Iterator` composition, no materialisation), and
+  always emits a `RunManifest` — success or failure, there is no manifest-off
+  switch. Scoped, disclosed rather than silently assumed: a single linear
+  chain only (no fan-in, no fan-out — genuine branching would need
+  `itertools.tee`-style broadcast with its own memory trade-offs, not built
+  yet); only `loader`/`preprocessor`/`chunker`/`segmenter` steps are
+  executable (no real `embedding`/`vectorstore` component exists yet to
+  validate a dispatch path against). A step's `StepProvenance.status` is
+  `"failed"` only for the step whose OWN transformation call raised, found
+  by wrapping each step's own component call (not a shared generic
+  reraise) so an upstream failure is never misattributed downstream.
+  Redacts any `key|token|secret|password|credential`-shaped config value
+  before embedding the config snapshot in the manifest
+  (docs/06_SECURITY_COMPLIANCE.md §3.7).
+- `openbtk.pipelines.pipeline.{Pipeline, Step}` — the public builder API
+  (`Pipeline(...).add(Step(...)).guard(...).run()`), plus
+  `Pipeline.from_yaml`/`from_config`. Both surfaces converge on the same
+  `PipelineConfig` before the executor ever sees them.
+- `tests/benchmark/test_memory.py` (task 3.9, NFR-01): a real, checked-in
+  measurement, not a projection — 10,000,000 synthetic notes streamed
+  through the real four-stage pipeline (JSONL load → deid → segment →
+  chunk), peak RSS **0.056 GB**, against a 4 GB target. Nightly only
+  (`@pytest.mark.benchmark`, skipped by default; `OPENBTK_RUN_BENCHMARKS=1`
+  to opt in). Peak RSS measured with stdlib/`ctypes` only (no new
+  dependency): `resource.getrusage` on Linux/macOS, `GetProcessMemoryInfo`
+  on Windows, written as a single `sys.platform`-branched function so
+  mypy's platform-narrowing type-checks each branch only on its own
+  platform — verified directly against `--platform win32/linux/darwin`,
+  since CI's `mypy --strict` runs on `ubuntu-latest` while this was
+  authored and run on Windows.
+
+### Added — M3 (task 3.8 — integration tests)
+- `tests/integration/test_clinical_text_pipeline.py`: load → deid → segment
+  → chunk, end-to-end, through the REAL executor and REAL `clinical_text`
+  components (`PlainTextLoader`, `DeidPreprocessor`, `SectionSegmenter`,
+  `SectionAwareChunker`) — not test doubles, unlike
+  `tests/unit/pipelines/test_executor.py`'s own suite. Since
+  `Pipeline.run()` returns only a `RunManifest`, never the processed data,
+  a small test-local guardrail attached at `"after:chunk"` captures chunk
+  text in-process for the test's own assertions — a legitimate use of the
+  documented guardrail-attachment mechanism, not a bypass. Covers both
+  `DeidMode.REDACT` and `DeidMode.SURROGATE` end to end, and a real
+  guardrail `BLOCK` halting the real pipeline.
+- `tests/security/test_phi_in_run_manifest.py`: the adversarial,
+  release-blocker test docs/07_TEST_CHARTER.md §3.5 names directly
+  (`test_no_phi_in_run_manifest`), deferred at M1 pending `RunManifest`
+  and the executor — both now exist. Runs the full labelled synthetic PHI
+  corpus through the real pipeline and asserts none of its planted
+  identifiers appear anywhere in the serialised manifest.
+
+### Added — M3 (clinical text, tasks 3.1–3.5)
+- `openbtk.deid.schemas.DeidStatus` (`UNKNOWN`/`RAW`/`DEIDENTIFIED`/`SURROGATE`) —
+  lives in `deid`, not `clinical_text`, because `ehr` needs it too and the
+  layering rule keeps modalities independent of each other.
+- `openbtk.data.clinical_text.schemas`: `ClinicalTextRecord` and
+  `ClinicalTextChunk` (docs/05_DATA_MODALITY_SPEC.md §1.1). `sections` maps
+  labels to `TextSpan`s into `text`, not copies of the text itself. A real
+  `timestamp` validator rejects naive datetimes at the schema boundary.
+- `openbtk.data.clinical_text.loaders`: `PlainTextLoader`, `JSONLLoader`,
+  `MIMICNotesLoader` (streaming, chunked `pandas.read_csv`, file handle
+  closed explicitly).
+- `openbtk.data.clinical_text.preprocessing.SectionSegmenter` — two
+  backends: a dependency-free rule-based header matcher, and a real
+  `medspacy` `Sectionizer` wrapper (opt-in, `text` extra).
+- `openbtk.data.clinical_text.tokenization`: `count_tokens_approximate`
+  (whitespace, always available) and `count_tokens_exact` (a real
+  HuggingFace tokenizer, opt-in, cached per model name).
+- `openbtk.data.clinical_text.chunking`: `FixedTokenChunker` and
+  `SectionAwareChunker` — the modality spec's own "part that matters",
+  genuinely net-new logic. Sentence-then-word-boundary packing with the
+  SAME token counter used for both the cut decision and the reported
+  `token_count`, closing a v1 defect where the two could disagree. Verified
+  against two Hypothesis properties from docs/07_TEST_CHARTER.md §3.4: no
+  chunk exceeds `max_tokens`, and (for any text with at least one
+  non-whitespace character) concatenated chunk texts reconstruct the
+  source exactly. A chunk that would carry zero real tokens (a
+  whitespace-only body) is omitted rather than fabricated to satisfy the
+  schema's `token_count >= 1` constraint.
+- `tests/contract/test_chunker_contract.py` generalized to a per-key record
+  factory (`_make_record`), the same pattern already used for the loader
+  contract suite: a modality chunker's real `RecordT` need not match the
+  shared reference fixture's generic shape.
+- `openbtk.data.clinical_text.preprocessing.DeidPreprocessor`
+  (`preprocessor.general.deidentify`) — a thin `BasePreprocessor` adapter
+  wrapping `openbtk.deid.DeidEngine`: de-identifies `record.text`, updates
+  `deid_status`, and preserves the full `DeidReport` (identifiers and
+  counts only, never PHI values) under `record.metadata["deid_report"]`
+  rather than discarding it, for a future pipeline stage to attach to a
+  `RunManifest`. When `record.patient_ref` is absent, falls back to
+  `record.record_id` for SURROGATE/DATE_SHIFT consistency — a disclosed
+  narrowing to per-record consistency, not a silent one.
+- `tests/contract/test_preprocessor_contract.py` generalized the same way
+  as the loader and chunker suites, for the same reason: `DeidPreprocessor`
+  genuinely reads `record.patient_ref`.
 
 ### Added — M2 (de-identification, flagship)
 - `openbtk.deid.schemas`: `PHICategory` (the 18 HIPAA Safe Harbor
