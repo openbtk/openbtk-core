@@ -8,6 +8,7 @@ from openbtk.core.errors import (
     AuthenticationError,
     ConfigError,
     DatasetError,
+    DeidError,
     GuardrailViolation,
     LoaderError,
     MissingDependencyError,
@@ -35,6 +36,7 @@ _ALL_SUBCLASSES = [
     RetrievalError,
     TerminologyError,
     DatasetError,
+    DeidError,
     GuardrailViolation,
     PluginError,
 ]

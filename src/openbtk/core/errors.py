@@ -118,6 +118,17 @@ class DatasetError(OpenBTKError):
     network error while accessing a named dataset."""
 
 
+class DeidError(OpenBTKError):
+    """A de-identification component failed: a malformed consistency key,
+    an unresolvable transform, or a recognizer failure.
+
+    Never carries the text being de-identified or any detected value --
+    only identifiers (document id, category, recognizer key). The whole
+    point of ``openbtk.deid`` is to keep PHI from spreading; an exception
+    about it must not become a new place PHI spread to.
+    """
+
+
 class GuardrailViolation(OpenBTKError):  # noqa: N818 -- name fixed by docs/04_API_DESIGN.md §8
     """A guardrail result was severity BLOCK and the pipeline is configured
     to raise rather than continue.
