@@ -16,6 +16,6 @@ nothing regardless of which loaders a caller ends up using.
 
 from __future__ import annotations
 
-from openbtk.data.clinical_text import loaders
+from openbtk.data.clinical_text import loaders, preprocessing
 
-__all__ = ["loaders"]
+__all__ = ["loaders", "preprocessing"]
