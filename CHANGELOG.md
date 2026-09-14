@@ -9,9 +9,51 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework.** Not yet released.
+**M1 — Core framework** and **M2 — De-identification (in progress)**. Not yet released.
 
-### Added
+### Added — M2 (de-identification, flagship)
+- `openbtk.deid.schemas`: `PHICategory` (the 18 HIPAA Safe Harbor
+  identifier categories), `DeidMode`, `Detection`, `RiskEstimate`,
+  `DeidReport`, `DeidResult`. No schema here can hold a matched PHI value —
+  `Detection` omits the detected text by construction.
+- `tests/fixtures/labelled_phi_corpus.py`: a deterministic, seeded,
+  synthetic corpus with ground-truth PHI spans, covering 16 of 18
+  categories (the other two, `FULL_FACE_PHOTO` and `BIOMETRIC_IDENTIFIER`,
+  are not text-representable at all).
+- `openbtk.deid.recognizers.base.BaseRecognizer` — the pluggable
+  detection extension point — plus its own `RECOGNIZER_REGISTRY`, and
+  `RuleRecognizer`, a regex-based recognizer covering the 14
+  format-detectable categories (SSN, email, URL, IPv4, date, phone/fax,
+  MRN, health plan ID, account number, license number, vehicle ID, device
+  ID, and a generic unique-identifier pattern). Deliberately does not
+  attempt `NAME` or `GEOGRAPHIC_SUBDIVISION` — no reliable regex shape
+  exists for either; that is NER's job (not yet built).
+- `openbtk.deid.merger.SpanMerger` — the accuracy-bearing component:
+  resolves overlapping detections (widest span wins, confidences combine
+  by noisy-OR, ties break by recognizer priority).
+- `openbtk.deid.consistency.ConsistencyStore` — stable, HMAC-keyed
+  original-to-surrogate mapping that never stores the original value.
+- `openbtk.deid.transforms.Transform` — applies `REDACT` / `TAG` / `HASH`
+  / `SURROGATE` / `DATE_SHIFT` to detected spans. Date shifting is
+  per-patient and interval-preserving, verified via a Hypothesis property
+  test.
+- `openbtk.deid.engine.DeidEngine` — the one-call public API
+  (`DeidEngine(...).deidentify(text, patient_id=...)`), wiring
+  recognizers → merge → recall-bias filtering → transform → report.
+- `tests/accuracy/`: a de-identification F1 regression gate against a
+  checked-in baseline computed from a real run (not hand-typed) —
+  14 of 16 text-representable categories score a perfect 1.0 F1, zero
+  false positives overall.
+- Additional `tests/security/` coverage: `DeidReport` and de-identified-text
+  leak tests against the labelled corpus.
+
+**Known gaps, tracked explicitly, not silently deferred:** `NERRecognizer`
+(task 2.4) and the opt-in `LLMVerifier` (task 2.9) are not yet built — real
+model-backed name/address detection remains open, and is marked with
+`xfail(strict=True)` tests wherever the gap is externally observable
+(de-identified text still contains undetected names/addresses today).
+
+### Added — M1 (core framework)
 - Exception hierarchy (`openbtk.core.errors`): one root `OpenBTKError` with
   structured, PHI-free `.context`, plus specific subclasses per failure mode
   (`ConfigError`, `RegistryError`, `PolicyError`, `LoaderError`,
