@@ -9,7 +9,41 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework** and **M2 — De-identification (in progress)**. Not yet released.
+**M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
+(in progress)**. Not yet released.
+
+### Added — M3 (clinical text, tasks 3.1–3.5)
+- `openbtk.deid.schemas.DeidStatus` (`UNKNOWN`/`RAW`/`DEIDENTIFIED`/`SURROGATE`) —
+  lives in `deid`, not `clinical_text`, because `ehr` needs it too and the
+  layering rule keeps modalities independent of each other.
+- `openbtk.data.clinical_text.schemas`: `ClinicalTextRecord` and
+  `ClinicalTextChunk` (docs/05_DATA_MODALITY_SPEC.md §1.1). `sections` maps
+  labels to `TextSpan`s into `text`, not copies of the text itself. A real
+  `timestamp` validator rejects naive datetimes at the schema boundary.
+- `openbtk.data.clinical_text.loaders`: `PlainTextLoader`, `JSONLLoader`,
+  `MIMICNotesLoader` (streaming, chunked `pandas.read_csv`, file handle
+  closed explicitly).
+- `openbtk.data.clinical_text.preprocessing.SectionSegmenter` — two
+  backends: a dependency-free rule-based header matcher, and a real
+  `medspacy` `Sectionizer` wrapper (opt-in, `text` extra).
+- `openbtk.data.clinical_text.tokenization`: `count_tokens_approximate`
+  (whitespace, always available) and `count_tokens_exact` (a real
+  HuggingFace tokenizer, opt-in, cached per model name).
+- `openbtk.data.clinical_text.chunking`: `FixedTokenChunker` and
+  `SectionAwareChunker` — the modality spec's own "part that matters",
+  genuinely net-new logic. Sentence-then-word-boundary packing with the
+  SAME token counter used for both the cut decision and the reported
+  `token_count`, closing a v1 defect where the two could disagree. Verified
+  against two Hypothesis properties from docs/07_TEST_CHARTER.md §3.4: no
+  chunk exceeds `max_tokens`, and (for any text with at least one
+  non-whitespace character) concatenated chunk texts reconstruct the
+  source exactly. A chunk that would carry zero real tokens (a
+  whitespace-only body) is omitted rather than fabricated to satisfy the
+  schema's `token_count >= 1` constraint.
+- `tests/contract/test_chunker_contract.py` generalized to a per-key record
+  factory (`_make_record`), the same pattern already used for the loader
+  contract suite: a modality chunker's real `RecordT` need not match the
+  shared reference fixture's generic shape.
 
 ### Added — M2 (de-identification, flagship)
 - `openbtk.deid.schemas`: `PHICategory` (the 18 HIPAA Safe Harbor
