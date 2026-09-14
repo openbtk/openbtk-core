@@ -168,6 +168,14 @@ python_version = "3.11"
 strict = true
 warn_unreachable = true
 files = ["src/openbtk"]
+# Pydantic's official plugin, required for mypy to correctly understand
+# default_factory=SomeModel and Field(None, ...)-style optional fields in
+# synthesized __init__ signatures. Without it, mypy's generic stub-based
+# inference produces false "missing argument" / "incompatible default_factory"
+# errors on patterns that are entirely valid Pydantic v2 -- found the hard way
+# in core/config.py, whose earlier models (dict/list default_factory only)
+# never exercised this gap.
+plugins = ["pydantic.mypy"]
 
 [[tool.mypy.overrides]]
 module = [
