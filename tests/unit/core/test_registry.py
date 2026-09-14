@@ -210,13 +210,18 @@ class TestGetRegistry:
 
         assert get_registry("loader") is LOADER_REGISTRY
 
-    @pytest.mark.parametrize("category", ["finetuner", "totally_made_up"])
+    @pytest.mark.parametrize("category", ["finetuner", "recognizer", "totally_made_up"])
     def test_get_registry_rejects_reserved_and_unknown_categories(
         self, category: str
     ) -> None:
         """ "finetuner" is reserved in the key grammar (docs/04_API_DESIGN.md
         section 1) but has no backing base class yet -- it must be rejected
-        exactly like any other unknown category until BaseFineTuner exists."""
+        exactly like any other unknown category until BaseFineTuner exists.
+        "recognizer" IS backed by a real class (BaseRecognizer,
+        openbtk.deid.recognizers.base) but deliberately lives in its own
+        Registry instance, not one of core's 12 -- get_registry() must
+        reject it exactly the same way, since core never imports from
+        openbtk.deid (layering)."""
         with pytest.raises(RegistryError):
             get_registry(category)
 
