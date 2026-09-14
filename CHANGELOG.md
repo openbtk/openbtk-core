@@ -38,6 +38,28 @@ its own documented P1/optional status in the roadmap, not newly descoped.
   `--doctest-modules` gives every docstring `Example`, applied to the
   README for the first time.
 
+### Added — M4 (docs site, task 4.5)
+- `mkdocs.yml` + `mkdocs/` — a real, build-verified MkDocs Material site
+  (home, quick start, and an API reference generated from the actual
+  source docstrings via `mkdocstrings`, not hand-duplicated). Lives in
+  `mkdocs/`, not `docs/` — this repository's own `docs/` is the
+  deliberately git-excluded internal design-doc folder (confirmed via
+  `git ls-files`), so a public site generated in CI could never read from
+  it regardless of intent.
+- `.github/workflows/docs.yml` — builds on every push to `main` that
+  touches the site or the source, and deploys with `mike` under a `dev`
+  version (not aliased to `latest`, since no tagged release exists yet).
+  Both the build and the `mike deploy`/`set-default` invocations were
+  exercised directly (a local, unpushed `mike deploy dev` really produces
+  a `gh-pages` commit) before being written into the workflow, not
+  assumed to work from reading `mike`'s docs alone.
+- Disclosed, not silently worked around: `mkdocs build --strict` fails on
+  two real but harmless `mkdocs_autorefs` false positives, where a
+  doctest `Example`'s own OUTPUT line (a plain Python list-of-strings
+  literal) is misread as an attempted cross-reference. The rendered pages
+  are correct either way; `docs.yml` builds without `--strict` for this
+  reason, recorded as a comment in `mkdocs.yml` itself.
+
 ### Fixed — M4
 - `pyproject.toml`'s `[project.urls]` pointed at
   `github.com/openbtk/openbtk` — the actual repository is
