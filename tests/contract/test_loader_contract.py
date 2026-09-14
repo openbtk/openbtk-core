@@ -82,6 +82,15 @@ class TestLoaderContract:
         assert records, f"{key}: yielded nothing for a two-item source"
         assert all(isinstance(r, BaseModel) for r in records)
 
+    def test_load_all_matches_load(self, key: str) -> None:
+        """The base class's load_all() default (list(self.load(source)))
+        must agree with load() itself -- it is a documented memory hazard,
+        not an alternate code path with its own semantics."""
+        loader = _new_instance(key)
+        via_load = list(loader.load(iter(["p", "q"])))
+        via_load_all = loader.load_all(iter(["p", "q"]))
+        assert via_load_all == via_load
+
     def test_provenance_is_serialisable(self, key: str) -> None:
         """Component.provenance() round-trips through JSON -- required for
         it to ever land safely in a run manifest."""
