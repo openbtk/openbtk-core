@@ -57,6 +57,25 @@ recorded here.
   literals into named constants so one marker covers all uses.
   `pre-commit run --all-files` is clean end to end for the first time.
 
+### Fixed
+- `MIMICNotesLoader`'s real tests (unit and contract suite) had no gate for
+  pandas actually being installed, unlike every spaCy/medspaCy/transformers-
+  dependent test elsewhere (all gated behind `OPENBTK_SLOW_TESTS`). CI's own
+  `test-core` job installs with **zero optional extras** (NFR-10) across a
+  9-combination OS/Python matrix — a condition never actually exercised
+  during M3 development, since every venv used to build and verify it
+  happened to have the `text` extra installed. Reproduced directly in a
+  genuinely clean venv (`pip install -e ".[dev]"` only, matching CI's exact
+  command): 10 tests failed with `MissingDependencyError`/collection
+  errors. Fixed by skipping `TestMIMICNotesLoader`'s pandas-requiring tests
+  (`@pytest.mark.skipif`) and the contract suite's
+  `loader.clinical_text.mimic_notes` parametrization when pandas is not
+  importable — the one test that verifies the *missing*-dependency error
+  path itself (which mocks `require()` and never needs pandas genuinely
+  absent) is unaffected, in its own un-gated class. Verified green in both
+  a zero-extras venv (625 passed, up from 10 failed) and the full-extras
+  venv (636 passed, unchanged) before this fix was considered done.
+
 **M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
 chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
 memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
