@@ -49,6 +49,7 @@ from openbtk.core.base import (
 )
 from openbtk.core.errors import RegistryError
 from openbtk.core.logging import get_logger
+from openbtk.core.plugins import load_plugins
 
 log = get_logger(__name__)
 
@@ -252,9 +253,15 @@ class Registry(Generic[T]):
     def get(self, key: str) -> type[T]:
         """Return the registered class for ``key``.
 
+        Triggers plugin discovery on first call (docs/04_API_DESIGN.md
+        section 10) -- lookup methods are where "first registry access"
+        actually happens; register() is what plugins themselves call, so
+        triggering discovery there would be re-entrant.
+
         Raises:
             RegistryError: If ``key`` is not registered.
         """
+        load_plugins()
         if key not in self._items:
             raise RegistryError(
                 f"Registry {self._category!r}: key {key!r} not found. "
@@ -307,11 +314,19 @@ class Registry(Generic[T]):
         return self.create(key, **params)
 
     def list_keys(self) -> list[str]:
-        """Return every registered key and alias, sorted."""
+        """Return every registered key and alias, sorted.
+
+        Triggers plugin discovery on first call -- see :meth:`get`.
+        """
+        load_plugins()
         return sorted(self._items)
 
     def is_registered(self, key: str) -> bool:
-        """Return whether ``key`` (or an alias of it) is registered."""
+        """Return whether ``key`` (or an alias of it) is registered.
+
+        Triggers plugin discovery on first call -- see :meth:`get`.
+        """
+        load_plugins()
         return key in self._items
 
     def describe(self, key: str) -> ComponentInfo:
@@ -330,6 +345,7 @@ class Registry(Generic[T]):
         )
 
     def __contains__(self, key: str) -> bool:
+        load_plugins()
         return key in self._items
 
     def __repr__(self) -> str:
