@@ -12,6 +12,37 @@ recorded here.
 **M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
 (in progress)**. Not yet released.
 
+### Added — M3 (clinical text + pipelines, tasks 3.1–3.7)
+- `openbtk.core.provenance`: `RunManifest`, `StepProvenance`, `DataDigest`,
+  `GuardrailOutcome`, `TokenUsage` (ADR-0005's remaining provenance
+  primitives, deferred since M1 pending `PipelineConfig`). `RunManifest.config`
+  is a serialised `dict` snapshot, not a `PipelineConfig` object — typing it
+  that way would make `core.provenance` import `core.config`, which imports
+  `core.registry`, which imports `core.base`, which imports
+  `core.provenance` — a real layering cycle. `GuardrailOutcome` aggregates
+  per (guardrail, attachment point) rather than one entry per record, to
+  keep a manifest itself bounded at real corpus scale.
+- `openbtk.pipelines.executor` — the streaming DAG executor
+  (docs/03_ARCHITECTURE.md §7): topologically orders steps, streams records
+  through them lazily (`Iterator` composition, no materialisation), and
+  always emits a `RunManifest` — success or failure, there is no manifest-off
+  switch. Scoped, disclosed rather than silently assumed: a single linear
+  chain only (no fan-in, no fan-out — genuine branching would need
+  `itertools.tee`-style broadcast with its own memory trade-offs, not built
+  yet); only `loader`/`preprocessor`/`chunker`/`segmenter` steps are
+  executable (no real `embedding`/`vectorstore` component exists yet to
+  validate a dispatch path against). A step's `StepProvenance.status` is
+  `"failed"` only for the step whose OWN transformation call raised, found
+  by wrapping each step's own component call (not a shared generic
+  reraise) so an upstream failure is never misattributed downstream.
+  Redacts any `key|token|secret|password|credential`-shaped config value
+  before embedding the config snapshot in the manifest
+  (docs/06_SECURITY_COMPLIANCE.md §3.7).
+- `openbtk.pipelines.pipeline.{Pipeline, Step}` — the public builder API
+  (`Pipeline(...).add(Step(...)).guard(...).run()`), plus
+  `Pipeline.from_yaml`/`from_config`. Both surfaces converge on the same
+  `PipelineConfig` before the executor ever sees them.
+
 ### Added — M3 (clinical text, tasks 3.1–3.5)
 - `openbtk.deid.schemas.DeidStatus` (`UNKNOWN`/`RAW`/`DEIDENTIFIED`/`SURROGATE`) —
   lives in `deid`, not `clinical_text`, because `ehr` needs it too and the
