@@ -1,8 +1,12 @@
-"""Unit tests for openbtk.data.clinical_text.preprocessing.SectionSegmenter.
+"""Unit tests for openbtk.data.clinical_text.preprocessing: SectionSegmenter
+and DeidPreprocessor.
 
-The "rule" backend is tested exhaustively (zero dependencies, always
-available). The "medspacy" backend's real-model tests are
-``@pytest.mark.slow`` -- see tests/conftest.py's OPENBTK_SLOW_TESTS gate.
+SectionSegmenter's "rule" backend is tested exhaustively (zero
+dependencies, always available). Its "medspacy" backend's real-model
+tests are ``@pytest.mark.slow`` -- see tests/conftest.py's
+OPENBTK_SLOW_TESTS gate. DeidPreprocessor needs no such gate: it only
+ever uses RuleRecognizer by default, which has zero optional
+dependencies.
 """
 
 from __future__ import annotations
@@ -11,12 +15,21 @@ import pytest
 
 from openbtk.core.errors import ProcessingError
 from openbtk.data.clinical_text import preprocessing
-from openbtk.data.clinical_text.preprocessing import SectionSegmenter
+from openbtk.data.clinical_text.preprocessing import DeidPreprocessor, SectionSegmenter
 from openbtk.data.clinical_text.schemas import ClinicalTextRecord
+from openbtk.deid import DeidMode, DeidStatus
 
 
 def _record(text: str) -> ClinicalTextRecord:
     return ClinicalTextRecord(record_id="n1", source="synthea", text=text)
+
+
+def _record_with_patient(
+    record_id: str, text: str, patient_ref: str | None = None
+) -> ClinicalTextRecord:
+    return ClinicalTextRecord(
+        record_id=record_id, source="synthea", text=text, patient_ref=patient_ref
+    )
 
 
 class TestRuleBackend:
@@ -145,3 +158,95 @@ class TestMedspacyBackendReal:
         assert cached_after_first is not None
         segmenter.process(_record("Plan:\nadmit"))
         assert preprocessing._medspacy_pipeline_cache is cached_after_first
+
+
+# Defined once with the suppression marker, then referenced by name
+# everywhere below -- tests/security/test_fixture_hygiene.py scans by line
+# text, so a line using the constant's NAME (not the literal digits) never
+# re-trips the scanner, matching tests/unit/deid/test_rule_recognizer.py's
+# own convention.
+_SSN_VALUE = "123-45-6789"  # phi-fixture-ok: synthetic, unassigned test value
+_SSN_TEXT = f"Patient SSN: {_SSN_VALUE}."
+
+
+class TestDeidPreprocessor:
+    def test_redact_mode_replaces_detected_phi(self) -> None:
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        assert result.text == "Patient SSN: [REDACTED]."
+
+    def test_redact_mode_sets_deidentified_status(self) -> None:
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        assert result.deid_status is DeidStatus.DEIDENTIFIED
+
+    def test_surrogate_mode_sets_surrogate_status(self) -> None:
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.SURROGATE).process(record)
+        assert result.deid_status is DeidStatus.SURROGATE
+
+    def test_text_with_no_detectable_phi_is_unchanged(self) -> None:
+        record = _record("Patient reports mild headache.")
+        result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        assert result.text == record.text
+
+    def test_original_record_is_not_mutated(self) -> None:
+        record = _record(_SSN_TEXT)
+        DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        assert record.text == _SSN_TEXT
+        assert record.deid_status is DeidStatus.UNKNOWN
+
+    def test_process_is_stateless_across_calls_for_redact(self) -> None:
+        """REDACT never varies -- a real assertion, not the SURROGATE/HASH
+        cases below, whose whole point is per-call state via a shared
+        ConsistencyStore."""
+        record = _record(_SSN_TEXT)
+        pre = DeidPreprocessor(mode=DeidMode.REDACT)
+        assert pre.process(record) == pre.process(record)
+
+    def test_report_is_attached_to_metadata_not_discarded(self) -> None:
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        report = result.metadata["deid_report"]
+        assert isinstance(report, dict)
+        assert report["document_id"] == "n1"
+        assert report["entity_counts"] == {"ssn": 1}
+
+    def test_report_contains_no_phi_value(self) -> None:
+        """Detection omits the matched text by construction (deid/schemas.py's
+        own module docstring) -- the attached report must not leak the
+        original value anywhere in its serialised form."""
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        assert _SSN_VALUE not in str(result.metadata["deid_report"])
+
+    def test_surrogate_is_stable_for_the_same_patient_across_records(self) -> None:
+        """Same (patient_ref, category, original) triple -> the same
+        surrogate, even across two different documents -- the whole point
+        of passing patient_id through at all (ConsistencyStore)."""
+        pre = DeidPreprocessor(mode=DeidMode.SURROGATE)
+        first = pre.process(
+            _record_with_patient("n1", _SSN_TEXT, patient_ref="patient-A")
+        )
+        second = pre.process(
+            _record_with_patient("n2", f"{_SSN_TEXT} again.", patient_ref="patient-A")
+        )
+        first_token = first.text.removeprefix("Patient SSN: ").removesuffix(".")
+        assert first_token in second.text
+
+    def test_missing_patient_ref_falls_back_to_record_id(self) -> None:
+        """Documented, disclosed narrowing: two records with no patient_ref
+        get independent surrogate numbering (per-record, not per-patient)
+        rather than DeidPreprocessor silently refusing to run."""
+        pre = DeidPreprocessor(mode=DeidMode.SURROGATE)
+        first = pre.process(_record_with_patient("n1", _SSN_TEXT))
+        second = pre.process(_record_with_patient("n2", _SSN_TEXT))
+        assert first.text != second.text
+
+    def test_recognizers_param_is_forwarded(self) -> None:
+        """Passing an empty recognizer list disables detection entirely --
+        proves the constructor genuinely forwards to DeidEngine rather than
+        hardcoding its own recognizer set."""
+        record = _record(_SSN_TEXT)
+        result = DeidPreprocessor(mode=DeidMode.REDACT, recognizers=[]).process(record)
+        assert result.text == record.text

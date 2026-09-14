@@ -44,6 +44,18 @@ recorded here.
   factory (`_make_record`), the same pattern already used for the loader
   contract suite: a modality chunker's real `RecordT` need not match the
   shared reference fixture's generic shape.
+- `openbtk.data.clinical_text.preprocessing.DeidPreprocessor`
+  (`preprocessor.general.deidentify`) — a thin `BasePreprocessor` adapter
+  wrapping `openbtk.deid.DeidEngine`: de-identifies `record.text`, updates
+  `deid_status`, and preserves the full `DeidReport` (identifiers and
+  counts only, never PHI values) under `record.metadata["deid_report"]`
+  rather than discarding it, for a future pipeline stage to attach to a
+  `RunManifest`. When `record.patient_ref` is absent, falls back to
+  `record.record_id` for SURROGATE/DATE_SHIFT consistency — a disclosed
+  narrowing to per-record consistency, not a silent one.
+- `tests/contract/test_preprocessor_contract.py` generalized the same way
+  as the loader and chunker suites, for the same reason: `DeidPreprocessor`
+  genuinely reads `record.patient_ref`.
 
 ### Added — M2 (de-identification, flagship)
 - `openbtk.deid.schemas`: `PHICategory` (the 18 HIPAA Safe Harbor

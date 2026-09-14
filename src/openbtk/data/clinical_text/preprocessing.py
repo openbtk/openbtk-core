@@ -1,6 +1,8 @@
-"""``SectionSegmenter`` (docs/05_DATA_MODALITY_SPEC.md section 1.2): splits
-a ``ClinicalTextRecord``'s text into labelled sections, populating
-``sections``.
+"""``SectionSegmenter`` and ``DeidPreprocessor``
+(docs/05_DATA_MODALITY_SPEC.md section 1.2).
+
+``SectionSegmenter`` splits a ``ClinicalTextRecord``'s text into labelled
+sections, populating ``sections``.
 
 Two backends:
 
@@ -36,9 +38,14 @@ from openbtk.core.errors import ProcessingError
 from openbtk.core.registry import PREPROCESSOR_REGISTRY
 from openbtk.core.schemas import TextSpan
 from openbtk.data.clinical_text.schemas import ClinicalTextRecord
+from openbtk.deid import DeidEngine, DeidMode, DeidStatus
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from spacy.language import Language
+
+    from openbtk.deid.engine import RecallBias
 
 _RULE_CONFIDENCE = 1.0
 """A deterministic keyword match either happened or didn't -- this is not
@@ -201,3 +208,94 @@ class SectionSegmenter(BasePreprocessor[ClinicalTextRecord]):
         else:
             sections = _medspacy_sections(record.text)
         return record.model_copy(update={"sections": sections})
+
+
+@PREPROCESSOR_REGISTRY.register("preprocessor.general.deidentify")
+class DeidPreprocessor(BasePreprocessor[ClinicalTextRecord]):
+    """Wrap ``openbtk.deid.DeidEngine`` as a pipeline preprocessing step:
+    de-identifies ``record.text``, updating ``deid_status`` to match.
+
+    Registered under the "general" scope, not "clinical_text": the
+    underlying engine has no modality dependency at all (``openbtk.deid``'s
+    own docstring: "cross-modal by design"). Only this ADAPTER currently
+    targets ``ClinicalTextRecord`` -- the one modality record shape that
+    exists pre-v0.5 (CLAUDE.md rule 13, the scope gate); a future ``ehr``
+    adapter would be a second, separate registration when that modality
+    actually exists, not a generalisation forced onto this one ahead of a
+    real second caller.
+
+    The full ``DeidReport`` (identifiers and counts only, never PHI values
+    -- see ``openbtk.deid.schemas``'s own module docstring) is preserved
+    under ``record.metadata["deid_report"]`` rather than discarded:
+    docs/04_API_DESIGN.md section 5 says a report is "safe to ... attach to
+    a run manifest", and this preprocessing step is the only place that
+    report is ever produced -- a future pipeline stage collecting it into
+    a ``RunManifest`` (task 3.7) reads it from there.
+
+    Example:
+        >>> import contextlib
+        >>> import io
+        >>> record = ClinicalTextRecord(
+        ...     record_id="n1",
+        ...     source="synthea",
+        ...     text="Patient SSN: 123-45-6789.",
+        ... )
+        >>> with contextlib.redirect_stdout(io.StringIO()):  # logging noise
+        ...     result = DeidPreprocessor(mode=DeidMode.REDACT).process(record)
+        >>> result.text
+        'Patient SSN: [REDACTED].'
+        >>> result.deid_status
+        <DeidStatus.DEIDENTIFIED: 'deidentified'>
+    """
+
+    def __init__(
+        self,
+        *,
+        mode: DeidMode = DeidMode.REDACT,
+        recall_bias: RecallBias = "high",
+        recognizers: Sequence[str] = ("rule",),
+    ) -> None:
+        self._mode = mode
+        self._engine = DeidEngine(
+            mode=mode, recall_bias=recall_bias, recognizers=recognizers
+        )
+
+    def process(self, record: ClinicalTextRecord) -> ClinicalTextRecord:
+        """De-identify ``record.text``.
+
+        Args:
+            record: A loaded (optionally section-segmented) record.
+
+        Returns:
+            A new record with ``text`` transformed, ``deid_status`` set,
+            and the audit report attached under
+            ``metadata["deid_report"]``.
+
+        Note:
+            ``DeidEngine.deidentify`` requires a ``patient_id`` for
+            SURROGATE/DATE_SHIFT consistency. When ``record.patient_ref``
+            is absent, ``record.record_id`` is used instead -- a real,
+            disclosed narrowing to per-record (not per-patient)
+            consistency in that case, not a silent one.
+        """
+        patient_id = (
+            record.patient_ref if record.patient_ref is not None else record.record_id
+        )
+        result = self._engine.deidentify(
+            record.text, patient_id=patient_id, document_id=record.record_id
+        )
+        status = (
+            DeidStatus.SURROGATE
+            if self._mode == DeidMode.SURROGATE
+            else DeidStatus.DEIDENTIFIED
+        )
+        return record.model_copy(
+            update={
+                "text": result.text,
+                "deid_status": status,
+                "metadata": {
+                    **record.metadata,
+                    "deid_report": result.report.model_dump(mode="json"),
+                },
+            }
+        )
