@@ -30,6 +30,11 @@ from typing import TYPE_CHECKING, Any, Generic, TypeVar
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    # Only used as a parameter annotation (create/create_from_config) --
+    # eager import would be circular: config.py imports get_registry and
+    # GUARDRAIL_REGISTRY from this module for PipelineConfig.validate_registry().
+    from openbtk.core.config import PolicyConfig
+
 from pydantic import BaseModel, ConfigDict, Field
 
 from openbtk.core.base import (
@@ -47,7 +52,7 @@ from openbtk.core.base import (
     BaseVectorStore,
     Component,
 )
-from openbtk.core.errors import RegistryError
+from openbtk.core.errors import PolicyError, RegistryError
 from openbtk.core.logging import get_logger
 from openbtk.core.plugins import load_plugins
 
@@ -270,27 +275,66 @@ class Registry(Generic[T]):
             )
         return self._items[key]
 
-    def create(self, key: str, **kwargs: Any) -> T:
+    def create(
+        self, key: str, *, policy: PolicyConfig | None = None, **kwargs: Any
+    ) -> T:
         """Instantiate the registered class for ``key`` with ``kwargs``.
+
+        Enforces ``sends_data_offsite`` (docs/06_SECURITY_COMPLIANCE.md
+        section 3.3, FR-V-07) before construction, i.e. before any data can
+        possibly be read: a class with ``sends_data_offsite = True`` refuses
+        to construct unless ``policy.allow_offsite_providers`` is ``True``.
+        ``policy=None`` (the default -- no caller has opted in to anything)
+        is treated the same as the safe ``PolicyConfig()`` default, not as
+        "no policy, no check": a component that sends data offsite must
+        never be constructible by accident.
+
+        Args:
+            key: The registry key to instantiate.
+            policy: The active pipeline policy. Only ``allow_offsite_providers``
+                is consulted here. Keyword-only so callers can never confuse
+                it with a component's own constructor kwarg.
+            **kwargs: Forwarded to the class's constructor.
 
         Raises:
             RegistryError: If ``key`` is not registered.
+            PolicyError: If the class sends data offsite and the policy
+                (explicit or default) does not allow that.
             Exception: Whatever the class's constructor raises.
         """
         cls = self.get(key)
+        if getattr(cls, "sends_data_offsite", False):
+            allow_offsite = policy is not None and policy.allow_offsite_providers
+            if not allow_offsite:
+                raise PolicyError(
+                    f"{cls.__qualname__} ({key}) sends data offsite "
+                    "(sends_data_offsite=True), but the active policy does "
+                    "not allow offsite providers. Pass policy=PolicyConfig("
+                    "allow_offsite_providers=True) to permit this explicitly.",
+                    context={
+                        "registry": self._category,
+                        "key": key,
+                        "class_name": cls.__qualname__,
+                    },
+                )
         log.debug("registry.create", registry=self._category, key=key)
         return cls(**kwargs)
 
-    def create_from_config(self, config: dict[str, Any]) -> T:
+    def create_from_config(
+        self, config: dict[str, Any], *, policy: PolicyConfig | None = None
+    ) -> T:
         """Instantiate from a ``{"type": ..., "params": {...}}`` dict.
 
         Args:
             config: Must contain a ``"type"`` key (the registry key); an
                 optional ``"params"`` dict supplies constructor kwargs.
+            policy: Forwarded to :meth:`create` -- see its docstring for the
+                ``sends_data_offsite`` enforcement this triggers.
 
         Raises:
             RegistryError: If ``config`` has no ``"type"`` key, or the type
                 is not registered.
+            PolicyError: See :meth:`create`.
 
         Example:
             >>> from openbtk.core.registry import GUARDRAIL_REGISTRY
@@ -311,7 +355,7 @@ class Registry(Generic[T]):
             )
         key = config["type"]
         params = config.get("params", {})
-        return self.create(key, **params)
+        return self.create(key, policy=policy, **params)
 
     def list_keys(self) -> list[str]:
         """Return every registered key and alias, sorted.

@@ -23,8 +23,11 @@ section 3, ADR-0007):
   * **``sends_data_offsite`` is enforced, not advisory.** Under
     ``policy.allow_offsite_providers: false`` (the pipeline default),
     constructing a provider with this set to ``True`` raises ``PolicyError``.
-    That enforcement lives in the pipeline/registry layer, not here; this
-    module only declares the contract.
+    That enforcement lives in ``Registry.create``/``create_from_config``
+    (openbtk.core.registry), not here; this module only declares the
+    contract. A component with no ``sends_data_offsite`` attribute at all
+    (anything outside ``BaseEmbeddingProvider``/``BaseLLMProvider``) is
+    unaffected -- the check is ``getattr(cls, "sends_data_offsite", False)``.
 """
 
 from __future__ import annotations

@@ -9,9 +9,48 @@ recorded here.
 
 ## [Unreleased]
 
-Next: **M1 — Core framework.** Registry, base classes, configuration, error
-hierarchy, PHI-redacting logging, run provenance, and the shared contract test
-suite every component implementation must pass.
+**M1 — Core framework.** Not yet released.
+
+### Added
+- Exception hierarchy (`openbtk.core.errors`): one root `OpenBTKError` with
+  structured, PHI-free `.context`, plus specific subclasses per failure mode
+  (`ConfigError`, `RegistryError`, `PolicyError`, `LoaderError`,
+  `ProviderError`, `GuardrailViolation`, and others).
+- Lazy optional-dependency loading (`openbtk.core._lazy.require`), naming the
+  pip extra to install rather than a bare `ImportError`.
+- Core Pydantic schemas (`openbtk.core.schemas`): `TextSpan`, `GuardrailResult`,
+  `LinkedEntity`, `SourceRef`, `SearchResult`, `Concept`, `Message`,
+  `LLMResponse`, all frozen and `extra="forbid"`.
+- Run provenance primitives (`openbtk.core.provenance`): `ModelIdentity`
+  (rejects floating tags like `"latest"`) and `ComponentProvenance`.
+  `RunManifest` deferred to a later milestone.
+- 12 abstract base classes (`openbtk.core.base`) covering every extension
+  point: loaders, preprocessors, chunkers, segmenters, feature extractors,
+  embedding and LLM providers, vector stores, guardrails, rerankers, dataset
+  adapters, and terminology services.
+- `Registry[T]` (`openbtk.core.registry`): config-driven component lookup by
+  permanent string key (`<category>.<scope>.<name>`), with alias support and
+  12 global category registries.
+- PHI-safe structured logging (`openbtk.core.logging`): a deny-list redaction
+  processor, hashed identifiers, and an independent per-logger processor
+  chain that never calls `structlog.configure()` globally.
+- Declarative pipeline configuration (`openbtk.core.config`): `PipelineConfig`
+  with YAML loading, `${VAR}` environment interpolation, and registry/DAG
+  validation with real cycle detection.
+- Plugin discovery via entry points (`openbtk.core.plugins`), loaded lazily
+  on first registry lookup.
+- `sends_data_offsite` policy enforcement in `Registry.create` /
+  `create_from_config`: constructing a component that sends data off-site
+  raises `PolicyError` unless the caller explicitly passes a policy with
+  `allow_offsite_providers=True` — enforced even when no policy is passed at
+  all, so the safe default cannot be bypassed by omission.
+- Shared contract test suite (`tests/contract/`) parametrized over every
+  registered implementation for all 12 base classes, with reference
+  implementations so the suite is never vacuous.
+- Security test suite (`tests/security/`): adversarial PHI-shaped strings
+  fuzzed through real error and logging paths, a fixture-hygiene scanner for
+  committed test source, and regression tests for offsite-policy enforcement.
+- 100% statement and branch coverage on `openbtk.core`.
 
 ## [0.0.1] — 2026-08-30
 
