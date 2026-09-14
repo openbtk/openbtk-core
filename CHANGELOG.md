@@ -10,7 +10,13 @@ recorded here.
 ## [Unreleased]
 
 **M1 — Core framework**, **M2 — De-identification**, and **M3 — Clinical Text
-(in progress)**. Not yet released.
++ Pipelines**. Not yet released.
+
+**M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
+chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
+memory benchmark (task 3.9) passes — 0.056 GB peak RSS for 10M notes against
+a 4 GB target. Task 3.10 (entity linking + ConText) is deferred to M5, per
+its own documented P1/optional status in the roadmap, not newly descoped.
 
 ### Fixed — M3
 - `openbtk.deid.engine.DeidEngine(mode=...)` crashed outright
