@@ -33,7 +33,8 @@ under-specified line, not a silent shortcut.
 
 **``TokenUsage`` is defined in ``core.schemas``, not here, as of M5 task
 5.1** -- re-exported from this module for backward compatibility with the
-name it originally shipped under (v0.1.0). ``LLMResponse`` (also in
+name it originally shipped under (v0.1.1 -- v0.1.0 was tagged but never
+actually published; see CHANGELOG.md). ``LLMResponse`` (also in
 ``core.schemas``) needed to carry per-call usage, and ``core.provenance``
 already imports from ``core.schemas`` (``JsonValue``) -- defining
 ``TokenUsage`` here and importing it into ``core.schemas`` would be a real

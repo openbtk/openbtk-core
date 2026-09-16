@@ -15,7 +15,7 @@ recorded here.
 retry/backoff, token accounting)
 - `TokenUsage` moved from `core.provenance` to `core.schemas` (re-exported
   from `core.provenance` for backward compatibility with the name it
-  shipped under in `v0.1.0`) so `LLMResponse` — also in `core.schemas` —
+  shipped under in `v0.1.1`) so `LLMResponse` — also in `core.schemas` —
   can carry a `usage: TokenUsage | None` field without a real import cycle
   (`core.provenance` already imports `JsonValue` from `core.schemas`).
   `TokenUsage.__add__` sums a run's multiple LLM calls into one running
@@ -41,10 +41,17 @@ retry/backoff, token accounting)
   "stale local pin, live toolchain is newer" issue already fixed once this
   project for ruff and numpy.
 
-## [0.1.0] — 2026-09-17
+## [0.1.1] — 2026-09-17
 
 **M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
 + Pipelines**, and **M4 — v0.1 Release**.
+
+**Note on the version number:** `0.1.0` is skipped. A `v0.1.0` tag existed
+briefly during release troubleshooting and, at some point, its wheel was
+uploaded to real PyPI and then deleted; PyPI permanently refuses to accept
+a re-upload of a previously-deleted filename (a deliberate anti-tampering
+policy, not a bug), so `0.1.0` can never be published under this project
+name again. `0.1.1` is this project's actual first real release.
 
 **M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
 chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
@@ -396,6 +403,6 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.0
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.1
 [0.0.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.0.1
