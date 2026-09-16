@@ -9,9 +9,7 @@ recorded here.
 
 ## [Unreleased]
 
-**M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
-+ Pipelines**, **M4 — v0.1 Release**, and **M5 — Providers & Retrieval (in
-progress)**.
+**M5 — Providers & Retrieval (in progress)**.
 
 ### Added — M5 (task 5.1 — `llms/base.py`: messages, responses,
 retry/backoff, token accounting)
@@ -42,6 +40,11 @@ retry/backoff, token accounting)
   old version to confirm before bumping to `v2.3.1`, matching the same
   "stale local pin, live toolchain is newer" issue already fixed once this
   project for ruff and numpy.
+
+## [0.1.0] — 2026-09-17
+
+**M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
++ Pipelines**, and **M4 — v0.1 Release**.
 
 **M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
 chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the
@@ -393,5 +396,6 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.0
 [0.0.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.0.1
