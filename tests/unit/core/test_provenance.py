@@ -1,11 +1,16 @@
 """Unit tests for openbtk.core.provenance: ModelIdentity, ComponentProvenance,
-DataDigest, TokenUsage, GuardrailOutcome, StepProvenance, RunManifest.
+DataDigest, GuardrailOutcome, StepProvenance, RunManifest.
 
 Coverage gaps from the contract suite baseline: the floating-tag rejection
 validator is never exercised there (no reference implementation constructs
 a ModelIdentity), and ComponentProvenance's frozen/extra=forbid enforcement
 is never adversarially tested. RunManifest and its parts have no contract
 suite at all (they are not a Component base class) -- tested directly here.
+
+TokenUsage's own tests live in tests/unit/core/test_schemas.py -- M5 task
+5.1 moved its real definition to core.schemas (see that module's own
+docstring for why); this file keeps only a check that the re-export
+genuinely is the same class, not a second, drifting definition.
 """
 
 from __future__ import annotations
@@ -15,6 +20,7 @@ from datetime import UTC, datetime
 import pytest
 from pydantic import ValidationError
 
+from openbtk.core import schemas as core_schemas
 from openbtk.core.provenance import (
     ComponentProvenance,
     DataDigest,
@@ -22,8 +28,8 @@ from openbtk.core.provenance import (
     ModelIdentity,
     RunManifest,
     StepProvenance,
-    TokenUsage,
 )
+from openbtk.core.provenance import TokenUsage as ProvenanceTokenUsage
 
 
 class TestModelIdentity:
@@ -124,18 +130,13 @@ class TestDataDigest:
             digest.record_count = 4  # type: ignore[misc]
 
 
-class TestTokenUsage:
-    def test_all_fields_default_to_zero(self) -> None:
-        usage = TokenUsage()
-        assert (usage.prompt_tokens, usage.completion_tokens, usage.total_tokens) == (
-            0,
-            0,
-            0,
-        )
-
-    def test_rejects_negative_tokens(self) -> None:
-        with pytest.raises(ValidationError):
-            TokenUsage(prompt_tokens=-1)
+class TestTokenUsageReExport:
+    def test_provenance_tokenusage_is_the_same_class_as_schemas_tokenusage(
+        self,
+    ) -> None:
+        """A genuine re-export, not a second, drifting definition -- see
+        this module's own docstring for the import-cycle reason it moved."""
+        assert ProvenanceTokenUsage is core_schemas.TokenUsage
 
 
 class TestGuardrailOutcome:

@@ -10,7 +10,38 @@ recorded here.
 ## [Unreleased]
 
 **M1 — Core framework**, **M2 — De-identification**, **M3 — Clinical Text
-+ Pipelines**, and **M4 — v0.1 Release (in progress)**. Not yet released.
++ Pipelines**, **M4 — v0.1 Release**, and **M5 — Providers & Retrieval (in
+progress)**.
+
+### Added — M5 (task 5.1 — `llms/base.py`: messages, responses,
+retry/backoff, token accounting)
+- `TokenUsage` moved from `core.provenance` to `core.schemas` (re-exported
+  from `core.provenance` for backward compatibility with the name it
+  shipped under in `v0.1.0`) so `LLMResponse` — also in `core.schemas` —
+  can carry a `usage: TokenUsage | None` field without a real import cycle
+  (`core.provenance` already imports `JsonValue` from `core.schemas`).
+  `TokenUsage.__add__` sums a run's multiple LLM calls into one running
+  total for `RunManifest.token_usage`; the executor still has no
+  `llm`-category step to populate that field automatically.
+- `tests/unit/core/test_schemas.py`: new file — `core.schemas` had no
+  dedicated unit tests anywhere before this (only contract-suite and
+  doctest coverage). 100% coverage on `core/schemas.py`.
+- `src/openbtk/llms/base.py`: `retry_with_backoff()`, exponential backoff
+  with jitter on `RateLimitError`, an injectable `sleep` so tests run
+  instantly; re-exports `Message`/`LLMResponse`/`TokenUsage`/
+  `BaseLLMProvider` for a single ergonomic import ahead of task 5.2's
+  concrete providers. 100% coverage.
+
+### Fixed — M5
+- `.pre-commit-config.yaml`: mypy hook pin (`v1.11.2`) predates a behaviour
+  change in how mypy narrows `isinstance` checks against a dunder method's
+  same-typed `other` parameter, producing a false-positive "unreachable"
+  error on `TokenUsage.__add__`'s `return NotImplemented` branch that the
+  project's actual (unpinned, `mypy>=1.10`) toolchain does not raise.
+  Reproduced directly against an isolated venv pinned to the hook's exact
+  old version to confirm before bumping to `v2.3.1`, matching the same
+  "stale local pin, live toolchain is newer" issue already fixed once this
+  project for ruff and numpy.
 
 **M3 exit criteria met**: the four-stage pipeline (load → deid → segment →
 chunk) runs end-to-end on synthetic data, emits a `RunManifest`, and the

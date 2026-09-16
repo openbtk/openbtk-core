@@ -31,12 +31,17 @@ counts plus a small, bounded sample of messages -- real, aggregate
 provenance, not a per-record log. A disclosed, deliberate reading of an
 under-specified line, not a silent shortcut.
 
-**``TokenUsage`` is declared but never populated yet.** No LLM-provider
-step exists in the executor's dispatch table as of task 3.7 (no real
-``llms``/``embeddings`` component exists in this repository yet either) --
-the schema exists now because ADR-0005 names it as part of this module's
-required primitive set, ready for the executor to populate once an LLM
-step is real.
+**``TokenUsage`` is defined in ``core.schemas``, not here, as of M5 task
+5.1** -- re-exported from this module for backward compatibility with the
+name it originally shipped under (v0.1.0). ``LLMResponse`` (also in
+``core.schemas``) needed to carry per-call usage, and ``core.provenance``
+already imports from ``core.schemas`` (``JsonValue``) -- defining
+``TokenUsage`` here and importing it into ``core.schemas`` would be a real
+cycle, not a hypothetical one. Still declared as part of ADR-0005's
+required primitive set; the executor does not yet aggregate per-call
+``LLMResponse.usage`` into ``RunManifest.token_usage`` (no `llm`-category
+step exists in its dispatch table yet), so `RunManifest.token_usage`
+itself is still never populated automatically today.
 
 See ADR-0005 (provenance as a core primitive) for why this exists at all.
 """
@@ -53,7 +58,11 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 # hiding this import behind TYPE_CHECKING raises PydanticUserError because
 # JsonValue would not exist in the module's runtime namespace when the model
 # schema is built.
-from openbtk.core.schemas import JsonValue  # noqa: TC001
+#
+# TokenUsage is RE-EXPORTED, not defined here (M5 task 5.1 moved its real
+# definition to core.schemas -- see this module's docstring) -- the same
+# eager-import requirement applies to a re-export used as a field type.
+from openbtk.core.schemas import JsonValue, TokenUsage  # noqa: TC001
 
 RunStatus = Literal["success", "failed", "partial"]
 """ADR-0005: "success, failure or partial." The executor (task 3.7) only
@@ -191,22 +200,6 @@ class DataDigest(BaseModel):
         ),
     )
     record_count: int = Field(..., ge=0, description="Records read from this source.")
-
-
-class TokenUsage(BaseModel):
-    """Token accounting for a run. See this module's docstring: declared,
-    not yet populated by anything in this repository.
-
-    Example:
-        >>> TokenUsage().total_tokens
-        0
-    """
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    prompt_tokens: int = Field(0, ge=0)
-    completion_tokens: int = Field(0, ge=0)
-    total_tokens: int = Field(0, ge=0)
 
 
 class GuardrailOutcome(BaseModel):

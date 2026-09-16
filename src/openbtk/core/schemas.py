@@ -246,20 +246,58 @@ class Message(BaseModel):
     content: str = Field(..., description="The message text.")
 
 
+class TokenUsage(BaseModel):
+    """Token accounting for one or more LLM calls.
+
+    Defined here, not in ``core.provenance`` (where ``RunManifest.token_usage``
+    lives) -- ``core.provenance`` already imports from this module
+    (``JsonValue``), so defining ``TokenUsage`` there and referencing it from
+    ``LLMResponse`` here would be a real import cycle, not a hypothetical
+    one. ``core.provenance`` re-exports this exact class for backward
+    compatibility with the name it originally shipped under.
+
+    Example:
+        >>> TokenUsage().total_tokens
+        0
+        >>> a = TokenUsage(prompt_tokens=10, completion_tokens=5, total_tokens=15)
+        >>> b = TokenUsage(prompt_tokens=3, completion_tokens=2, total_tokens=5)
+        >>> (a + b).total_tokens
+        20
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    prompt_tokens: int = Field(0, ge=0)
+    completion_tokens: int = Field(0, ge=0)
+    total_tokens: int = Field(0, ge=0)
+
+    def __add__(self, other: TokenUsage) -> TokenUsage:
+        """Combine two calls' usage into a running total -- real
+        accounting for a pipeline that makes more than one LLM call in a
+        run, not just a single-call struct with nothing to aggregate it."""
+        if not isinstance(other, TokenUsage):
+            return NotImplemented
+        return TokenUsage(
+            prompt_tokens=self.prompt_tokens + other.prompt_tokens,
+            completion_tokens=self.completion_tokens + other.completion_tokens,
+            total_tokens=self.total_tokens + other.total_tokens,
+        )
+
+
 class LLMResponse(BaseModel):
     """The result of one LLM generation call.
-
-    Deliberately minimal for now: just the generated text. Cost/token
-    accounting (docs/03_ARCHITECTURE.md section 4.4's TokenUsage) is
-    aggregated at the RunManifest level once core/provenance.py's second
-    increment lands (see that module's docstring) -- this is not the place
-    to pre-invent that shape.
 
     Example:
         >>> LLMResponse(text="The patient has type 2 diabetes.").text
         'The patient has type 2 diabetes.'
+        >>> resp = LLMResponse(text="...", usage=TokenUsage(total_tokens=42))
+        >>> resp.usage.total_tokens
+        42
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
     text: str = Field(..., description="The generated text.")
+    usage: TokenUsage | None = Field(
+        None, description="Token accounting for this call, if the provider reports it."
+    )
