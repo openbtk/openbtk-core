@@ -30,6 +30,78 @@ retry/backoff, token accounting)
   `BaseLLMProvider` for a single ergonomic import ahead of task 5.2's
   concrete providers. 100% coverage.
 
+### Added — M5 (task 5.2 — OpenAI, Anthropic, HuggingFace-local,
+OpenAI-compatible endpoint providers)
+- `openbtk.llms.openai.OpenAIProvider` (`llm.general.openai`) — a thin
+  adapter over the official `openai` SDK: Chat Completions for
+  `generate`/`chat`, native SSE for `stream`, `TokenUsage` from the
+  response's own usage block, SDK exception translation
+  (`RateLimitError`/`AuthenticationError`/`APIError` →
+  `openbtk.core.errors`'s hierarchy) wrapped in
+  `retry_with_backoff`. `sends_data_offsite = True`.
+- `openbtk.llms.anthropic.AnthropicProvider` (`llm.general.anthropic`) —
+  same shape over the official `anthropic` SDK, with two genuine API
+  differences handled rather than papered over: a leading `role: "system"`
+  `Message` is split into the Messages API's own top-level `system`
+  parameter, and `max_tokens` (required by that API, unlike OpenAI's) gets
+  a class default so callers don't have to name one every time. Streaming
+  retries only the connection-open step (`__enter__`), never a
+  partially-consumed stream, and always closes the context manager via
+  `finally`. `sends_data_offsite = True`.
+- `openbtk.llms.openai_compatible.OpenAICompatibleProvider`
+  (`llm.general.openai_compatible`) — for self-hosted/third-party
+  endpoints that speak the OpenAI wire format without being OpenAI (vLLM,
+  Ollama, LM Studio, ...). Built directly on `httpx` (already a core
+  dependency, and its first real caller in `src/`) rather than the
+  `openai` package, since the wire format — not OpenAI's service — is the
+  actual contract. `sends_data_offsite` is conservatively `True` at the
+  class level always: `Registry.create`'s policy gate checks it before
+  construction, before `base_url` is even known, so it cannot vary
+  per-instance by how that URL resolves.
+- `openbtk.llms.huggingface.HuggingFaceLocalProvider`
+  (`llm.general.huggingface_local`) — local `transformers` text
+  generation. `sends_data_offsite = False`, the only one of the four.
+  `revision` is a *required* constructor argument (no default): FR-P-05
+  requires an immutable pinned revision, and unlike an API-based provider
+  (where the model name itself is the vendor's pinned unit), a bare HF
+  model name with no revision resolves to whatever the hub's default
+  branch is at load time. `chat()` uses the tokenizer's own chat template
+  when the model ships one, falling back to a disclosed, plain
+  role-prefixed transcript otherwise. `stream()` uses the standard
+  `transformers` background-thread `TextIteratorStreamer` pattern — with
+  a real fix found while testing it: `streamer.end()` must be called
+  unconditionally in the generation thread's `finally`, not only on
+  success, or a `generate()` failure before producing any token would
+  leave the consuming generator blocked forever (`TextIteratorStreamer`
+  only signals completion through its own on-success hook).
+- `tests/unit/llms/test_{openai,anthropic,huggingface,openai_compatible}.py`
+  — 81 tests total, 100% coverage on all four provider modules, none
+  needing the real `openai`/`anthropic`/`torch`/`transformers` packages
+  installed (verified directly in a genuinely clean zero-extras venv):
+  OpenAI/Anthropic/HuggingFace mock the SDK/model surface directly (the
+  same rationale as `llms/base.py`'s own tests);
+  `OpenAICompatibleProvider`'s use a real `httpx.MockTransport` instead,
+  since `httpx` is core and always installed.
+- `tests/contract/test_llm_contract.py`, extended: the three checks that
+  never touch the network or a model (`sends_data_offsite`,
+  `model_identity`, `provenance`) now run unconditionally for all four
+  providers (via `PolicyConfig(allow_offsite_providers=True)`, since three
+  of the four are offsite by design and `Registry.create` refuses them
+  otherwise). The three that make a real call are skipped per key unless
+  `OPENBTK_SLOW_TESTS=1` **and** the specific resource each one needs is
+  genuinely available: `OPENAI_API_KEY`/`ANTHROPIC_API_KEY` for the two
+  cloud providers, `torch`+`transformers` actually importable for
+  `HuggingFaceLocalProvider` (found by direct reproduction —
+  `OPENBTK_SLOW_TESTS=1` alone let this suite attempt, and fail, a real
+  model load in this project's own dev venv, which has `transformers` but
+  not `torch`), and a real endpoint URL via
+  `OPENBTK_TEST_OPENAI_COMPATIBLE_BASE_URL` for the compatible provider
+  (there is no such server this repo controls or can assume exists
+  anywhere).
+- `pyproject.toml`: `torch>=2.0` added to the `llms` extra, needed by
+  `HuggingFaceLocalProvider` — `transformers` (already in `text`) needs a
+  real tensor backend to run a model, and does not pull one in itself.
+
 ### Fixed — M5
 - `.pre-commit-config.yaml`: mypy hook pin (`v1.11.2`) predates a behaviour
   change in how mypy narrows `isinstance` checks against a dunder method's
@@ -39,7 +111,11 @@ retry/backoff, token accounting)
   Reproduced directly against an isolated venv pinned to the hook's exact
   old version to confirm before bumping to `v2.3.1`, matching the same
   "stale local pin, live toolchain is newer" issue already fixed once this
-  project for ruff and numpy.
+  project for ruff and numpy. Also missing `httpx` from the same hook's
+  `additional_dependencies` (task 5.2's `openai_compatible.py` is this
+  hook's first file to import a core dependency beyond the four already
+  listed) — found the same way, by actually running the hook rather than
+  assuming a core dependency would just be there.
 
 ## [0.1.1] — 2026-09-17
 

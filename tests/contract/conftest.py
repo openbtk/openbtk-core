@@ -101,12 +101,16 @@ if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
     # accident of directory naming.
     from openbtk.deid.recognizers import ner as _ner  # noqa: F401
 
-# Unconditional (unlike the NER import above): importing this package costs
-# nothing regardless of which loaders a caller ends up using -- none of its
-# three loaders need their optional dependency merely to be *defined*, only
-# to actually load (see that package's own __init__.py docstring). Ensures
-# PlainTextLoader/JSONLLoader/MIMICNotesLoader are always registered before
-# tests/contract/test_loader_contract.py's parametrize evaluates.
+# Both imports below are unconditional (unlike the NER import above):
+# defining a component never needs its optional dependency, only actually
+# calling it does (each package's own __init__.py docstring). Ensures the
+# real implementations are registered before their contract suite's own
+# parametrize evaluates.
+#
+# The four LLM providers, for test_llm_contract.py:
+from openbtk import llms as _llms  # noqa: F401
+
+# PlainTextLoader/JSONLLoader/MIMICNotesLoader, for test_loader_contract.py:
 from openbtk.data import clinical_text as _clinical_text  # noqa: F401
 
 # ---------------------------------------------------------------------------

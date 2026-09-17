@@ -20,8 +20,12 @@ repos:
         # python_version=3.11 -- confirmed by direct reproduction (this
         # hook's own isolated env has no version ceiling of its own,
         # independent of the project's, unless pinned here too).
+        # httpx added for llms/openai_compatible.py (task 5.2): this hook's
+        # isolated env has none of the project's own dependencies unless
+        # listed here, core or not -- confirmed by direct reproduction
+        # ("Cannot find implementation or library stub for module httpx").
         additional_dependencies:
-          [pydantic>=2.5, types-PyYAML, "numpy>=1.26,<2.5", structlog]
+          [pydantic>=2.5, types-PyYAML, "numpy>=1.26,<2.5", structlog, httpx]
         exclude: ^tests/
 
   - repo: https://github.com/Yelp/detect-secrets

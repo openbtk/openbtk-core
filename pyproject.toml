@@ -82,6 +82,12 @@ retrieval = [
 llms = [
     "openai>=1.30",
     "anthropic>=0.30",
+    # For HuggingFaceLocalProvider (task 5.2): transformers (the "text"
+    # extra) needs a real tensor backend to run text generation, and does
+    # not pull one in itself -- torch is deliberately absent from "text"
+    # since that extra's own transformers usage (tokenization only, in
+    # data.clinical_text.tokenization) never needs it.
+    "torch>=2.0",
 ]
 # First candidate for carve-out into its own distribution: its version must be
 # free to track langchain-core independently of ours. See ADR-0002.
