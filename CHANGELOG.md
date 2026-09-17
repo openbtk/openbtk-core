@@ -11,6 +11,25 @@ recorded here.
 
 **M5 — Providers & Retrieval (in progress)**.
 
+### Added — M5 (task 5.3 — biomedical LLM presets)
+- `openbtk.llms.presets`: `BIOMEDICAL_LLM_PRESETS`, `list_llm_presets()`,
+  `create_llm_preset()`. Explicitly "config, not classes"
+  (docs/10_ROADMAP.md's own wording): MedGemma, Meditron and OpenBioLLM
+  are ordinary causal LMs `HuggingFaceLocalProvider` already handles, so
+  a preset is a `{"type": ..., "params": {...}}` dict — the same shape
+  `Registry.create_from_config` already accepts — not a new provider
+  subclass per model. Every preset's `revision` is a real commit SHA
+  fetched directly from the HuggingFace Hub API at write time (`GET
+  /api/models/<id>`), not fabricated; `google/medgemma-4b-it` was
+  checked and rejected for the MedGemma preset specifically because the
+  Hub API reports it as `image-text-to-text` (multimodal), architecturally
+  incompatible with `HuggingFaceLocalProvider`'s text-only interface —
+  `google/medgemma-27b-text-it` (confirmed `text-generation`) is the
+  MedGemma preset instead. `meditron-7b` and `medgemma-27b-text` are
+  gated on the Hub (confirmed via the same API call) and require prior
+  license acceptance + `huggingface-cli login`; disclosed in the module
+  docstring, not silently assumed to work.
+
 ### Added — M5 (task 5.1 — `llms/base.py`: messages, responses,
 retry/backoff, token accounting)
 - `TokenUsage` moved from `core.provenance` to `core.schemas` (re-exported
