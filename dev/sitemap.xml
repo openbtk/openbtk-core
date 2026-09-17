@@ -2,26 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/quickstart/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/api/clinical_text/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/api/core/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/api/deid/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
     <url>
          <loc>https://openbtk.github.io/openbtk-core/dev/api/pipelines/</loc>
-         <lastmod>2026-09-14</lastmod>
+         <lastmod>2026-09-17</lastmod>
     </url>
 </urlset>
