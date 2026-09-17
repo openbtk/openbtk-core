@@ -11,6 +11,65 @@ recorded here.
 
 **M5 — Providers & Retrieval (in progress)**.
 
+### Added — M5 (task 5.4 — `embeddings/`: PubMedBERT, BioBERT,
+ClinicalBERT, SapBERT, MedCPT, OpenAI)
+- `openbtk.embeddings.huggingface.HuggingFaceEmbeddingProvider`
+  (`embedding.general.huggingface`) — one generic local `transformers`
+  encoder-embedding implementation, parameterised by model/revision/
+  pooling, serving every current biomedical BERT-family embedding model
+  (see presets below) rather than a bespoke class per model. `dimension`
+  is a *required* constructor argument (not derived by loading the
+  model): this class's own `sends_data_offsite`/`dimension`/
+  `model_identity`/`provenance` contract checks must stay possible
+  without a real model load. `embed()` still verifies the declared
+  dimension against what the model actually produces on first real use,
+  raising `ProviderError` on a mismatch rather than silently returning
+  the wrong shape into a vector store.
+- `openbtk.embeddings.openai.OpenAIEmbeddingProvider`
+  (`embedding.general.openai`) — thin adapter over the `openai` SDK's
+  Embeddings API, same retry/error-translation shape as
+  `llms.openai.OpenAIProvider`. `dimension` defaults from a small table
+  of OpenAI's own documented model widths, with a clear `ConfigError`
+  for an unrecognised model unless `dimension=` is passed explicitly.
+- `openbtk.embeddings.presets`: `BIOMEDICAL_EMBEDDING_PRESETS`,
+  `list_embedding_presets()`, `create_embedding_preset()` — same "config,
+  not classes" shape as `llms.presets` (task 5.3), covering PubMedBERT,
+  BioBERT, ClinicalBERT, SapBERT and MedCPT. Every `model`/`revision`/
+  `dimension` verified directly against the HuggingFace Hub API and each
+  model's own `config.json`, not fabricated. Two real findings from that
+  verification: **PubMedBERT was renamed** on the Hub (the well-known
+  name 307-redirects to `microsoft/BiomedNLP-BiomedBERT-base-uncased-
+  abstract-fulltext`; the preset keeps the familiar `"pubmedbert"` name
+  but points at the real, current repository) and **MedCPT is a dual
+  encoder**, not one symmetric model (NCBI publishes a separate
+  Query-Encoder and Article-Encoder) — presented as two explicit presets,
+  `medcpt-query` and `medcpt-article`, rather than picking one and
+  calling it "medcpt". Pooling defaults to `"mean"` for the three plain
+  MLM checkpoints (PubMedBERT/BioBERT/ClinicalBERT) and `"cls"` for
+  SapBERT/MedCPT, per their own documented convention.
+- `openbtk.core.retry`: `retry_with_backoff` moved here from
+  `openbtk.llms.base` (re-exported there for backward compatibility)
+  once `embeddings.openai` needed the identical rate-limited-then-retry
+  shape and had nothing LLM-specific to justify importing it from an
+  unrelated, same-level provider category.
+- `tests/unit/embeddings/test_{huggingface,openai,presets}.py` — 48
+  tests, 100% coverage across the whole `embeddings` package, none
+  needing the real `torch`/`transformers`/`openai` packages installed
+  (verified in a genuinely clean zero-extras venv): the HuggingFace
+  provider's tests use a small numpy-backed fake tensor with just enough
+  surface for its real pooling arithmetic to run unmodified.
+- `tests/contract/test_embedding_contract.py`, extended the same way
+  `test_llm_contract.py` was in task 5.2: the four checks that never
+  touch the network or a model run unconditionally (via
+  `PolicyConfig(allow_offsite_providers=True)`, since OpenAI is offsite
+  by design); `embed`/`embed_one` are skipped per key unless
+  `OPENBTK_SLOW_TESTS=1` **and** the specific resource each needs is
+  genuinely available (`OPENAI_API_KEY`, or `torch`+`transformers`
+  actually importable) — using a genuinely tiny, real test-only BERT
+  checkpoint (`hf-internal-testing/tiny-random-bert`, 126K parameters)
+  rather than a real biomedical preset's multi-GB model, so an opt-in run
+  of this suite never downloads gigabytes just to check a shape.
+
 ### Added — M5 (task 5.3 — biomedical LLM presets)
 - `openbtk.llms.presets`: `BIOMEDICAL_LLM_PRESETS`, `list_llm_presets()`,
   `create_llm_preset()`. Explicitly "config, not classes"
