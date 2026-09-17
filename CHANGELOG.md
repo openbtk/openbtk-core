@@ -11,6 +11,29 @@ recorded here.
 
 **M5 — Providers & Retrieval (in progress)**.
 
+### Added — M5 (task 5.5 — `sends_data_offsite` + `PolicyError`
+enforcement end to end)
+- `tests/integration/test_offsite_policy_pipeline.py`: closes the gap
+  task 5.2's own roadmap note anticipated ("this can only be REALLY
+  tested once a real offsite provider like OpenAI/Anthropic exists").
+  `tests/security/test_offsite_policy_enforcement.py` already proved the
+  enforcement *mechanism* (`Registry.create`/`create_from_config`) in
+  isolation, against fake test doubles on a private registry instance
+  (deliberately, so the embedding contract suite's real no-opt-out sweep
+  never trips over a fake offsite provider planted in a real global
+  registry). This proves the same enforcement fires when a real
+  `Pipeline` names a real registered offsite provider
+  (`llm.general.openai`, `embedding.general.openai`) — blocked with no
+  policy opt-in, and past construction (onto the executor's own,
+  already-disclosed "no llm/embedding-category dispatch yet" limit —
+  confirmed to be a genuinely different failure message, not the same
+  block reported twice) once `PolicyConfig(allow_offsite_providers=True)`
+  is set. A negative control (`llm.general.huggingface_local`,
+  `sends_data_offsite=False`) confirms the gate is targeted, not a
+  blanket restriction. No network call happens in any case: a blocked
+  construction never reaches the SDK client, and an allowed one fails
+  for the dispatch reason before ever reaching one either.
+
 ### Added — M5 (task 5.4 — `embeddings/`: PubMedBERT, BioBERT,
 ClinicalBERT, SapBERT, MedCPT, OpenAI)
 - `openbtk.embeddings.huggingface.HuggingFaceEmbeddingProvider`
