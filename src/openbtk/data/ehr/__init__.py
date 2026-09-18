@@ -1,4 +1,5 @@
-"""Structured EHR: FHIR R4, OMOP CDM, HL7v2 loaders; terminology and temporal
-normalisation; timeline serialisation; cohort building.
+"""EHR / EMR: FHIR + OMOP loaders, temporal normalisation, cohort building.
 See docs/05_DATA_MODALITY_SPEC.md section 2.
 """
+
+from __future__ import annotations
