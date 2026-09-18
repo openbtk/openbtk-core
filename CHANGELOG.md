@@ -9,7 +9,51 @@ recorded here.
 
 ## [Unreleased]
 
-**M5 — Providers & Retrieval (in progress)**.
+**M5 — Providers & Retrieval — complete**.
+
+### Added — M5 (task 5.8 — integration: full RAG pipeline with
+`SourceRef` provenance)
+- `openbtk.core.schemas.RAGAnswer` — `text`, `sources: list[SourceRef]`,
+  `usage: TokenUsage | None`. Carrying `sources` as its own field (not a
+  bare `LLMResponse`) is the whole point: every generated answer is
+  traceable back to the exact retrieved chunks it was grounded in, in the
+  order given to the model.
+- `openbtk.pipelines.rag.RAGPipeline` — embed the question, query a
+  vector store, optionally rerank, then generate, with `SourceRef`s
+  reconstructed for every chunk used. Deliberately **not** another
+  `openbtk.pipelines.executor` step type: that streaming DAG executor has
+  no `embedding`/`vectorstore`/`llm`-category dispatch yet (confirmed
+  directly by task 5.5's own integration test), and teaching it one is a
+  real, separate, larger undertaking than this task's scope — the ingest
+  side (load/deid/segment/chunk) already runs through the real executor
+  today; `RAGPipeline` covers the query side, which does not. Depends
+  only on the abstract base classes
+  (`BaseEmbeddingProvider`/`BaseVectorStore`/`BaseLLMProvider`/
+  `BaseReranker`), so it works with any real implementation from tasks
+  5.2/5.4/5.6/5.7 or a test double, via dependency injection.
+  Documents, and depends on, a real indexing convention: each chunk's own
+  text/record_id/chunk_id must be present in the metadata dict passed to
+  `BaseVectorStore.upsert` at index time (configurable key names) — there
+  is nowhere else for them to live.
+- `tests/unit/pipelines/test_rag.py` — 13 tests, 100% coverage, against
+  small real subclasses of the actual abstract bases (not bare mocks).
+- `tests/integration/test_rag_pipeline.py` — the real end-to-end proof:
+  load → deid → segment → chunk through the REAL executor (same
+  capture-guardrail pattern as M3's own integration test), then real
+  embedding (`HuggingFaceEmbeddingProvider` with the same genuinely tiny,
+  real `hf-internal-testing/tiny-random-bert` checkpoint the embedding
+  contract suite uses), a real `FAISSVectorStore`, and a real
+  `ConceptOverlapReranker` -- only the LLM is a deterministic test double
+  (no real API credentials in this environment; already covered
+  separately in tests/unit/llms). Gated on `torch`+`transformers` and
+  `faiss-cpu` actually being installed. A real bug was caught and fixed
+  while building this test, not merely by inspection: the first version
+  never populated each indexed chunk's own `"cuis"` metadata, so
+  `ConceptOverlapReranker`'s overlap score was silently 0 for every
+  result and ranking fell back entirely to `tiny-random-bert`'s
+  untrained (effectively random) embedding distances — caught by
+  actually running the test and getting the wrong note back, not
+  assumed correct from the code alone.
 
 ### Added — M5 (task 5.7 — `ConceptOverlapReranker`)
 - `openbtk.retrieval.reranker.ConceptOverlapReranker`

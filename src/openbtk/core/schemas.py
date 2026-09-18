@@ -301,3 +301,37 @@ class LLMResponse(BaseModel):
     usage: TokenUsage | None = Field(
         None, description="Token accounting for this call, if the provider reports it."
     )
+
+
+class RAGAnswer(BaseModel):
+    """The result of a full retrieve-(rerank)-generate RAG call
+    (:class:`~openbtk.pipelines.rag.RAGPipeline`, task 5.8).
+
+    ``sources`` is the whole point of carrying this as its own type rather
+    than returning a bare ``LLMResponse``: every generated answer is
+    traceable back to the exact retrieved chunks it was grounded in, in
+    the order they were given to the model -- what makes a
+    ``GroundednessGuardrail`` (or a human reviewer) able to check a claim
+    against a precise source rather than "some document somewhere"
+    (:class:`~openbtk.core.schemas.SourceRef`'s own docstring).
+
+    Example:
+        >>> answer = RAGAnswer(
+        ...     text="The patient has type 2 diabetes.",
+        ...     sources=[SourceRef(record_id="note-1", chunk_id="chunk-3")],
+        ... )
+        >>> answer.sources[0].record_id
+        'note-1'
+    """
+
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    text: str = Field(..., description="The generated answer.")
+    sources: list[SourceRef] = Field(
+        default_factory=list,
+        description="Retrieved chunks the answer was grounded in, in the "
+        "order given to the model.",
+    )
+    usage: TokenUsage | None = Field(
+        None, description="Token accounting for the generation call, if reported."
+    )
