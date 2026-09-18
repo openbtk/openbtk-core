@@ -55,6 +55,10 @@ if TYPE_CHECKING:
 _MISSING_DEPENDENCY_BY_KEY: dict[str, str] = {}
 if importlib.util.find_spec("pandas") is None:
     _MISSING_DEPENDENCY_BY_KEY["loader.clinical_text.mimic_notes"] = "pandas"
+if importlib.util.find_spec("fhir") is None:
+    _MISSING_DEPENDENCY_BY_KEY["loader.ehr.fhir"] = "fhir.resources"
+if importlib.util.find_spec("pyarrow") is None:
+    _MISSING_DEPENDENCY_BY_KEY["loader.ehr.omop"] = "pyarrow"
 
 
 def _skip_if_missing_dependency(key: str) -> None:
@@ -92,6 +96,39 @@ def _make_source(key: str, tmp_path: Path) -> Any:
         path = tmp_path / "notes.csv"
         path.write_text("ROW_ID,TEXT\n1,first\n2,second\n", encoding="utf-8")
         return str(path)
+    if key == "loader.ehr.fhir":
+        # A Bundle is plain JSON -- writing one needs no fhir.resources
+        # import at all (only FHIRLoader.load() itself does, lazily); two
+        # single-Patient bundles are a valid, minimal, real two-record source.
+        import json
+
+        for patient_id in ("pt-1", "pt-2"):
+            bundle = {
+                "resourceType": "Bundle",
+                "type": "collection",
+                "entry": [{"resource": {"resourceType": "Patient", "id": patient_id}}],
+            }
+            (tmp_path / f"{patient_id}.json").write_text(
+                json.dumps(bundle), encoding="utf-8"
+            )
+        return str(tmp_path)
+    if key == "loader.ehr.omop":
+        # Unlike the JSON case above, a real Parquet file genuinely needs
+        # pyarrow to write -- guarded so the two iterator-protocol checks
+        # below (which call this function unconditionally, before any
+        # _skip_if_missing_dependency gate) never raise ImportError in a
+        # zero-extras environment; they only inspect this return value's
+        # type and never actually call .load() on it when pyarrow is absent.
+        if importlib.util.find_spec("pyarrow") is None:
+            return str(tmp_path)
+        import pyarrow as pa
+        import pyarrow.parquet as pq
+
+        pq.write_table(
+            pa.table({"person_id": [1, 2], "gender_concept_id": [8532, 8507]}),
+            tmp_path / "person.parquet",
+        )
+        return str(tmp_path)
     return iter(["a", "b"])
 
 
