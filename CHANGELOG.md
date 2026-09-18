@@ -11,6 +11,64 @@ recorded here.
 
 **M5 — Providers & Retrieval (in progress)**.
 
+### Added — M5 (task 5.6 — `retrieval/`: FAISS, Chroma, Qdrant)
+- `openbtk.retrieval.faiss.FAISSVectorStore` (`vectorstore.general.faiss`)
+  — a local, in-process FAISS index (`IndexIDMap` over `IndexFlatL2`/
+  `IndexFlatIP`) with a real string-id-to-int64 mapping layered over it
+  (FAISS itself has neither string ids, metadata, nor upsert), real
+  `remove_ids`-based delete, and real `write_index`/`read_index`
+  persistence plus a JSON sidecar for the id/metadata state FAISS itself
+  doesn't persist. `query`'s `filter` is an exact-match-all post-filter,
+  disclosed as approximate (it can return fewer than `top_k` matches even
+  when more exist) since FAISS's base index has no metadata-aware search
+  at all -- mitigated, not hidden, by over-fetching when a filter is set.
+  `SearchResult.score` is always higher-is-better regardless of metric
+  (L2 distances negated, inner product used as-is).
+- `openbtk.retrieval.chroma.ChromaVectorStore`
+  (`vectorstore.general.chroma`) — wraps Chroma's *embedded* client modes
+  only (ephemeral in-memory, or `PersistentClient`) — never `HttpClient`,
+  a deliberate, disclosed scope limit (a remote-server variant would need
+  its own offsite-policy handling). Found while testing against the real
+  client, not assumed: Chroma rejects an empty `{}` metadata dict outright
+  ("Expected metadata to be a non-empty dict") but accepts `None` for "no
+  metadata" — handled by converting empty dicts before every upsert.
+- `openbtk.retrieval.qdrant.QdrantVectorStore`
+  (`vectorstore.general.qdrant`) — same embedded-only scope limit as
+  Chroma (`":memory:"` or a local `path=`, never a remote/Cloud
+  `url=`/`host=`). Qdrant point ids must be an unsigned int or UUID, never
+  an arbitrary string — every point's id is a `uuid.uuid5` deterministically
+  derived from the caller's own string id (stable across calls, so
+  `upsert` on an existing id genuinely overwrites the same point), with
+  the original string round-tripped through the point's payload. Another
+  real finding from testing against the live client: on-disk `path=`
+  access is exclusive, not concurrent — a second store instance pointed
+  at a still-open path raises a real `RuntimeError` from the client
+  itself, confirmed directly and documented, not silently papered over.
+- Both Chroma's and Qdrant's persistence models don't match
+  `BaseVectorStore`'s explicit `persist(path)`/`load(path)` pair (an
+  embedded/local client persists continuously once configured with a
+  path, with no "save now" step) — both classes disclose this and leave
+  the base class's own `NotImplementedError` defaults in place rather
+  than forcing an awkward, misleading implementation onto a model that
+  doesn't have one; persistence is configured via each constructor's own
+  `path` argument instead.
+- `pyproject.toml`: `qdrant-client>=1.9` added to the `retrieval` extra —
+  the roadmap names FAISS, Chroma **and** Qdrant, but the extra never
+  listed the package the third one needs.
+- `tests/unit/retrieval/test_{faiss,chroma,qdrant}.py` — 56 tests, 100%
+  coverage across the whole `retrieval` package, run against the REAL
+  libraries (not mocked): unlike the LLM/embedding SDK clients, all three
+  are purely local, fast, no-network operations, so there is no cost or
+  real-call concern to mock away — gated only on the respective package
+  actually being installed (the same pattern already used for
+  pandas-dependent loader tests), verified clean in a genuinely fresh
+  zero-extras venv.
+- `tests/contract/test_vectorstore_contract.py`, extended with the same
+  missing-dependency gating and a real `tmp_path` for the persistence
+  check (the previous version's bare relative path would have littered a
+  real file in the working directory every run, for any store that
+  actually supports `persist()`, once one existed to trip over it).
+
 ### Added — M5 (task 5.5 — `sends_data_offsite` + `PolicyError`
 enforcement end to end)
 - `tests/integration/test_offsite_policy_pipeline.py`: closes the gap
