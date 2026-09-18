@@ -35,6 +35,14 @@ def _make_record(key: str, record_id: str, text: str) -> Any:
         from openbtk.data.clinical_text.schemas import ClinicalTextRecord
 
         return ClinicalTextRecord(record_id=record_id, source="synthea", text=text)
+    if key.startswith("preprocessor.ehr."):
+        from openbtk.data.ehr.schemas import Demographics, PatientRecord
+
+        return PatientRecord(
+            patient_id=record_id,
+            demographics=Demographics(),
+            source_system="fhir-r4",
+        )
     return FixtureRecord(record_id=record_id, text=text)
 
 

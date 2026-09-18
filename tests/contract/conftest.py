@@ -119,6 +119,10 @@ from openbtk import retrieval as _retrieval  # noqa: F401
 # PlainTextLoader/JSONLLoader/MIMICNotesLoader, for test_loader_contract.py:
 from openbtk.data import clinical_text as _clinical_text  # noqa: F401
 
+# FHIRLoader/OMOPLoader/TemporalNormalizer, for test_loader_contract.py and
+# test_preprocessor_contract.py:
+from openbtk.data import ehr as _ehr  # noqa: F401
+
 # ---------------------------------------------------------------------------
 # Shared fixture schemas -- deliberately NOT importing modality-specific
 # SCHEMAS from any modality module; the contract layer tests base-class
