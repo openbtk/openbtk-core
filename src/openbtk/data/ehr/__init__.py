@@ -10,6 +10,6 @@ first real use (CLAUDE.md rule 5).
 
 from __future__ import annotations
 
-from openbtk.data.ehr import fhir, omop
+from openbtk.data.ehr import fhir, omop, temporal
 
-__all__ = ["fhir", "omop"]
+__all__ = ["fhir", "omop", "temporal"]
