@@ -83,14 +83,40 @@ class HuggingFaceLocalProvider(BaseLLMProvider):
             # tensor backend to actually run a model, even though this class
             # never calls torch's API directly (transformers does, internally).
             transformers = require("transformers", extra="text")
-            self._tokenizer = transformers.AutoTokenizer.from_pretrained(
-                self._model_name, revision=self._revision
-            )
+            self._tokenizer = self._load_tokenizer(transformers)
             model = transformers.AutoModelForCausalLM.from_pretrained(
                 self._model_name, revision=self._revision
             )
             self._model = model.to(self._device)
         return self._tokenizer, self._model
+
+    def _load_tokenizer(self, transformers: Any) -> Any:
+        """Load the tokenizer, falling back to the slow (pure-Python)
+        tokenizer when the fast one can't be built.
+
+        A repo that ships only legacy slow-tokenizer files (``vocab.json``
+        + ``merges.txt``, no ``tokenizer.json`` -- true of real, still
+        widely used checkpoints such as ``sshleifer/tiny-gpt2``) makes
+        ``AutoTokenizer``'s default ``use_fast=True`` raise a real
+        ``ValueError`` in this transformers version instead of silently
+        falling back, reproduced directly against the real model. The
+        slow tokenizer is fully capable of tokenizing/decoding correctly
+        from those same files; it is only more expensive per call, an
+        acceptable trade-off for a single-request local-generation
+        provider rather than a high-throughput server.
+        """
+        try:
+            return transformers.AutoTokenizer.from_pretrained(
+                self._model_name, revision=self._revision
+            )
+        except ValueError:
+            log.warning(
+                "llm.huggingface_local.fast_tokenizer_unavailable",
+                model=self._model_name,
+            )
+            return transformers.AutoTokenizer.from_pretrained(
+                self._model_name, revision=self._revision, use_fast=False
+            )
 
     def _prompt_from_messages(self, messages: list[Message]) -> str:
         """Render a message list to a single prompt string.

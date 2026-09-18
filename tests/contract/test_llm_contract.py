@@ -64,7 +64,7 @@ _ALLOW_OFFSITE = PolicyConfig(allow_offsite_providers=True)
 # is a harmless placeholder for the three tests that never make a real
 # call (declares_sends_data_offsite/model_identity/provenance); the real,
 # env-provided endpoint is substituted in _new_instance for the three that do.
-_TINY_GPT2_SHA = "5f91d94ce9ff8f65e1c2b0e75c7cd54306e02710"  # pragma: allowlist secret
+_TINY_GPT2_SHA = "5f91d94bd9cd7190a9f3216ff93cd1dd95f2c7be"  # pragma: allowlist secret
 _OPENAI_COMPATIBLE_BASE_URL_ENV_VAR = "OPENBTK_TEST_OPENAI_COMPATIBLE_BASE_URL"
 _CONSTRUCTOR_KWARGS_BY_KEY: dict[str, dict[str, Any]] = {
     "llm.general.huggingface_local": {

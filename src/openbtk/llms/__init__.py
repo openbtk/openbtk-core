@@ -14,10 +14,16 @@ the four imports pulls in a heavy optional dependency by itself: every
 provider's real SDK/model import is lazy, inside a method, via
 ``openbtk.core._lazy.require`` (``openai.py``, ``anthropic.py``,
 ``huggingface.py``) or is ``httpx`` (already core, ``openai_compatible.py``).
+
+``llms.presets`` (task 5.3) has no registration side effect of its own --
+it is a lookup table of ``{"type": ..., "params": {...}}`` configs for
+``HuggingFaceLocalProvider``, not a new component -- but is imported here
+too for the same reason every other submodule is: so
+``from openbtk.llms import presets`` needs no separate import elsewhere.
 """
 
 from __future__ import annotations
 
-from openbtk.llms import anthropic, huggingface, openai, openai_compatible
+from openbtk.llms import anthropic, huggingface, openai, openai_compatible, presets
 
-__all__ = ["anthropic", "huggingface", "openai", "openai_compatible"]
+__all__ = ["anthropic", "huggingface", "openai", "openai_compatible", "presets"]

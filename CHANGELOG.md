@@ -9,7 +9,237 @@ recorded here.
 
 ## [Unreleased]
 
-**M5 — Providers & Retrieval (in progress)**.
+**M5 — Providers & Retrieval — complete**.
+
+### Added — M5 (task 5.8 — integration: full RAG pipeline with
+`SourceRef` provenance)
+- `openbtk.core.schemas.RAGAnswer` — `text`, `sources: list[SourceRef]`,
+  `usage: TokenUsage | None`. Carrying `sources` as its own field (not a
+  bare `LLMResponse`) is the whole point: every generated answer is
+  traceable back to the exact retrieved chunks it was grounded in, in the
+  order given to the model.
+- `openbtk.pipelines.rag.RAGPipeline` — embed the question, query a
+  vector store, optionally rerank, then generate, with `SourceRef`s
+  reconstructed for every chunk used. Deliberately **not** another
+  `openbtk.pipelines.executor` step type: that streaming DAG executor has
+  no `embedding`/`vectorstore`/`llm`-category dispatch yet (confirmed
+  directly by task 5.5's own integration test), and teaching it one is a
+  real, separate, larger undertaking than this task's scope — the ingest
+  side (load/deid/segment/chunk) already runs through the real executor
+  today; `RAGPipeline` covers the query side, which does not. Depends
+  only on the abstract base classes
+  (`BaseEmbeddingProvider`/`BaseVectorStore`/`BaseLLMProvider`/
+  `BaseReranker`), so it works with any real implementation from tasks
+  5.2/5.4/5.6/5.7 or a test double, via dependency injection.
+  Documents, and depends on, a real indexing convention: each chunk's own
+  text/record_id/chunk_id must be present in the metadata dict passed to
+  `BaseVectorStore.upsert` at index time (configurable key names) — there
+  is nowhere else for them to live.
+- `tests/unit/pipelines/test_rag.py` — 13 tests, 100% coverage, against
+  small real subclasses of the actual abstract bases (not bare mocks).
+- `tests/integration/test_rag_pipeline.py` — the real end-to-end proof:
+  load → deid → segment → chunk through the REAL executor (same
+  capture-guardrail pattern as M3's own integration test), then real
+  embedding (`HuggingFaceEmbeddingProvider` with the same genuinely tiny,
+  real `hf-internal-testing/tiny-random-bert` checkpoint the embedding
+  contract suite uses), a real `FAISSVectorStore`, and a real
+  `ConceptOverlapReranker` -- only the LLM is a deterministic test double
+  (no real API credentials in this environment; already covered
+  separately in tests/unit/llms). Gated on `torch`+`transformers` and
+  `faiss-cpu` actually being installed. A real bug was caught and fixed
+  while building this test, not merely by inspection: the first version
+  never populated each indexed chunk's own `"cuis"` metadata, so
+  `ConceptOverlapReranker`'s overlap score was silently 0 for every
+  result and ranking fell back entirely to `tiny-random-bert`'s
+  untrained (effectively random) embedding distances — caught by
+  actually running the test and getting the wrong note back, not
+  assumed correct from the code alone.
+
+### Added — M5 (task 5.7 — `ConceptOverlapReranker`)
+- `openbtk.retrieval.reranker.ConceptOverlapReranker`
+  (`reranker.general.concept_overlap`) — reorders search results by
+  shared UMLS CUIs between the query and each result (FR-R-03). Concept
+  *extraction* is deliberately not built here: `openbtk.terminology`
+  (UMLS/SNOMED/LOINC/RxNorm) isn't implemented yet, and UMLS itself is a
+  licensed, restricted vocabulary this project already commits to never
+  bundling — building a real entity-linker now would mean fabricating one
+  against no real vocabulary, a correctness risk worse than the reranker
+  itself. Concept extraction is an injected `extract_concepts:
+  Callable[[str], Iterable[str]]` dependency instead — "wrap, don't
+  reinvent" applied to this project's own future terminology work.
+  Each result's own CUIs are read from `SearchResult.metadata` (a
+  configurable key, `"cuis"` by default) rather than re-extracted per
+  result at rerank time, since a real indexing pipeline runs entity
+  linking once, at index time — not on every query. Sorts by
+  `(overlap_count, original_score)`, both descending, so a result set
+  with no concept metadata anywhere degrades gracefully to the original
+  score order rather than an arbitrary one.
+- `tests/unit/retrieval/test_reranker.py` — 15 tests, 100% coverage, no
+  optional dependency and no mocking needed (a trivial word-set extractor
+  stands in for a real linker in every test).
+- `tests/contract/test_reranker_contract.py`, extended with the
+  per-key constructor kwargs pattern already used by the vector store and
+  LLM/embedding contract suites, since `ConceptOverlapReranker` has no
+  default `extract_concepts`.
+
+### Added — M5 (task 5.6 — `retrieval/`: FAISS, Chroma, Qdrant)
+- `openbtk.retrieval.faiss.FAISSVectorStore` (`vectorstore.general.faiss`)
+  — a local, in-process FAISS index (`IndexIDMap` over `IndexFlatL2`/
+  `IndexFlatIP`) with a real string-id-to-int64 mapping layered over it
+  (FAISS itself has neither string ids, metadata, nor upsert), real
+  `remove_ids`-based delete, and real `write_index`/`read_index`
+  persistence plus a JSON sidecar for the id/metadata state FAISS itself
+  doesn't persist. `query`'s `filter` is an exact-match-all post-filter,
+  disclosed as approximate (it can return fewer than `top_k` matches even
+  when more exist) since FAISS's base index has no metadata-aware search
+  at all -- mitigated, not hidden, by over-fetching when a filter is set.
+  `SearchResult.score` is always higher-is-better regardless of metric
+  (L2 distances negated, inner product used as-is).
+- `openbtk.retrieval.chroma.ChromaVectorStore`
+  (`vectorstore.general.chroma`) — wraps Chroma's *embedded* client modes
+  only (ephemeral in-memory, or `PersistentClient`) — never `HttpClient`,
+  a deliberate, disclosed scope limit (a remote-server variant would need
+  its own offsite-policy handling). Found while testing against the real
+  client, not assumed: Chroma rejects an empty `{}` metadata dict outright
+  ("Expected metadata to be a non-empty dict") but accepts `None` for "no
+  metadata" — handled by converting empty dicts before every upsert.
+- `openbtk.retrieval.qdrant.QdrantVectorStore`
+  (`vectorstore.general.qdrant`) — same embedded-only scope limit as
+  Chroma (`":memory:"` or a local `path=`, never a remote/Cloud
+  `url=`/`host=`). Qdrant point ids must be an unsigned int or UUID, never
+  an arbitrary string — every point's id is a `uuid.uuid5` deterministically
+  derived from the caller's own string id (stable across calls, so
+  `upsert` on an existing id genuinely overwrites the same point), with
+  the original string round-tripped through the point's payload. Another
+  real finding from testing against the live client: on-disk `path=`
+  access is exclusive, not concurrent — a second store instance pointed
+  at a still-open path raises a real `RuntimeError` from the client
+  itself, confirmed directly and documented, not silently papered over.
+- Both Chroma's and Qdrant's persistence models don't match
+  `BaseVectorStore`'s explicit `persist(path)`/`load(path)` pair (an
+  embedded/local client persists continuously once configured with a
+  path, with no "save now" step) — both classes disclose this and leave
+  the base class's own `NotImplementedError` defaults in place rather
+  than forcing an awkward, misleading implementation onto a model that
+  doesn't have one; persistence is configured via each constructor's own
+  `path` argument instead.
+- `pyproject.toml`: `qdrant-client>=1.9` added to the `retrieval` extra —
+  the roadmap names FAISS, Chroma **and** Qdrant, but the extra never
+  listed the package the third one needs.
+- `tests/unit/retrieval/test_{faiss,chroma,qdrant}.py` — 56 tests, 100%
+  coverage across the whole `retrieval` package, run against the REAL
+  libraries (not mocked): unlike the LLM/embedding SDK clients, all three
+  are purely local, fast, no-network operations, so there is no cost or
+  real-call concern to mock away — gated only on the respective package
+  actually being installed (the same pattern already used for
+  pandas-dependent loader tests), verified clean in a genuinely fresh
+  zero-extras venv.
+- `tests/contract/test_vectorstore_contract.py`, extended with the same
+  missing-dependency gating and a real `tmp_path` for the persistence
+  check (the previous version's bare relative path would have littered a
+  real file in the working directory every run, for any store that
+  actually supports `persist()`, once one existed to trip over it).
+
+### Added — M5 (task 5.5 — `sends_data_offsite` + `PolicyError`
+enforcement end to end)
+- `tests/integration/test_offsite_policy_pipeline.py`: closes the gap
+  task 5.2's own roadmap note anticipated ("this can only be REALLY
+  tested once a real offsite provider like OpenAI/Anthropic exists").
+  `tests/security/test_offsite_policy_enforcement.py` already proved the
+  enforcement *mechanism* (`Registry.create`/`create_from_config`) in
+  isolation, against fake test doubles on a private registry instance
+  (deliberately, so the embedding contract suite's real no-opt-out sweep
+  never trips over a fake offsite provider planted in a real global
+  registry). This proves the same enforcement fires when a real
+  `Pipeline` names a real registered offsite provider
+  (`llm.general.openai`, `embedding.general.openai`) — blocked with no
+  policy opt-in, and past construction (onto the executor's own,
+  already-disclosed "no llm/embedding-category dispatch yet" limit —
+  confirmed to be a genuinely different failure message, not the same
+  block reported twice) once `PolicyConfig(allow_offsite_providers=True)`
+  is set. A negative control (`llm.general.huggingface_local`,
+  `sends_data_offsite=False`) confirms the gate is targeted, not a
+  blanket restriction. No network call happens in any case: a blocked
+  construction never reaches the SDK client, and an allowed one fails
+  for the dispatch reason before ever reaching one either.
+
+### Added — M5 (task 5.4 — `embeddings/`: PubMedBERT, BioBERT,
+ClinicalBERT, SapBERT, MedCPT, OpenAI)
+- `openbtk.embeddings.huggingface.HuggingFaceEmbeddingProvider`
+  (`embedding.general.huggingface`) — one generic local `transformers`
+  encoder-embedding implementation, parameterised by model/revision/
+  pooling, serving every current biomedical BERT-family embedding model
+  (see presets below) rather than a bespoke class per model. `dimension`
+  is a *required* constructor argument (not derived by loading the
+  model): this class's own `sends_data_offsite`/`dimension`/
+  `model_identity`/`provenance` contract checks must stay possible
+  without a real model load. `embed()` still verifies the declared
+  dimension against what the model actually produces on first real use,
+  raising `ProviderError` on a mismatch rather than silently returning
+  the wrong shape into a vector store.
+- `openbtk.embeddings.openai.OpenAIEmbeddingProvider`
+  (`embedding.general.openai`) — thin adapter over the `openai` SDK's
+  Embeddings API, same retry/error-translation shape as
+  `llms.openai.OpenAIProvider`. `dimension` defaults from a small table
+  of OpenAI's own documented model widths, with a clear `ConfigError`
+  for an unrecognised model unless `dimension=` is passed explicitly.
+- `openbtk.embeddings.presets`: `BIOMEDICAL_EMBEDDING_PRESETS`,
+  `list_embedding_presets()`, `create_embedding_preset()` — same "config,
+  not classes" shape as `llms.presets` (task 5.3), covering PubMedBERT,
+  BioBERT, ClinicalBERT, SapBERT and MedCPT. Every `model`/`revision`/
+  `dimension` verified directly against the HuggingFace Hub API and each
+  model's own `config.json`, not fabricated. Two real findings from that
+  verification: **PubMedBERT was renamed** on the Hub (the well-known
+  name 307-redirects to `microsoft/BiomedNLP-BiomedBERT-base-uncased-
+  abstract-fulltext`; the preset keeps the familiar `"pubmedbert"` name
+  but points at the real, current repository) and **MedCPT is a dual
+  encoder**, not one symmetric model (NCBI publishes a separate
+  Query-Encoder and Article-Encoder) — presented as two explicit presets,
+  `medcpt-query` and `medcpt-article`, rather than picking one and
+  calling it "medcpt". Pooling defaults to `"mean"` for the three plain
+  MLM checkpoints (PubMedBERT/BioBERT/ClinicalBERT) and `"cls"` for
+  SapBERT/MedCPT, per their own documented convention.
+- `openbtk.core.retry`: `retry_with_backoff` moved here from
+  `openbtk.llms.base` (re-exported there for backward compatibility)
+  once `embeddings.openai` needed the identical rate-limited-then-retry
+  shape and had nothing LLM-specific to justify importing it from an
+  unrelated, same-level provider category.
+- `tests/unit/embeddings/test_{huggingface,openai,presets}.py` — 48
+  tests, 100% coverage across the whole `embeddings` package, none
+  needing the real `torch`/`transformers`/`openai` packages installed
+  (verified in a genuinely clean zero-extras venv): the HuggingFace
+  provider's tests use a small numpy-backed fake tensor with just enough
+  surface for its real pooling arithmetic to run unmodified.
+- `tests/contract/test_embedding_contract.py`, extended the same way
+  `test_llm_contract.py` was in task 5.2: the four checks that never
+  touch the network or a model run unconditionally (via
+  `PolicyConfig(allow_offsite_providers=True)`, since OpenAI is offsite
+  by design); `embed`/`embed_one` are skipped per key unless
+  `OPENBTK_SLOW_TESTS=1` **and** the specific resource each needs is
+  genuinely available (`OPENAI_API_KEY`, or `torch`+`transformers`
+  actually importable) — using a genuinely tiny, real test-only BERT
+  checkpoint (`hf-internal-testing/tiny-random-bert`, 126K parameters)
+  rather than a real biomedical preset's multi-GB model, so an opt-in run
+  of this suite never downloads gigabytes just to check a shape.
+
+### Added — M5 (task 5.3 — biomedical LLM presets)
+- `openbtk.llms.presets`: `BIOMEDICAL_LLM_PRESETS`, `list_llm_presets()`,
+  `create_llm_preset()`. Explicitly "config, not classes"
+  (docs/10_ROADMAP.md's own wording): MedGemma, Meditron and OpenBioLLM
+  are ordinary causal LMs `HuggingFaceLocalProvider` already handles, so
+  a preset is a `{"type": ..., "params": {...}}` dict — the same shape
+  `Registry.create_from_config` already accepts — not a new provider
+  subclass per model. Every preset's `revision` is a real commit SHA
+  fetched directly from the HuggingFace Hub API at write time (`GET
+  /api/models/<id>`), not fabricated; `google/medgemma-4b-it` was
+  checked and rejected for the MedGemma preset specifically because the
+  Hub API reports it as `image-text-to-text` (multimodal), architecturally
+  incompatible with `HuggingFaceLocalProvider`'s text-only interface —
+  `google/medgemma-27b-text-it` (confirmed `text-generation`) is the
+  MedGemma preset instead. `meditron-7b` and `medgemma-27b-text` are
+  gated on the Hub (confirmed via the same API call) and require prior
+  license acceptance + `huggingface-cli login`; disclosed in the module
+  docstring, not silently assumed to work.
 
 ### Added — M5 (task 5.1 — `llms/base.py`: messages, responses,
 retry/backoff, token accounting)
@@ -103,6 +333,32 @@ OpenAI-compatible endpoint providers)
   real tensor backend to run a model, and does not pull one in itself.
 
 ### Fixed — M5
+- `tests/contract/test_llm_contract.py` and
+  `tests/integration/test_offsite_policy_pipeline.py`: both used a wrong
+  commit SHA for `sshleifer/tiny-gpt2`
+  (`5f91d94ce9ff8f65e1c2b0e75c7cd54306e02710`, apparently a transcription
+  error made back in task 5.2/5.5 before this project's later,
+  now-consistent habit of verifying every model identifier directly
+  against the HuggingFace Hub API) — never actually exercised until a
+  full `OPENBTK_SLOW_TESTS=1` run with real `torch`/`transformers`
+  installed hit `RevisionNotFoundError: 404 Client Error... Invalid rev
+  id`. Corrected to the real SHA
+  (`5f91d94bd9cd7190a9f3216ff93cd1dd95f2c7be`), verified directly via
+  `GET https://huggingface.co/api/models/sshleifer/tiny-gpt2`. A full
+  sweep of every other model-identifier SHA introduced across M5 (11
+  total, in `llms/presets.py`, `embeddings/presets.py`, and the
+  contract/integration test fixtures) was re-verified against the real
+  Hub API the same way; all others were already correct.
+- `src/openbtk/llms/huggingface.py`: `HuggingFaceLocalProvider` raised a
+  real `ValueError` loading `sshleifer/tiny-gpt2` once the SHA above was
+  fixed and a real download actually happened — that repo ships only
+  legacy slow-tokenizer files (`vocab.json` + `merges.txt`, no
+  `tokenizer.json`), and the installed `transformers` version no longer
+  silently falls back to the slow tokenizer when fast-tokenizer
+  conversion fails. `_load_tokenizer()` now retries with `use_fast=False`
+  on that `ValueError`, a real, disclosed trade-off (correctness over the
+  fast tokenizer's speed) for any local model that ships without a
+  bundled fast-tokenizer file, not just this test fixture.
 - `.pre-commit-config.yaml`: mypy hook pin (`v1.11.2`) predates a behaviour
   change in how mypy narrows `isinstance` checks against a dunder method's
   same-typed `other` parameter, producing a false-positive "unreachable"

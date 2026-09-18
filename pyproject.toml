@@ -78,6 +78,10 @@ ehr = [
 retrieval = [
     "faiss-cpu>=1.8",
     "chromadb>=0.5",
+    # openbtk.retrieval.qdrant: task 5.6's roadmap entry names FAISS,
+    # Chroma AND Qdrant explicitly, but this extra never listed the
+    # package the third one needs -- added here, not assumed present.
+    "qdrant-client>=1.9",
 ]
 llms = [
     "openai>=1.30",

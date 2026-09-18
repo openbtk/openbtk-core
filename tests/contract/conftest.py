@@ -107,8 +107,14 @@ if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
 # real implementations are registered before their contract suite's own
 # parametrize evaluates.
 #
+# The two embedding providers, for test_embedding_contract.py:
+from openbtk import embeddings as _embeddings  # noqa: F401
+
 # The four LLM providers, for test_llm_contract.py:
 from openbtk import llms as _llms  # noqa: F401
+
+# The three vector stores, for test_vectorstore_contract.py:
+from openbtk import retrieval as _retrieval  # noqa: F401
 
 # PlainTextLoader/JSONLLoader/MIMICNotesLoader, for test_loader_contract.py:
 from openbtk.data import clinical_text as _clinical_text  # noqa: F401
