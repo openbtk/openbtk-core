@@ -9,6 +9,86 @@ recorded here.
 
 ## [Unreleased]
 
+**M6 — EHR — complete**.
+
+### Added — M6 (task 6.7 — integration: Synthea-shaped FHIR round trip)
+A FHIR R4 Bundle matching Synthea's real default per-patient export shape,
+run through the real `FHIRLoader -> TemporalNormalizer ->
+PatientTimelineSerializer` chain, proves three claims for real rather than
+by construction: (1) those three components genuinely compose; (2) the
+"cross-modal seam" claim (docs/05_DATA_MODALITY_SPEC.md section 2.3) —
+a PHI-shaped value deliberately embedded in a coded event's display text
+is actually redacted by the exact same real `clinical_text` pipeline
+(`PlainTextLoader` -> `DeidPreprocessor` -> `SectionSegmenter` ->
+`SectionAwareChunker`) M3's own integration test uses, unmodified; (3)
+"switch from FHIR to OMOP is a config change" — the identical, unmodified
+`has_condition(...)` cohort predicate matches a patient loaded from a FHIR
+bundle and an independently-built OMOP Parquet dataset describing an
+equivalent patient.
+
+### Added — M6 (tasks 6.5, 6.6 — `PatientTimelineSerializer`, `CohortBuilder`)
+`PatientTimelineSerializer` converts a `PatientRecord` into a
+`ClinicalTextRecord`, so a structured chart flows into the same
+de-identification/chunking/guardrail text pipeline clinical notes already
+use. **Lives in `openbtk.pipelines`, not `openbtk.data.ehr`** — a real
+architectural issue caught by running import-linter, not assumed: placing
+it under `data.ehr` fails the "Modalities are independent of one another"
+contract, since the conversion genuinely needs both `data.ehr`'s and
+`data.clinical_text`'s concrete types. `openbtk.pipelines` sits above
+`openbtk.data` and may depend on either, the same way `RAGPipeline` (task
+5.8) already spans provider categories. Separately, it is also not a
+registered `preprocessor.ehr.*` step: `BasePreprocessor.process()` is
+deliberately same-type in and out, which a `PatientRecord ->
+ClinicalTextRecord` conversion cannot be.
+
+`CohortBuilder` composes `include()`/`exclude()` predicates
+(`has_condition`/`has_medication`/`has_procedure`/`age_between`) over a
+streaming `Iterable[PatientRecord]`, never materialising the source. Does
+**not** implement the original spec example's `before_index=True`/
+`.within(encounter_window(...))` — that needs an index-date definition the
+spec never actually gave, and inventing one would have been an unverified
+design decision (rule 14). A follow-up ADR is the right place to define it
+once a real use case needs it.
+
+### Added — M6 (task 6.4 — `TemporalNormalizer`)
+Anchors an event's missing timestamp to its encounter's start time when
+resolvable (a real gap in OMOP's `visit_occurrence`-only timestamping in
+particular), and sorts every event list chronologically, undated items
+last. Genuinely fits `BasePreprocessor`'s same-type contract, unlike
+`PatientTimelineSerializer`, so it registers normally as
+`preprocessor.ehr.temporal`.
+
+### Added — M6 (tasks 6.2, 6.3 — `FHIRLoader`, `OMOPLoader`)
+`FHIRLoader` reads one FHIR R4 Bundle JSON file per patient (Synthea's own
+default per-patient export shape), wrapping `fhir.resources`' R4B models
+for real validation. Recognises `Patient`/`Encounter`/`Condition`/
+`MedicationRequest`/`MedicationStatement`/`Procedure`/`Observation`; an
+unrecognised coding system (outside the six standard HL7 URIs this loader
+knows) is skipped with a logged warning rather than failing the whole
+patient. Race/ethnicity read from the real US Core extensions when
+present.
+
+`OMOPLoader` reads OMOP CDM v5.4 core tables as batched Parquet via
+pyarrow. Two disclosed, real scope decisions: no vocabulary resolution
+(reads `*_source_value` columns directly — resolving standard concept ids
+needs the multi-gigabyte `concept` table this project does not bundle);
+and memory is not O(batch) across the whole loader the way the
+`clinical_text` loaders are, since OMOP's normalised multi-table schema
+does not co-locate one patient's events across independently-scanned
+tables — a real, disclosed trade-off, documented in the module's own
+docstring, not a shortcut.
+
+### Added — M6 (task 6.1 — `ehr/schemas.py`)
+`PatientRecord`/`Demographics`/`Encounter`/`CodedEvent`/`Measurement` —
+the convergence point FHIR and OMOP both map into. `CodeSystem`
+(`openbtk.core.schemas`) reconciles a real documentation inconsistency
+flagged since M5: the spec's original `CodedEvent.system` comment
+(SNOMED/ICD10/ICD10CM/RXNORM/LOINC/CPT) disagreed with the glossary's
+authoritative set (SNOMED/LOINC/ICD10CM/RXNORM/CPT/UCUM) — reconciled in
+favour of the glossary. `Measurement` gains a `display` field beyond the
+original spec listing, needed for `PatientTimelineSerializer` to render a
+human-readable lab name rather than a bare code.
+
 **M5 — Providers & Retrieval — complete**.
 
 ### Added — M5 (task 5.8 — integration: full RAG pipeline with
