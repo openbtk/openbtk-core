@@ -116,6 +116,10 @@ from openbtk import llms as _llms  # noqa: F401
 # The three vector stores, for test_vectorstore_contract.py:
 from openbtk import retrieval as _retrieval  # noqa: F401
 
+# UMLSRestBackend/LocalVocabBackend/BundledMinimalBackend, for
+# test_terminology_contract.py:
+from openbtk import terminology as _terminology  # noqa: F401
+
 # PlainTextLoader/JSONLLoader/MIMICNotesLoader, for test_loader_contract.py:
 from openbtk.data import clinical_text as _clinical_text  # noqa: F401
 
