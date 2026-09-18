@@ -11,6 +11,33 @@ recorded here.
 
 **M5 — Providers & Retrieval (in progress)**.
 
+### Added — M5 (task 5.7 — `ConceptOverlapReranker`)
+- `openbtk.retrieval.reranker.ConceptOverlapReranker`
+  (`reranker.general.concept_overlap`) — reorders search results by
+  shared UMLS CUIs between the query and each result (FR-R-03). Concept
+  *extraction* is deliberately not built here: `openbtk.terminology`
+  (UMLS/SNOMED/LOINC/RxNorm) isn't implemented yet, and UMLS itself is a
+  licensed, restricted vocabulary this project already commits to never
+  bundling — building a real entity-linker now would mean fabricating one
+  against no real vocabulary, a correctness risk worse than the reranker
+  itself. Concept extraction is an injected `extract_concepts:
+  Callable[[str], Iterable[str]]` dependency instead — "wrap, don't
+  reinvent" applied to this project's own future terminology work.
+  Each result's own CUIs are read from `SearchResult.metadata` (a
+  configurable key, `"cuis"` by default) rather than re-extracted per
+  result at rerank time, since a real indexing pipeline runs entity
+  linking once, at index time — not on every query. Sorts by
+  `(overlap_count, original_score)`, both descending, so a result set
+  with no concept metadata anywhere degrades gracefully to the original
+  score order rather than an arbitrary one.
+- `tests/unit/retrieval/test_reranker.py` — 15 tests, 100% coverage, no
+  optional dependency and no mocking needed (a trivial word-set extractor
+  stands in for a real linker in every test).
+- `tests/contract/test_reranker_contract.py`, extended with the
+  per-key constructor kwargs pattern already used by the vector store and
+  LLM/embedding contract suites, since `ConceptOverlapReranker` has no
+  default `extract_concepts`.
+
 ### Added — M5 (task 5.6 — `retrieval/`: FAISS, Chroma, Qdrant)
 - `openbtk.retrieval.faiss.FAISSVectorStore` (`vectorstore.general.faiss`)
   — a local, in-process FAISS index (`IndexIDMap` over `IndexFlatL2`/

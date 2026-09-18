@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import pytest
 
@@ -12,9 +12,18 @@ from openbtk.core.schemas import SearchResult
 if TYPE_CHECKING:
     from openbtk.core.base import BaseReranker
 
+# ConceptOverlapReranker needs a concept-extraction callable up front (no
+# default -- see its own module docstring for why); the reference
+# implementation needs nothing extra.
+_CONSTRUCTOR_KWARGS_BY_KEY: dict[str, dict[str, Any]] = {
+    "reranker.general.concept_overlap": {
+        "extract_concepts": lambda text: set(text.split())
+    },
+}
+
 
 def _new_instance(key: str) -> BaseReranker:
-    return RERANKER_REGISTRY.create(key)
+    return RERANKER_REGISTRY.create(key, **_CONSTRUCTOR_KWARGS_BY_KEY.get(key, {}))
 
 
 def _sample_results() -> list[SearchResult]:
