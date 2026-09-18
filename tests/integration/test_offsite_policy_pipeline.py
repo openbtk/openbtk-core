@@ -90,7 +90,7 @@ class TestLocalOnlyProviderIsUnaffectedThroughTheRealPipeline:
     a local, non-offsite provider must never trip this gate."""
 
     def test_a_local_llm_step_is_not_blocked_by_the_offsite_gate(self) -> None:
-        sha = "5f91d94ce9ff8f65e1c2b0e75c7cd54306e02710"  # pragma: allowlist secret
+        sha = "5f91d94bd9cd7190a9f3216ff93cd1dd95f2c7be"  # pragma: allowlist secret
         pipeline = Pipeline("local-probe").add(
             Step(
                 "llm",

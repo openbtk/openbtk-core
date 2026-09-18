@@ -114,15 +114,20 @@ def fake_model(fake_tokenizer: Any) -> Any:
     return model
 
 
+@pytest.fixture
+def fake_transformers_module(fake_tokenizer: Any, fake_model: Any) -> Any:
+    return _fake_transformers_module(fake_tokenizer, fake_model)
+
+
 @pytest.fixture(autouse=True)
 def _patch_require(
-    monkeypatch: pytest.MonkeyPatch, fake_tokenizer: Any, fake_model: Any
+    monkeypatch: pytest.MonkeyPatch, fake_transformers_module: Any
 ) -> None:
     def fake_require(module: str, extra: str) -> Any:
         if module == "torch":
             return _fake_torch_module()
         if module == "transformers":
-            return _fake_transformers_module(fake_tokenizer, fake_model)
+            return fake_transformers_module
         raise AssertionError(f"unexpected require({module!r})")
 
     monkeypatch.setattr("openbtk.llms.huggingface.require", fake_require)
@@ -283,6 +288,54 @@ class TestModelLaziness:
         assert fake_model.generate.call_count == 2
         # to() is called once, at load time, not once per generate() call
         fake_model.to.assert_called_once()
+
+
+class TestTokenizerFallback:
+    """Real bug found via the contract suite once torch/transformers were
+    actually installed: sshleifer/tiny-gpt2 ships only legacy slow-tokenizer
+    files (vocab.json + merges.txt, no tokenizer.json), and this
+    transformers version raises ValueError building the fast tokenizer
+    instead of silently falling back. _load_tokenizer must retry with
+    use_fast=False rather than let that ValueError propagate."""
+
+    def test_fast_tokenizer_is_used_when_it_loads_successfully(
+        self, fake_transformers_module: Any
+    ) -> None:
+        provider = _provider()
+        provider.generate("hello")
+        # only the plain (fast, default) call happened -- no use_fast kwarg
+        from_pretrained = fake_transformers_module.AutoTokenizer.from_pretrained
+        assert from_pretrained.call_count == 1
+        _, kwargs = from_pretrained.call_args
+        assert "use_fast" not in kwargs
+
+    def test_falls_back_to_the_slow_tokenizer_on_value_error(
+        self, fake_tokenizer: Any, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        calls: list[dict[str, Any]] = []
+
+        def _from_pretrained(model: str, **kwargs: Any) -> Any:
+            calls.append(kwargs)
+            if len(calls) == 1:
+                raise ValueError("Couldn't instantiate the backend tokenizer")
+            return fake_tokenizer
+
+        def fake_require(module: str, extra: str) -> Any:
+            if module == "torch":
+                return _fake_torch_module()
+            if module == "transformers":
+                module_mock = _fake_transformers_module(fake_tokenizer, MagicMock())
+                module_mock.AutoTokenizer.from_pretrained = _from_pretrained
+                return module_mock
+            raise AssertionError(f"unexpected require({module!r})")
+
+        monkeypatch.setattr("openbtk.llms.huggingface.require", fake_require)
+        provider = _provider()
+        provider.generate("hello")
+
+        assert len(calls) == 2
+        assert "use_fast" not in calls[0]
+        assert calls[1]["use_fast"] is False
 
 
 class TestDeclaredAttributes:

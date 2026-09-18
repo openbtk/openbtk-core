@@ -333,6 +333,32 @@ OpenAI-compatible endpoint providers)
   real tensor backend to run a model, and does not pull one in itself.
 
 ### Fixed — M5
+- `tests/contract/test_llm_contract.py` and
+  `tests/integration/test_offsite_policy_pipeline.py`: both used a wrong
+  commit SHA for `sshleifer/tiny-gpt2`
+  (`5f91d94ce9ff8f65e1c2b0e75c7cd54306e02710`, apparently a transcription
+  error made back in task 5.2/5.5 before this project's later,
+  now-consistent habit of verifying every model identifier directly
+  against the HuggingFace Hub API) — never actually exercised until a
+  full `OPENBTK_SLOW_TESTS=1` run with real `torch`/`transformers`
+  installed hit `RevisionNotFoundError: 404 Client Error... Invalid rev
+  id`. Corrected to the real SHA
+  (`5f91d94bd9cd7190a9f3216ff93cd1dd95f2c7be`), verified directly via
+  `GET https://huggingface.co/api/models/sshleifer/tiny-gpt2`. A full
+  sweep of every other model-identifier SHA introduced across M5 (11
+  total, in `llms/presets.py`, `embeddings/presets.py`, and the
+  contract/integration test fixtures) was re-verified against the real
+  Hub API the same way; all others were already correct.
+- `src/openbtk/llms/huggingface.py`: `HuggingFaceLocalProvider` raised a
+  real `ValueError` loading `sshleifer/tiny-gpt2` once the SHA above was
+  fixed and a real download actually happened — that repo ships only
+  legacy slow-tokenizer files (`vocab.json` + `merges.txt`, no
+  `tokenizer.json`), and the installed `transformers` version no longer
+  silently falls back to the slow tokenizer when fast-tokenizer
+  conversion fails. `_load_tokenizer()` now retries with `use_fast=False`
+  on that `ValueError`, a real, disclosed trade-off (correctness over the
+  fast tokenizer's speed) for any local model that ships without a
+  bundled fast-tokenizer file, not just this test fixture.
 - `.pre-commit-config.yaml`: mypy hook pin (`v1.11.2`) predates a behaviour
   change in how mypy narrows `isinstance` checks against a dunder method's
   same-typed `other` parameter, producing a false-positive "unreachable"
