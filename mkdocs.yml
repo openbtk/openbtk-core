@@ -31,6 +31,7 @@ theme:
 nav:
   - Home: index.md
   - Quick start: quickstart.md
+  - Benchmarks: benchmarks.md
   - API reference:
       - Core: api/core.md
       - De-identification: api/deid.md
