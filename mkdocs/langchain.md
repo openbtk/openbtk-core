@@ -46,7 +46,7 @@ chunk = ClinicalTextChunk(
 )
 document = chunk_to_document(chunk)
 assert document.page_content == chunk.text
-assert document_to_chunk(document) == chunk   # nothing is lost
+assert document_to_chunk(document) == chunk  # nothing is lost
 ```
 
 A `Document` that did not come from a chunk has no exact token count, and
@@ -113,8 +113,10 @@ class ListStore(BaseVectorStore):
 
     def query(self, vector, top_k=5, filter=None):
         hits = sorted(self.rows.items(), key=lambda kv: -float(kv[1][0] @ vector))
-        return [SearchResult(id=i, score=float(v @ vector), metadata=m)
-                for i, (v, m) in hits[:top_k]]
+        return [
+            SearchResult(id=i, score=float(v @ vector), metadata=m)
+            for i, (v, m) in hits[:top_k]
+        ]
 
     def delete(self, ids):
         for i in ids:
