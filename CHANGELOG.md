@@ -47,7 +47,7 @@ existing test suite.
   retrieval, guardrails, terminology, evaluation and the LangChain adapter; a
   tutorials page. Every guide code block is executed, every pipeline YAML block
   validated, every `openbtk ...` command parsed, every API directive resolved, by
-  `tests/docs`.
+  `tests/docsite`.
 - **Eight tutorial notebooks** (`notebooks/`), offline and synthetic-only, executed
   top to bottom in fresh kernels by `tests/notebooks`. New optional `notebooks`
   extra (nbclient, nbformat, ipykernel).

@@ -189,7 +189,7 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: |
           set +e
-          pytest "${{ github.workspace }}/tests/docs" \
+          pytest "${{ github.workspace }}/tests/docsite" \
                  "${{ github.workspace }}/tests/unit/integrations/test_docs_page.py" \
                  -q -rfEs -p no:cacheprovider --junitxml=docs.xml 2>&1 | tee pytest.out
           status=${PIPESTATUS[0]}
