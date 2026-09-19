@@ -110,6 +110,10 @@ if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
 # The two embedding providers, for test_embedding_contract.py:
 from openbtk import embeddings as _embeddings  # noqa: F401
 
+# PHILeakageGuardrail/TerminologyValidityGuardrail/GroundednessGuardrail/
+# EHR guardrails, for test_guardrail_contract.py:
+from openbtk import guardrails as _guardrails  # noqa: F401
+
 # The four LLM providers, for test_llm_contract.py:
 from openbtk import llms as _llms  # noqa: F401
 
