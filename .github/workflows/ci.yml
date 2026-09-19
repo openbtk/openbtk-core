@@ -104,7 +104,16 @@ jobs:
       - name: Test suite (from outside the repository)
         working-directory: ${{ runner.temp }}
         shell: bash
-        run: pytest "${{ github.workspace }}/tests" -v -p no:cacheprovider
+        run: |
+          set +e
+          pytest "${{ github.workspace }}/tests" -v -rfE -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            # Surface the failing tests as an annotation, readable without log access.
+            echo "::error title=test-core failed::$(grep -E '^(FAILED|ERROR)' pytest.out | head -c 1500 | tr '\n' '|')"
+            exit "$status"
+          fi
 
   # v0.5 gate "FHIR R4 + OMOP loaders; Synthea round-trip": test-core installs
   # zero extras, so its EHR tests skip (by design). This job installs [ehr] and
