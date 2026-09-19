@@ -703,12 +703,19 @@ every pipeline execution emits automatically. It runs on your laptop or
 behind your firewall, works with any LLM provider, and streams corpora far
 larger than memory.</p>
 <div class="admonition note">
-<p class="admonition-title">Status: early, real, and honestly scoped</p>
-<p>Milestones <strong>M1</strong> (core framework), <strong>M2</strong> (de-identification) and <strong>M3</strong>
-(clinical text + streaming pipelines) are built, tested, and merged.
-<strong><code>0.0.1</code> on PyPI is still a pre-implementation placeholder</strong> — install
-from source until <code>v0.1.0</code> ships real functionality to PyPI. See
-<a href="quickstart/">Quick start</a> for exact install instructions.</p>
+<p class="admonition-title">Status: pre-1.0, real, and honestly scoped</p>
+<p>Milestones <strong>M1–M8</strong> are built, tested, and merged: core framework,
+de-identification, clinical text, EHR loading, providers and retrieval,
+guardrails and terminology, benchmarks, and LangChain interop. <strong>PyPI
+carries <code>0.1.1</code></strong> (M1–M3); the rest is on <code>main</code> and ships with the next
+release. See <a href="quickstart/">Quick start</a> for install instructions.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">One published number is missing, on purpose</p>
+<p>The i2b2/n2c2 de-identification benchmark harness exists and is tested,
+but that corpus is Data-Use-Agreement-restricted and has <strong>not</strong> been run.
+The published figures are on a synthetic corpus. See
+<a href="benchmarks/">Benchmarks</a>.</p>
 </div>
 <h2 id="why">Why<a class="headerlink" href="#why" title="Permanent link">&para;</a></h2>
 <p>Building a clinical RAG pipeline means weeks of undifferentiated plumbing: a
@@ -734,7 +741,17 @@ two are what OpenBTK is for.</p>
   a <code>RunManifest</code>: per-step record counts, component identity, guardrail
   outcomes, and a content digest for each input source.</li>
 <li><strong>Streaming, not in-memory</strong> — 10,000,000 synthetic notes streamed
-  through the full four-stage pipeline at 0.056 GB peak RSS, measured.</li>
+  through the full four-stage pipeline at 0.074 GB peak RSS, measured.</li>
+<li><strong>EHR loading</strong> — FHIR R4 and OMOP into one <code>PatientRecord</code> schema, with
+  timelines, cohorts, and a serializer bridging EHR to clinical text.</li>
+<li><strong>Providers and retrieval</strong> — LLM and embedding providers behind one
+  interface with an off-site policy guard; FAISS, Chroma and Qdrant stores;
+  concept reranking; a RAG pipeline with source provenance.</li>
+<li><strong>Guardrails and terminology</strong> — PHI-leakage, terminology, groundedness
+  and EHR checks; a terminology service with a bundled ICD-10-CM subset.</li>
+<li><strong>Evaluation and interop</strong> — <a href="benchmarks/">reproducible benchmarks</a>,
+  retrieval metrics, and an optional <a href="langchain/">LangChain / LangGraph
+  adapter</a>.</li>
 </ul>
 <p>See the <a href="https://github.com/openbtk/openbtk-core">project README</a> and
 <a href="https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md">CHANGELOG</a>

@@ -708,7 +708,15 @@
 </thead>
 <tbody>
 <tr>
-<td>Core + clinical text (loaders, de-id, chunking, pipelines)</td>
+<td>Released to PyPI (<code>0.1.1</code>: core, de-identification, clinical text)</td>
+<td><code>pip install openbtk</code></td>
+</tr>
+<tr>
+<td>Everything on <code>main</code> (EHR, providers, retrieval, guardrails, interop)</td>
+<td><code>pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
+</tr>
+<tr>
+<td>Core + clinical text from source</td>
 <td><code>pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
 </tr>
 <tr>
@@ -717,8 +725,8 @@
 </tr>
 </tbody>
 </table>
-<p>From PyPI: not yet — <code>0.0.1</code> is a pre-implementation placeholder. Real
-functionality ships to PyPI at <code>v0.1.0</code>.</p>
+<p>Optional extras: <code>text</code>, <code>ehr</code>, <code>retrieval</code>, <code>llms</code>, <code>langchain</code>, <code>langgraph</code>.
+A component that needs one says which, by name, when you construct it.</p>
 <p>The optional NER recognizer additionally needs a downloaded spaCy model:</p>
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>spacy<span class="w"> </span>download<span class="w"> </span>en_core_web_sm
 </code></pre></div>
