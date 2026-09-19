@@ -1,0 +1,53 @@
+name: Benchmarks
+
+# NFR-01 / v0.5 gate: "MIMIC-scale streaming demonstrated < 4 GB RSS".
+# The benchmark streams 10,000,000 synthetic notes through the full four-stage
+# pipeline and takes tens of minutes, so it is nightly (and on demand) rather
+# than on every push. It is skipped by default in the ordinary suite
+# (tests/conftest.py); OPENBTK_RUN_BENCHMARKS=1 opts in.
+#
+# The notes are synthetic: the scale is MIMIC's, the data is not (MIMIC is
+# credentialed and is never used in CI).
+
+on:
+  schedule:
+    - cron: "17 3 * * *"
+  workflow_dispatch:
+    inputs:
+      note_count:
+        description: "Override the note count (default: the literal 10,000,000)"
+        required: false
+        default: ""
+
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  memory:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev]"
+      - name: Peak-RSS benchmark (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        env:
+          OPENBTK_RUN_BENCHMARKS: "1"
+          OPENBTK_BENCHMARK_NOTE_COUNT: ${{ github.event.inputs.note_count }}
+        run: |
+          pytest "${{ github.workspace }}/tests/benchmark" -s -v -p no:cacheprovider 2>&1 | tee bench.log
+          {
+            echo "### Memory benchmark"
+            echo
+            grep -E "^\[memory benchmark\]" bench.log || echo "no result line found"
+          } >> "$GITHUB_STEP_SUMMARY"

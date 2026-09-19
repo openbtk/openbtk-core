@@ -32,7 +32,7 @@ class TestNodeContract:
     def test_a_missing_input_key_names_the_key_not_the_state(self) -> None:
         node = as_langgraph_node(EchoLLM(), input_key="prompt", output_key="answer")
         with pytest.raises(ConfigError, match="'prompt'") as exc:
-            node({"secret": "PATIENT TEXT"})
+            node({"secret": "PATIENT TEXT"})  # pragma: allowlist secret
         assert "PATIENT TEXT" not in str(exc.value)
 
     def test_unsupported_components_fail_at_wrapping_time(self) -> None:
