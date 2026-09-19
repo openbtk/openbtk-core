@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, dev]
+    # feat/** and fix/**: feature branches get the same zero-extras matrix BEFORE
+    # merge. M6/M7 broke test-core on main because branch work was never run here.
+    branches: [main, dev, "feat/**", "fix/**"]
   pull_request:
     branches: [main, dev]
 
