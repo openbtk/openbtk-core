@@ -14,12 +14,11 @@ than memory.
 
 > ## Status: v0.5 — pre-1.0, real, and honestly scoped
 >
-> Milestones **M1–M9** are built, tested and released: the core framework,
+> Milestones **M1–M10** are built, tested and released: the core framework,
 > de-identification, clinical text, EHR loading, providers and retrieval,
 > guardrails and terminology, benchmarks, and LangChain interop.
-> `pip install openbtk` gives you `0.5.0`. `main` also has the `openbtk` command
-> line, clinical-QA and groundedness evaluation, guides and eight tutorial
-> notebooks (M10), which ship with the next release.
+> `pip install openbtk` gives you `0.6.0`, including the `openbtk` command line,
+> clinical-QA and groundedness evaluation, guides and eight tutorial notebooks.
 >
 > **The i2b2/n2c2 de-identification benchmark has not been run.** The harness
 > exists and is tested, but that corpus is released only under a Data Use

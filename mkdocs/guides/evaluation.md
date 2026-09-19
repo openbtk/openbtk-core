@@ -39,10 +39,6 @@ embedding provider and vector store.
 
 ## Clinical QA (MedQA / MedMCQA format)
 
-!!! note "New since 0.5.0"
-    Clinical QA evaluation, groundedness scoring and eval manifests is on `main` and ships with the next release. Until then install
-    from source: `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"`.
-
 `evaluate_qa` scores any function from a prompt to a reply, so a real model is
 one adapter away. This example uses a stand-in "model" so it runs anywhere:
 

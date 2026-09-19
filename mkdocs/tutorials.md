@@ -4,15 +4,12 @@ Eight Jupyter notebooks, in order. Each one runs **offline**, downloads no model
 uses only synthetic data, and is **executed in CI on every change** — a tutorial
 that stopped working would fail the build.
 
-The notebooks track `main`. Several use features and fixes newer than the 0.5.0
-release (the command line, QA and groundedness evaluation, `DATE_SHIFT` beside
-other identifiers, the terminology guardrail's warning-not-block behaviour), so
-install from source until the next release.
+The notebooks need OpenBTK 0.6.0 or later.
 
 To run them yourself:
 
 ```bash
-pip install "openbtk[text,ehr,langchain,langgraph,notebooks] @ git+https://github.com/openbtk/openbtk-core.git" faiss-cpu
+pip install "openbtk[text,ehr,langchain,langgraph,notebooks]" faiss-cpu
 jupyter lab notebooks/
 ```
 

@@ -1,9 +1,5 @@
 # Command line
 
-!!! note "New since 0.5.0"
-    The `openbtk` command is on `main` and ships with the next release. Until then install
-    from source: `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"`.
-
 `pip install openbtk` installs an `openbtk` command (also `python -m openbtk`).
 The library's own log lines go to **stderr**; a command's result is the only
 thing on **stdout**, so `--json` output can be piped straight into `jq` or a

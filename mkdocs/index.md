@@ -9,10 +9,10 @@ behind your firewall, works with any LLM provider, and streams corpora far
 larger than memory.
 
 !!! note "Status: v0.5 — pre-1.0, real, and honestly scoped"
-    Milestones **M1–M9** are built, tested, and released: core framework,
+    Milestones **M1–M10** are built, tested, and released: core framework,
     de-identification, clinical text, EHR loading, providers and retrieval,
     guardrails and terminology, benchmarks, and LangChain interop.
-    `pip install openbtk` gives you `0.5.0`. See [Quick start](quickstart.md).
+    `pip install openbtk` gives you `0.6.0`. See [Quick start](quickstart.md).
 
 !!! warning "The i2b2/n2c2 benchmark has not been run"
     The harness exists and is tested, but that corpus is

@@ -12,13 +12,10 @@
 | 8 | [LangChain and LangGraph](08_langchain_and_langgraph.ipynb) |
 
 Every notebook runs offline, downloads no model, and uses only fictitious data.
-They track `main`. Several use features and fixes newer than the 0.5.0 release
-(the command line, QA and groundedness evaluation, `DATE_SHIFT` beside other
-identifiers, the terminology guardrail's warning-not-block behaviour), so install
-from source until the next release.
+They need OpenBTK 0.6.0 or later.
 
 ```bash
-pip install "openbtk[text,ehr,langchain,langgraph,notebooks] @ git+https://github.com/openbtk/openbtk-core.git" faiss-cpu
+pip install "openbtk[text,ehr,langchain,langgraph,notebooks]" faiss-cpu
 jupyter lab notebooks/
 ```
 
