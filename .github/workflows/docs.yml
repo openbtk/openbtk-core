@@ -26,11 +26,11 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[docs]"
-      # Strict mode deliberately off -- see mkdocs.yml's own comment on a
-      # known mkdocstrings/autorefs false positive against doctest output.
+      - run: pip install -e ".[docs,langchain]"
+      # --strict: any warning fails the build (see mkdocs.yml for the one class
+      # of warning to watch for in docstrings).
       - name: Build
-        run: mkdocs build
+        run: mkdocs build --strict
 
   deploy:
     needs: build
@@ -43,7 +43,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[docs]"
+      - run: pip install -e ".[docs,langchain]"
       - name: Configure git identity for mike's commits
         run: |
           git config user.name "github-actions[bot]"

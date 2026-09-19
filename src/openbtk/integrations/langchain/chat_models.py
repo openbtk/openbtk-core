@@ -54,8 +54,8 @@ class OpenBTKChatModel(BaseChatModel):
     ``.stream()`` here falls back to LangChain's default of yielding the
     complete response as a single chunk.
 
-    Args:
-        provider: The provider to wrap.
+    Construct it with ``provider=`` -- the ``BaseLLMProvider`` to wrap (a
+    pydantic field, as every LangChain chat model's parameters are).
 
     Example:
         >>> from openbtk.core.base import BaseLLMProvider

@@ -172,6 +172,49 @@ jobs:
         working-directory: ${{ runner.temp }}
         run: pytest "${{ github.workspace }}/tests" --ignore="${{ github.workspace }}/tests/unit/integrations" -q -p no:cacheprovider
 
+  # Every code example on the documentation site is executed. Some need an extra
+  # (the EHR guide needs [ehr]; the adapter's API page needs [langchain]), which
+  # test-core does not install, so this job installs them and FAILS if anything
+  # skipped -- otherwise those examples would never run anywhere.
+  test-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr,langchain,langgraph]"
+      - name: Docs examples, none skipped (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          pytest "${{ github.workspace }}/tests/docs" \
+                 "${{ github.workspace }}/tests/unit/integrations/test_docs_page.py" \
+                 -q -p no:cacheprovider --junitxml=docs.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          suite = ET.parse("docs.xml").getroot()
+          suite = suite if suite.tag == "testsuite" else suite[0]
+          skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
+          assert tests > 25, f"suspiciously few docs tests ran: {tests}"
+          assert skipped == 0, f"{skipped} docs tests skipped -- an extra is missing"
+          print(f"{tests} docs tests, 0 skipped")
+          PY
+
+  # The docs site builds with --strict on every branch, so a broken cross-reference
+  # or an unresolvable API directive is caught before merge, not after (docs.yml
+  # only runs on main). [langchain] because the adapter's API page imports it.
+  docs-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[docs,langchain]"
+      - run: mkdocs build --strict
+
   build:
     runs-on: ubuntu-latest
     steps:

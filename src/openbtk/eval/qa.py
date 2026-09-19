@@ -211,8 +211,9 @@ def format_prompt(item: MCQItem) -> str:
         >>> item = MCQItem(
         ...     item_id="q", question="Q?", options={"A": "x", "B": "y"}, answer="A"
         ... )
-        >>> format_prompt(item).splitlines()[-4:]
-        ['A. x', 'B. y', '', 'Answer:']
+        >>> prompt = format_prompt(item)
+        >>> "A. x" in prompt and prompt.endswith("Answer:")
+        True
     """
     options = "\n".join(f"{k}. {v}" for k, v in item.options.items())
     return _PROMPT.format(question=item.question, options=options)
