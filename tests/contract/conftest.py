@@ -110,11 +110,19 @@ if os.environ.get("OPENBTK_SLOW_TESTS") == "1":
 # The two embedding providers, for test_embedding_contract.py:
 from openbtk import embeddings as _embeddings  # noqa: F401
 
+# PHILeakageGuardrail/TerminologyValidityGuardrail/GroundednessGuardrail/
+# EHR guardrails, for test_guardrail_contract.py:
+from openbtk import guardrails as _guardrails  # noqa: F401
+
 # The four LLM providers, for test_llm_contract.py:
 from openbtk import llms as _llms  # noqa: F401
 
 # The three vector stores, for test_vectorstore_contract.py:
 from openbtk import retrieval as _retrieval  # noqa: F401
+
+# UMLSRestBackend/LocalVocabBackend/BundledMinimalBackend, for
+# test_terminology_contract.py:
+from openbtk import terminology as _terminology  # noqa: F401
 
 # PlainTextLoader/JSONLLoader/MIMICNotesLoader, for test_loader_contract.py:
 from openbtk.data import clinical_text as _clinical_text  # noqa: F401
