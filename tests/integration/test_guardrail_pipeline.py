@@ -24,6 +24,8 @@ from __future__ import annotations
 import json
 from typing import TYPE_CHECKING, Any
 
+import pytest
+
 from openbtk.data import ehr as _ehr  # noqa: F401 -- registers FHIRLoader
 from openbtk.deid import DeidEngine, DeidMode
 from openbtk.guardrails.ehr import (
@@ -37,6 +39,9 @@ from openbtk.pipelines import PatientTimelineSerializer
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+# Needs the 'ehr' extra (fhir.resources); skipped in CI's zero-extras job.
+pytest.importorskip("fhir.resources")
 
 _SSN_VALUE = "123-45-6789"  # phi-fixture-ok: synthetic, unassigned test value
 

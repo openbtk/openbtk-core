@@ -21,6 +21,10 @@ from openbtk.data.ehr.fhir import FHIRLoader, _reference_id
 if TYPE_CHECKING:
     from pathlib import Path
 
+# The 'ehr' extra (fhir.resources) is genuinely optional; skip this whole
+# module in CI's zero-extras test-core job instead of failing at load().
+pytest.importorskip("fhir.resources")
+
 
 def _bundle(*resources: dict[str, Any]) -> dict[str, Any]:
     return {

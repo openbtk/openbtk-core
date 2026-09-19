@@ -10,8 +10,6 @@ from __future__ import annotations
 from datetime import UTC, date, datetime
 from typing import TYPE_CHECKING, Any
 
-import pyarrow as pa
-import pyarrow.parquet as pq
 import pytest
 
 from openbtk.core.errors import LoaderError
@@ -20,6 +18,12 @@ from openbtk.data.ehr.omop import OMOPLoader
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+# The 'ehr' extra (pyarrow) is genuinely optional -- CI's test-core job installs
+# zero extras (NFR-10), so this whole module skips there rather than erroring at
+# collection. Found by reproducing a clean `pip install -e .[dev]` venv.
+pa = pytest.importorskip("pyarrow")
+pq = pytest.importorskip("pyarrow.parquet")
 
 
 def _write_table(directory: Path, filename: str, columns: dict[str, list[Any]]) -> None:

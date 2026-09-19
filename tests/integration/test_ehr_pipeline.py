@@ -46,8 +46,7 @@ import json
 from datetime import date
 from typing import TYPE_CHECKING, Any, ClassVar
 
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pytest
 
 from openbtk.core.base import BaseGuardrail
 from openbtk.core.registry import GUARDRAIL_REGISTRY
@@ -68,6 +67,11 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from openbtk.data.ehr.schemas import PatientRecord
+
+# Needs the 'ehr' extra (fhir.resources + pyarrow); skipped in CI's zero-extras job.
+pytest.importorskip("fhir.resources")
+pa = pytest.importorskip("pyarrow")
+pq = pytest.importorskip("pyarrow.parquet")
 
 _SSN_VALUE = "123-45-6789"  # phi-fixture-ok: synthetic, unassigned test value
 _PNEUMONIA_SNOMED = "385093006"
