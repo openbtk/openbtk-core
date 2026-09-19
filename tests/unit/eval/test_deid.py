@@ -233,7 +233,7 @@ class TestReports:
         assert "no Safe Harbor category" not in format_markdown(result)
 
     def test_reports_never_contain_document_text(self) -> None:
-        secret = "SECRETDOCUMENTTEXT"
+        secret = "SECRETDOCUMENTTEXT"  # pragma: allowlist secret
         doc = LabelledDocument(
             document_id="d",
             text=secret,
