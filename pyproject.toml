@@ -51,6 +51,9 @@ dependencies = [
     "typing-extensions>=4.12",
 ]
 
+[project.scripts]
+openbtk = "openbtk.cli:main"
+
 [project.optional-dependencies]
 text = [
     "scispacy>=0.5",

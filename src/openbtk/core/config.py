@@ -24,19 +24,23 @@ resolving:
   * ``PipelineConfig.validate_registry()``'s described checks
     (docs/03_ARCHITECTURE.md section 7.3) include "every params validates
     against that component's config model" and "stage types are
-    compatible." Neither is implemented here: OpenBTK components take plain
-    keyword arguments, not a single Pydantic config object per component
-    (see core/registry.py's ``ComponentInfo`` docstring for the same
-    tension), so there is no per-component schema to validate params
-    against yet, and no stage-compatibility rule has been specified
-    anywhere. What IS implemented: every step's ``type`` resolves in its
-    registry, every ``after`` reference points at a real step, the ``after``
-    graph is acyclic, and every guardrail's ``type`` resolves in
-    ``GUARDRAIL_REGISTRY``.
+    compatible." OpenBTK components take plain keyword arguments, not a
+    single Pydantic config object per component (see core/registry.py's
+    ``ComponentInfo`` docstring for the same tension), so there is no
+    per-component schema. What IS checked, from the constructor's own
+    signature and without instantiating anything: no unknown parameter (unless
+    the constructor takes ``**kwargs``), no missing required parameter, and no
+    off-site component under a policy that forbids it (task 10.1). Stage
+    *compatibility* (a chunker cannot follow an embedder) is still not
+    checked -- no rule has been specified anywhere. Also implemented: every
+    step's ``type`` resolves in its registry, every ``after`` reference points
+    at a real step, the ``after`` graph is acyclic, and every guardrail's
+    ``type`` resolves in ``GUARDRAIL_REGISTRY``.
 """
 
 from __future__ import annotations
 
+import inspect
 import os
 import re
 from pathlib import Path
@@ -230,6 +234,75 @@ class ValidationIssue(BaseModel):
     )
 
 
+def _component_issues(
+    step: StepConfig, registry: Any, policy: PolicyConfig
+) -> list[ValidationIssue]:
+    """Checks on one registered step that need only its class, never an
+    instance and never data: the off-site policy, and its parameters against
+    the constructor signature."""
+    cls = registry.get(step.type)
+    issues: list[ValidationIssue] = []
+
+    if getattr(cls, "sends_data_offsite", False) and not policy.allow_offsite_providers:
+        issues.append(
+            ValidationIssue(
+                severity="error",
+                message=(
+                    f"Step {step.id!r}: {cls.__qualname__} ({step.type}) sends "
+                    "data offsite (sends_data_offsite=True), but the active "
+                    "policy does not allow offsite providers. Set "
+                    "policy.allow_offsite_providers to permit this explicitly."
+                ),
+                step_id=step.id,
+            )
+        )
+
+    params = set(step.params)
+    try:
+        parameters = inspect.signature(cls).parameters.values()
+    except (TypeError, ValueError):  # pragma: no cover -- a class without a signature
+        return issues
+    keywords = {
+        p.name
+        for p in parameters
+        if p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
+    }
+    if step.type.startswith("loader."):
+        # A loader's source is a .load() argument, not a constructor one
+        # (see the executor's _wire_step) -- unless its constructor really
+        # does take that name, in which case it is checked like any other.
+        params -= {"source", "path"} - keywords
+    if not any(p.kind is p.VAR_KEYWORD for p in parameters):
+        for name in sorted(params - keywords):
+            issues.append(
+                ValidationIssue(
+                    severity="error",
+                    message=(
+                        f"Step {step.id!r}: {step.type!r} has no parameter "
+                        f"{name!r} (accepted: {sorted(keywords) or 'none'})."
+                    ),
+                    step_id=step.id,
+                )
+            )
+    for p in parameters:
+        if (
+            p.kind in (p.POSITIONAL_OR_KEYWORD, p.KEYWORD_ONLY)
+            and p.default is p.empty
+            and p.name not in params
+        ):
+            issues.append(
+                ValidationIssue(
+                    severity="error",
+                    message=(
+                        f"Step {step.id!r}: {step.type!r} requires the "
+                        f"parameter {p.name!r}."
+                    ),
+                    step_id=step.id,
+                )
+            )
+    return issues
+
+
 class PipelineConfig(BaseModel):
     """A pipeline, described declaratively.
 
@@ -339,6 +412,8 @@ class PipelineConfig(BaseModel):
                         step_id=step.id,
                     )
                 )
+            else:
+                issues.extend(_component_issues(step, registry, self.policy))
             for dep in step.after:
                 if dep not in step_ids:
                     issues.append(

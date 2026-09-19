@@ -482,6 +482,16 @@ _ALL_REGISTRIES: dict[str, Registry[Any]] = {
 }
 
 
+def list_categories() -> list[str]:
+    """Every registry category that exists, sorted.
+
+    Example:
+        >>> "loader" in list_categories()
+        True
+    """
+    return sorted(_ALL_REGISTRIES)
+
+
 def get_registry(category: str) -> Registry[Any]:
     """Return the global registry for ``category``.
 
