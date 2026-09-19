@@ -9,6 +9,64 @@ recorded here.
 
 ## [Unreleased]
 
+**M7 — Guardrails & Terminology — complete**.
+
+### Added — M7 (tasks 7.2–7.6 — `openbtk.guardrails`)
+- `PHILeakageGuardrail` (`guardrail.general.phi_leakage`): wraps the real
+  `DeidEngine`'s detections, never its transformed text. Result messages,
+  details and spans carry only category names, counts and offsets — never
+  a detected value.
+- `TerminologyValidityGuardrail` (`guardrail.general.terminology`):
+  validates codes from a `(code, system)` tuple, a `CodedEvent`/
+  `Measurement`, a list, or a whole `PatientRecord` against an injectable
+  terminology service (default: the bundled ICD-10-CM subset). A code the
+  backend cannot confirm is a WARNING — never silently valid, never
+  conflated with an invalid code (BLOCK).
+- `GroundednessGuardrail` (`guardrail.general.groundedness`): decomposes
+  an answer into claims and returns unsupported spans. Defaults to a
+  dependency-free sentence splitter plus significant-word overlap —
+  disclosed as a heuristic, not entailment — overridable via injected
+  callables.
+- `GuardrailPipeline`: runs guardrails in sequence over one payload,
+  aggregates, short-circuits on BLOCK (configurable), and reshapes results
+  into `GuardrailOutcome` entries for manifest recording. Separate from the
+  executor's per-step guardrail attachment; unregistered, since its
+  configuration is other guardrails.
+- EHR guardrails: `guardrail.ehr.code_validity` (a real subclass of the
+  terminology guardrail — not `register_alias`, whose docstring scopes it
+  to deprecation transitions), `guardrail.ehr.referential` (dangling
+  encounter refs; events outside their encounter window), and
+  `guardrail.ehr.units` (a bounded UCUM allowlist plus wide ranges for
+  seven common LOINC labs, each code verified against the real NLM
+  Clinical Table service — a data-quality check, not clinical decision
+  support). k-anonymity (`guardrail.ehr.k_anonymity`), named in the spec
+  but not in this task's roadmap entry, is not built.
+- Integration test over a real `FHIRLoader`-loaded `PatientRecord` and the
+  real `DeidEngine`/`PatientTimelineSerializer`, including a proof that the
+  default code-validity backend's ICD-10-CM-only scope genuinely fires for
+  real SNOMED/LOINC codes.
+
+### Added — M7 (task 7.1 — `openbtk.terminology`)
+- `UMLSRestBackend` (`terminology.general.umls`): the real UMLS UTS REST
+  API. Auth and endpoint behaviour verified directly against the live
+  service (a real, well-formed 401 naming the `apiKey` query parameter)
+  and NLM's current documentation, which deprecates the older
+  ticket-granting-ticket flow. `sends_data_offsite=True`, so construction
+  is policy-gated. Never exercised against a live licensed account (an
+  approved individual licence is required) — verified against realistic
+  mocked responses, the same treatment as OpenAI/Anthropic.
+- `LocalVocabBackend` (`terminology.general.local`): a simple, documented
+  `code,system,display` CSV — not any official release format (UMLS RRF,
+  LOINC's multi-table export).
+- `BundledMinimalBackend` (`terminology.general.bundled_minimal`): 20
+  ICD-10-CM codes spanning many chapters, each checked against the real,
+  free NLM Clinical Table Search Service. ICD-10-CM only, deliberately (a
+  U.S. government work); SNOMED CT (restricted) and LOINC (redistribution
+  requires its own licence acceptance) are not bundled.
+- `CachedTerminologyService`: a TTL, content-addressed disk cache wrapping
+  any terminology service for offline operation once warmed. Unregistered:
+  its configuration is another service instance.
+
 **M6 — EHR — complete**.
 
 ### Added — M6 (task 6.7 — integration: Synthea-shaped FHIR round trip)
