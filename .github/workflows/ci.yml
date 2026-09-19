@@ -22,8 +22,8 @@ env:
 # NOTE: jobs are added as milestones deliver the code they test. A CI file that
 # references paths which do not exist is how v1's workflow came to point at
 # `src.core` and `mypy openbtk`, neither of which resolved. Current: M0.
-# Pending: test-modules (M3), test-security (M1), test-accuracy (M2),
-# test-no-langchain (M8), docs (M4).
+# Pending: test-modules (M3), test-security (M1), test-accuracy (M2), docs (M4).
+# test-langchain / test-no-langchain (M8) are the two halves of ADR-0001.
 
 jobs:
   lint:
@@ -70,7 +70,9 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[dev]"
+      # [langchain]: openbtk.integrations.langchain subclasses langchain-core
+      # types at import time, so mypy needs them to check it.
+      - run: pip install -e ".[dev,langchain]"
       - run: mypy --strict
 
   # The widest matrix in the project. Installability across platforms is where
@@ -103,6 +105,43 @@ jobs:
         working-directory: ${{ runner.temp }}
         shell: bash
         run: pytest "${{ github.workspace }}/tests" -v -p no:cacheprovider
+
+  # ADR-0001, half one: the adapter really works against real langchain-core
+  # and langgraph (not mocks of them).
+  test-langchain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,langchain,langgraph]"
+      - name: Adapter tests (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: pytest "${{ github.workspace }}/tests/unit/integrations" -v -p no:cacheprovider
+
+  # ADR-0001, half two: everything else works with langchain-core ABSENT.
+  test-no-langchain:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr]"   # deliberately NOT [langchain]
+      - name: Confirm langchain-core and langgraph are really absent
+        run: |
+          python - <<'PY'
+          import importlib.util
+          present = [m for m in ("langchain_core", "langchain", "langgraph")
+                     if importlib.util.find_spec(m)]
+          assert not present, f"test-no-langchain would prove nothing: {present} installed"
+          PY
+      - name: Suite passes without langchain (adapter tests excluded)
+        working-directory: ${{ runner.temp }}
+        run: pytest "${{ github.workspace }}/tests" --ignore="${{ github.workspace }}/tests/unit/integrations" -q -p no:cacheprovider
 
   build:
     runs-on: ubuntu-latest
