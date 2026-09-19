@@ -91,7 +91,9 @@ def test_every_cli_example_parses(guide: Path) -> None:
             try:
                 parser.parse_args(shlex.split(command)[1:])
             except SystemExit as e:  # argparse exits on a bad command line
-                pytest.fail(f"{guide.name}: `{command}` is not a valid command ({e.code})")
+                pytest.fail(
+                    f"{guide.name}: `{command}` is not a valid command ({e.code})"
+                )
     if guide.name == "cli.md":
         assert seen >= 10
 
@@ -100,7 +102,7 @@ def test_cli_guide_documents_every_subcommand() -> None:
     from openbtk.cli.main import build_parser
 
     parser = build_parser()
-    sub = next(a for a in parser._actions if a.dest == "command")  # noqa: SLF001
+    sub = next(a for a in parser._actions if a.dest == "command")
     text = (_DOCS / "guides" / "cli.md").read_text(encoding="utf-8")
     for name in sub.choices:
         assert f"openbtk {name}" in text, f"cli.md does not document `openbtk {name}`"
@@ -147,8 +149,13 @@ def test_navigation_and_files_agree() -> None:
         return []
 
     in_nav = set(entries(config["nav"]))
-    on_disk = {str(p.relative_to(_DOCS)).replace("\\", "/") for p in _DOCS.rglob("*.md")}
-    assert in_nav == on_disk, {"only in nav": in_nav - on_disk, "not in nav": on_disk - in_nav}
+    on_disk = {
+        str(p.relative_to(_DOCS)).replace("\\", "/") for p in _DOCS.rglob("*.md")
+    }
+    assert in_nav == on_disk, {
+        "only in nav": in_nav - on_disk,
+        "not in nav": on_disk - in_nav,
+    }
 
 
 def test_tutorial_links_point_at_real_notebooks() -> None:
