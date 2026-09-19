@@ -4,11 +4,13 @@
 
 | What you get | Command |
 |---|---|
-| Core + clinical text (loaders, de-id, chunking, pipelines) | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Released to PyPI (`0.1.1`: core, de-identification, clinical text) | `pip install openbtk` |
+| Everything on `main` (EHR, providers, retrieval, guardrails, interop) | `pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Core + clinical text from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
 | Core only (registry, config, provenance — no modality) | `pip install "openbtk @ git+https://github.com/openbtk/openbtk-core.git"` |
 
-From PyPI: not yet — `0.0.1` is a pre-implementation placeholder. Real
-functionality ships to PyPI at `v0.1.0`.
+Optional extras: `text`, `ehr`, `retrieval`, `llms`, `langchain`, `langgraph`.
+A component that needs one says which, by name, when you construct it.
 
 The optional NER recognizer additionally needs a downloaded spaCy model:
 

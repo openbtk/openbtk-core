@@ -106,6 +106,35 @@ jobs:
         shell: bash
         run: pytest "${{ github.workspace }}/tests" -v -p no:cacheprovider
 
+  # v0.5 gate "FHIR R4 + OMOP loaders; Synthea round-trip": test-core installs
+  # zero extras, so its EHR tests skip (by design). This job installs [ehr] and
+  # FAILS if any of them still skips, so the gate is demonstrated, not assumed.
+  test-ehr:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr]"
+      - name: EHR tests, none skipped (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          pytest "${{ github.workspace }}/tests/unit/data/ehr" \
+                 "${{ github.workspace }}/tests/integration/test_ehr_pipeline.py" \
+                 "${{ github.workspace }}/tests/integration/test_guardrail_pipeline.py" \
+                 -q -p no:cacheprovider --junitxml=ehr.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          suite = ET.parse("ehr.xml").getroot()
+          suite = suite if suite.tag == "testsuite" else suite[0]
+          skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
+          assert tests > 50, f"suspiciously few EHR tests ran: {tests}"
+          assert skipped == 0, f"{skipped} EHR tests skipped -- [ehr] extra not effective"
+          print(f"{tests} EHR tests, 0 skipped")
+          PY
+
   # ADR-0001, half one: the adapter really works against real langchain-core
   # and langgraph (not mocks of them).
   test-langchain:

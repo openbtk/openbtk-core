@@ -12,14 +12,20 @@ than memory.
 
 ---
 
-> ## Status: early, real, and honestly scoped
+> ## Status: pre-1.0, real, and honestly scoped
 >
-> Milestones **M1 (core framework)**, **M2 (de-identification)** and **M3
-> (clinical text + streaming pipelines)** are built, tested, and merged to
-> `main`. **`0.0.1` on PyPI is still the pre-M1 placeholder release** — it
-> installs and imports, but has none of the functionality described below.
-> Real functionality is on `main` in this repository; install from source
-> (see [Installing](#installing)) until `v0.1.0` ships it to PyPI.
+> Milestones **M1–M8** are built, tested and merged to `main`: the core
+> framework, de-identification, clinical text, EHR loading, providers and
+> retrieval, guardrails and terminology, benchmarks, and LangChain interop.
+> **PyPI carries `0.1.1`** — the core, de-identification and clinical-text
+> milestones (M1–M3). Everything after that is on `main` and ships with the
+> next release; install from source to get it (see [Installing](#installing)).
+>
+> **One published number is still missing, on purpose.** The i2b2/n2c2
+> de-identification benchmark harness exists and is tested, but that corpus is
+> released only under a Data Use Agreement and has not been run. The numbers
+> below are on a **synthetic** corpus — a regression gate, not evidence of
+> real-world accuracy. See [Benchmarks](mkdocs/benchmarks.md).
 >
 > A previous attempt (`legacy/v1-snapshot`) produced ~5,200 lines that were
 > never executable. Every claim below is backed by a test that runs in CI —
@@ -72,8 +78,35 @@ two are what OpenBTK is for.
   corpus appears anywhere in a serialised manifest.
 - **Streaming, not in-memory**: **10,000,000 synthetic notes streamed through
   the full four-stage pipeline (load → de-identify → segment → chunk) at
-  0.056 GB peak RSS** — measured, not projected. See
+  0.074 GB peak RSS** — measured, not projected. See
   [`tests/benchmark/test_memory.py`](tests/benchmark/test_memory.py).
+- **EHR loading**: FHIR R4 (`Bundle` and per-resource, streamed) and OMOP
+  (core tables in `pyarrow` batches) into one `PatientRecord` schema, with
+  encounter-anchored timelines, composable cohort predicates, and a
+  serializer that turns a patient timeline into text the clinical-text side
+  can chunk and embed. Exercised by a Synthea-shaped round-trip test (needs
+  `pip install "openbtk[ehr]"`).
+- **LLM and embedding providers behind one interface**: OpenAI, Anthropic,
+  HuggingFace-local and any OpenAI-compatible endpoint, plus configuration
+  presets for MedGemma, Meditron and OpenBioLLM; embeddings from
+  HuggingFace models (presets for PubMedBERT, BioBERT, ClinicalBERT, SapBERT
+  and MedCPT) and OpenAI. Every provider declares whether it sends data
+  off-site, and a local-only policy refuses to construct one that does.
+  *In CI the cloud SDKs and models are mocked; calls against live services
+  run only when you supply keys or models.*
+- **Retrieval**: FAISS, Chroma and Qdrant stores, a UMLS-concept-overlap
+  reranker, and a RAG pipeline whose answers carry `SourceRef` provenance
+  back to the originating record.
+- **Guardrails and terminology**: PHI-leakage, terminology-validity,
+  groundedness (a disclosed word-overlap heuristic, not entailment) and EHR
+  integrity/units checks that always return a result and never raise on a
+  failed check; a terminology service with a bundled ICD-10-CM subset, local
+  vocabularies and UMLS (bring your own licence; the UMLS mapping call has
+  not been verified against the live service).
+- **Evaluation and interop**: de-identification scoring shared by the CI
+  gate and the credentialed benchmark; recall@k, MRR and nDCG@k; and an
+  optional LangChain/LangGraph adapter that is tested against the real
+  libraries while the rest of the suite is verified to pass without them.
 
 ## Quick start
 
@@ -127,13 +160,50 @@ an oversight.
 This exact example — extracted from this README and executed — is what CI
 runs on every change; see [`tests/unit/test_readme.py`](tests/unit/test_readme.py).
 
+Guardrails and terminology need nothing beyond the core install either. A
+guardrail returns a result rather than raising, so a pipeline decides what a
+failure means:
+
+```python
+import contextlib
+import io
+
+with contextlib.redirect_stdout(io.StringIO()):  # structured JSON logs, not errors
+    from openbtk.core.schemas import CodeSystem
+    from openbtk.guardrails.groundedness import (
+        GroundednessCheckInput,
+        GroundednessGuardrail,
+    )
+    from openbtk.guardrails.phi_leakage import PHILeakageGuardrail
+    from openbtk.terminology.bundled import BundledMinimalBackend
+
+    leak = PHILeakageGuardrail().check("Contact the patient at (555) 010-2345.")
+    answer = GroundednessCheckInput(
+        answer="The patient has a fractured femur.",
+        context=["Assessment: type 2 diabetes mellitus, stable."],
+    )
+    grounded = GroundednessGuardrail().check(answer)
+    concept = BundledMinimalBackend().resolve("E11.9", CodeSystem.ICD10CM)
+
+assert not leak.passed  # a phone number is PHI; the message names the category only
+assert not grounded.passed  # the claim is not supported by the context
+assert concept is not None and concept.display.startswith("Type 2 diabetes")
+```
+
 ## Installing
 
 | What you get | Command |
 |---|---|
-| Core + clinical text (loaders, de-id, chunking, pipelines) | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Released to PyPI (`0.1.1`: core, de-identification, clinical text) | `pip install openbtk` |
+| Everything on `main` (EHR, providers, retrieval, guardrails, interop) | `pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Core + clinical text from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
 | Core only (registry, config, provenance — no modality) | `pip install "openbtk @ git+https://github.com/openbtk/openbtk-core.git"` |
-| From PyPI | Not yet — `0.0.1` is a placeholder; real functionality ships at `v0.1.0` |
+
+Optional extras: `text` (NER, medspaCy, tokenizers), `ehr` (FHIR, OMOP),
+`retrieval` (FAISS, Chroma, Qdrant), `llms` (OpenAI, Anthropic, local
+models), `langchain` (LangChain adapter), `langgraph` (to run LangGraph
+graphs). Each component that needs one says so, by name, when you construct
+it.
 
 `openbtk[text]`'s optional NER recognizer additionally needs a downloaded
 spaCy model: `python -m spacy download en_core_web_sm`.
@@ -145,7 +215,7 @@ spaCy model: `python -m spacy download en_core_web_sm`.
   spaCy; net-new code only where nothing adequate exists (chunking is the
   main example so far).
 - **Streaming by default** — memory is `O(batch)`, not `O(corpus)`. Measured:
-  10M notes in 0.056 GB RSS, against a 4 GB target.
+  10M notes in 0.074 GB RSS, against a 4 GB target.
 - **Light core** — six runtime dependencies, no ML framework in core.
   Reading a clinical note does not require installing PyTorch.
 - **Safe and provable by construction** — de-identification and run
@@ -153,26 +223,34 @@ spaCy model: `python -m spacy download en_core_web_sm`.
 
 ## Roadmap
 
-**Next (M4):** packaging polish, contribution docs, a published docs site,
-and a real `v0.1.0` release to PyPI.
+**Now (M9):** the v0.5 release gates — see the gate audit in
+[`tests/release/`](tests/release/). The one open gate is the published
+i2b2/n2c2 de-identification result (data access needed; see above).
 
-**Later:** EHR/FHIR loading, terminology resolution, embedding and LLM
-providers, retrieval with concept reranking, clinical guardrails, an
-evaluation harness, a CLI, and clinical entity linking (ConText) for
-clinical text.
+**Later:** an evaluation harness beyond de-identification and retrieval
+(clinical QA, groundedness scoring), a CLI, tutorials, a complete API
+reference, and clinical entity linking (ConText) for clinical text.
 
 **v2 and beyond — imaging, biosignals, genomics, video, audio.** These will
-**wrap** MONAI, wfdb, MNE, pysam and librosa rather than compete with them,
-and stay gated until the current scope ships with published benchmarks.
+**wrap** MONAI, wfdb, MNE, pysam and librosa rather than compete with them.
+They stay gated until the current scope ships with published benchmarks —
+including the n2c2 result above.
 
 **Never** — a model zoo, a serving platform, a clinical decision-support
 system, or a dataset distributor.
 
 ## Documentation
 
-Design documents — market research, PRD, architecture, API contract,
+- [Benchmarks](mkdocs/benchmarks.md) — every published number, its
+  reproduction command, and what has *not* been measured.
+- [LangChain and LangGraph](mkdocs/langchain.md) — the optional adapter; every
+  code block on the page is executed by a test.
+- [Quick start](mkdocs/quickstart.md) and the generated API reference in
+  `mkdocs/`.
+
+The design documents — market research, PRD, architecture, API contract,
 security and compliance, test charter, roadmap and ADRs — are maintained
-outside this repository today. A published docs site is on the M4 roadmap.
+outside this repository today.
 
 ## Contributing
 
