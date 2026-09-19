@@ -703,18 +703,17 @@ every pipeline execution emits automatically. It runs on your laptop or
 behind your firewall, works with any LLM provider, and streams corpora far
 larger than memory.</p>
 <div class="admonition note">
-<p class="admonition-title">Status: pre-1.0, real, and honestly scoped</p>
-<p>Milestones <strong>M1–M8</strong> are built, tested, and merged: core framework,
+<p class="admonition-title">Status: v0.5 — pre-1.0, real, and honestly scoped</p>
+<p>Milestones <strong>M1–M9</strong> are built, tested, and released: core framework,
 de-identification, clinical text, EHR loading, providers and retrieval,
-guardrails and terminology, benchmarks, and LangChain interop. <strong>PyPI
-carries <code>0.1.1</code></strong> (M1–M3); the rest is on <code>main</code> and ships with the next
-release. See <a href="quickstart/">Quick start</a> for install instructions.</p>
+guardrails and terminology, benchmarks, and LangChain interop.
+<code>pip install openbtk</code> gives you <code>0.5.0</code>. See <a href="quickstart/">Quick start</a>.</p>
 </div>
 <div class="admonition warning">
-<p class="admonition-title">One published number is missing, on purpose</p>
-<p>The i2b2/n2c2 de-identification benchmark harness exists and is tested,
-but that corpus is Data-Use-Agreement-restricted and has <strong>not</strong> been run.
-The published figures are on a synthetic corpus. See
+<p class="admonition-title">The i2b2/n2c2 benchmark has not been run</p>
+<p>The harness exists and is tested, but that corpus is
+Data-Use-Agreement-restricted. The published figures are on a synthetic
+corpus, and the default recognizer does not detect names. See
 <a href="benchmarks/">Benchmarks</a>.</p>
 </div>
 <h2 id="why">Why<a class="headerlink" href="#why" title="Permanent link">&para;</a></h2>

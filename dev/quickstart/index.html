@@ -708,20 +708,20 @@
 </thead>
 <tbody>
 <tr>
-<td>Released to PyPI (<code>0.1.1</code>: core, de-identification, clinical text)</td>
-<td><code>pip install openbtk</code></td>
+<td>Core + clinical text (loaders, de-id, chunking, pipelines)</td>
+<td><code>pip install "openbtk[text]"</code></td>
 </tr>
 <tr>
-<td>Everything on <code>main</code> (EHR, providers, retrieval, guardrails, interop)</td>
-<td><code>pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
-</tr>
-<tr>
-<td>Core + clinical text from source</td>
-<td><code>pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
+<td>Everything</td>
+<td><code>pip install "openbtk[text,ehr,retrieval,llms,langchain]"</code></td>
 </tr>
 <tr>
 <td>Core only (registry, config, provenance — no modality)</td>
-<td><code>pip install "openbtk @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
+<td><code>pip install openbtk</code></td>
+</tr>
+<tr>
+<td>Latest <code>main</code> from source</td>
+<td><code>pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
 </tr>
 </tbody>
 </table>
