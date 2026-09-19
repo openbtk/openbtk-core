@@ -4,10 +4,10 @@
 
 | What you get | Command |
 |---|---|
-| Released to PyPI (`0.1.1`: core, de-identification, clinical text) | `pip install openbtk` |
-| Everything on `main` (EHR, providers, retrieval, guardrails, interop) | `pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"` |
-| Core + clinical text from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
-| Core only (registry, config, provenance — no modality) | `pip install "openbtk @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Core + clinical text (loaders, de-id, chunking, pipelines) | `pip install "openbtk[text]"` |
+| Everything | `pip install "openbtk[text,ehr,retrieval,llms,langchain]"` |
+| Core only (registry, config, provenance — no modality) | `pip install openbtk` |
+| Latest `main` from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
 
 Optional extras: `text`, `ehr`, `retrieval`, `llms`, `langchain`, `langgraph`.
 A component that needs one says which, by name, when you construct it.

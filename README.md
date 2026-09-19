@@ -12,20 +12,18 @@ than memory.
 
 ---
 
-> ## Status: pre-1.0, real, and honestly scoped
+> ## Status: v0.5 — pre-1.0, real, and honestly scoped
 >
-> Milestones **M1–M8** are built, tested and merged to `main`: the core
-> framework, de-identification, clinical text, EHR loading, providers and
-> retrieval, guardrails and terminology, benchmarks, and LangChain interop.
-> **PyPI carries `0.1.1`** — the core, de-identification and clinical-text
-> milestones (M1–M3). Everything after that is on `main` and ships with the
-> next release; install from source to get it (see [Installing](#installing)).
+> Milestones **M1–M9** are built, tested and released: the core framework,
+> de-identification, clinical text, EHR loading, providers and retrieval,
+> guardrails and terminology, benchmarks, and LangChain interop.
+> `pip install openbtk` gives you `0.5.0`.
 >
-> **One published number is still missing, on purpose.** The i2b2/n2c2
-> de-identification benchmark harness exists and is tested, but that corpus is
-> released only under a Data Use Agreement and has not been run. The numbers
-> below are on a **synthetic** corpus — a regression gate, not evidence of
-> real-world accuracy. See [Benchmarks](mkdocs/benchmarks.md).
+> **The i2b2/n2c2 de-identification benchmark has not been run.** The harness
+> exists and is tested, but that corpus is released only under a Data Use
+> Agreement. Every number below is on a **synthetic** corpus — a regression
+> gate, not evidence of real-world accuracy. The default recognizer does not
+> detect names. See [Benchmarks](mkdocs/benchmarks.md).
 >
 > A previous attempt (`legacy/v1-snapshot`) produced ~5,200 lines that were
 > never executable. Every claim below is backed by a test that runs in CI —
@@ -194,10 +192,10 @@ assert concept is not None and concept.display.startswith("Type 2 diabetes")
 
 | What you get | Command |
 |---|---|
-| Released to PyPI (`0.1.1`: core, de-identification, clinical text) | `pip install openbtk` |
-| Everything on `main` (EHR, providers, retrieval, guardrails, interop) | `pip install "openbtk[text,ehr,retrieval,llms,langchain] @ git+https://github.com/openbtk/openbtk-core.git"` |
-| Core + clinical text from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
-| Core only (registry, config, provenance — no modality) | `pip install "openbtk @ git+https://github.com/openbtk/openbtk-core.git"` |
+| Core + clinical text (loaders, de-id, chunking, pipelines) | `pip install "openbtk[text]"` |
+| Everything | `pip install "openbtk[text,ehr,retrieval,llms,langchain]"` |
+| Core only (registry, config, provenance — no modality) | `pip install openbtk` |
+| Latest `main` from source | `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"` |
 
 Optional extras: `text` (NER, medspaCy, tokenizers), `ehr` (FHIR, OMOP),
 `retrieval` (FAISS, Chroma, Qdrant), `llms` (OpenAI, Anthropic, local
@@ -223,13 +221,13 @@ spaCy model: `python -m spacy download en_core_web_sm`.
 
 ## Roadmap
 
-**Now (M9):** the v0.5 release gates — see the gate audit in
-[`tests/release/`](tests/release/). The one open gate is the published
-i2b2/n2c2 de-identification result (data access needed; see above).
+**Next (M10):** an evaluation harness beyond de-identification and retrieval,
+a CLI, tutorials and a complete API reference. The one open v0.5 gate — the
+published i2b2/n2c2 de-identification result (data access needed; see above)
+— is audited in [`tests/release/`](tests/release/).
 
-**Later:** an evaluation harness beyond de-identification and retrieval
-(clinical QA, groundedness scoring), a CLI, tutorials, a complete API
-reference, and clinical entity linking (ConText) for clinical text.
+**Later:** clinical QA and groundedness scoring, and clinical entity
+linking (ConText) for clinical text.
 
 **v2 and beyond — imaging, biosignals, genomics, video, audio.** These will
 **wrap** MONAI, wfdb, MNE, pysam and librosa rather than compete with them.

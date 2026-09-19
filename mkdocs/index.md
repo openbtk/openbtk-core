@@ -8,17 +8,16 @@ every pipeline execution emits automatically. It runs on your laptop or
 behind your firewall, works with any LLM provider, and streams corpora far
 larger than memory.
 
-!!! note "Status: pre-1.0, real, and honestly scoped"
-    Milestones **M1–M8** are built, tested, and merged: core framework,
+!!! note "Status: v0.5 — pre-1.0, real, and honestly scoped"
+    Milestones **M1–M9** are built, tested, and released: core framework,
     de-identification, clinical text, EHR loading, providers and retrieval,
-    guardrails and terminology, benchmarks, and LangChain interop. **PyPI
-    carries `0.1.1`** (M1–M3); the rest is on `main` and ships with the next
-    release. See [Quick start](quickstart.md) for install instructions.
+    guardrails and terminology, benchmarks, and LangChain interop.
+    `pip install openbtk` gives you `0.5.0`. See [Quick start](quickstart.md).
 
-!!! warning "One published number is missing, on purpose"
-    The i2b2/n2c2 de-identification benchmark harness exists and is tested,
-    but that corpus is Data-Use-Agreement-restricted and has **not** been run.
-    The published figures are on a synthetic corpus. See
+!!! warning "The i2b2/n2c2 benchmark has not been run"
+    The harness exists and is tested, but that corpus is
+    Data-Use-Agreement-restricted. The published figures are on a synthetic
+    corpus, and the default recognizer does not detect names. See
     [Benchmarks](benchmarks.md).
 
 ## Why
