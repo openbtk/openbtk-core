@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import pytest
 
+from openbtk.core.errors import DatasetError
 from openbtk.core.registry import DATASET_REGISTRY
 
 if TYPE_CHECKING:
@@ -35,9 +36,18 @@ class TestDatasetAdapterContract:
         assert isinstance(ds.requires_credentials, bool)
 
     def test_load_returns_something(self, key: str) -> None:
+        """An open dataset's zero-argument load() yields something. A
+        credentialed one must instead REFUSE, with a DatasetError that names
+        where to register, when given no source -- it must never download,
+        fall back to a substitute, or return an empty stand-in
+        (docs/05_DATA_MODALITY_SPEC.md section 1.5: "Credentialed adapters
+        never auto-download")."""
         ds = _new_instance(key)
-        result = ds.load()
-        assert result is not None
+        if ds.requires_credentials:
+            with pytest.raises(DatasetError, match="Register at"):
+                ds.load()
+            return
+        assert ds.load() is not None
 
     def test_provenance_is_serialisable(self, key: str) -> None:
         ds = _new_instance(key)

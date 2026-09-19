@@ -9,6 +9,75 @@ recorded here.
 
 ## [Unreleased]
 
+**M8 — Benchmarks & Interop — complete**, with one honest gap: the n2c2/i2b2
+de-identification benchmark harness is built and tested, but **no i2b2/n2c2
+number is published because none has been produced** — that corpus is
+released only under a Data Use Agreement and is not available to this
+project's CI or development environments.
+
+### Added — M8 (tasks 8.1–8.2 — de-identification benchmark)
+- `openbtk.eval.deid`: one scorer (relaxed entity-level overlap; category-aware
+  and binary "any PHI" views; micro-averaged overall) now shared by the M2
+  accuracy gate and the credentialed benchmark, so a published number and a CI
+  gate cannot disagree. Reports hold counts and category names only — never
+  document text. The M2 accuracy baselines pass unchanged on the shared scorer.
+- `openbtk.deid.labelled`: `LabelledSpan` / `LabelledDocument`, the shared
+  ground-truth types (in `deid` so both the dataset adapter and the evaluator
+  can use them without breaking layering).
+- `N2C2DeidDataset` (`dataset.clinical_text.n2c2_deid`): reads a
+  user-supplied i2b2/n2c2 2014 `<deIdi2b2>` XML directory. Never downloads;
+  without a path it raises `DatasetError` naming the registration page.
+  Refuses (never mis-scores) files whose tag offsets do not match the text, and
+  DOCTYPE/ENTITY declarations. Annotation types with no Safe Harbor category
+  (AGE, PROFESSION, organisations) are counted as unscored, not dropped. **The
+  parser was written from the published scheme and has not been run against the
+  real corpus** — only hand-built files in its shape.
+- `python -m openbtk.eval.deid_benchmark --dataset n2c2 --path DIR`: one
+  command, JSON and Markdown reports, exit 2 on refusal.
+- `mkdocs/benchmarks.md`: the reproducible synthetic-corpus tables (rule
+  recognizer overall F1 0.933; rule + NER 0.922, category-aware), each with its
+  regeneration command, the matching rule, and an explicit statement that
+  n2c2/i2b2 was not run. `tests/accuracy/test_benchmarks_doc.py` compares the
+  published tables with a fresh run so they cannot drift. The synthetic corpus
+  is a regression gate, not evidence of real-world accuracy.
+
+### Added — M8 (task 8.3 — retrieval metrics)
+- `openbtk.eval.retrieval`: `recall_at_k`, `reciprocal_rank`, `ndcg_at_k`
+  (linear gain, first-occurrence de-duplication), `RetrievalQuery`,
+  `evaluate_retrieval` (streaming, O(1) aggregation) and `retriever_from`
+  (embedding + vector store → retrieve function). No retrieval number is
+  published: there is no agreed corpus in the repository yet.
+
+### Added — M8 (tasks 8.4–8.6 — LangChain / LangGraph interop)
+- `openbtk.integrations.langchain` (`pip install "openbtk[langchain]"`), the
+  only package that imports LangChain: `OpenBTKEmbeddings`,
+  `OpenBTKChatModel`, `OpenBTKVectorStore`, `chunk_to_document` /
+  `document_to_chunk` (lossless round trip; a token count is never estimated),
+  `as_runnable` / `from_runnable`, and `as_langgraph_node`. Tested against the
+  real `langchain-core` and `langgraph`, not mocks of them.
+- New optional extra `langgraph` (also in `all`), used to test the node
+  adapter against a real `StateGraph`; not a core dependency.
+- `mkdocs/langchain.md`: a guide whose every code block is executed by a test.
+- CI: `test-langchain` (adapter against the real libraries) and
+  `test-no-langchain` (rest of the suite with them verifiably absent) — the two
+  halves of ADR-0001; `typecheck` now installs the `langchain` extra.
+  Feature branches (`feat/**`, `fix/**`) now run CI before merge.
+- `tests/packaging/test_langchain_isolation.py`: imports every non-adapter
+  module under a blocker that makes LangChain/LangGraph unimportable, and
+  checks the adapter fails with an actionable message when they are absent.
+- The import-linter LangChain-ban contract now also covers `openbtk.embeddings`,
+  `llms`, `retrieval` and `eval`.
+
+### Known limits (M8)
+- `OpenBTKChatModel` does not stream token-by-token (the provider `stream()`
+  takes a prompt, not messages). `OpenBTKVectorStore` exposes the store's own
+  scores and does not support normalised relevance scores or delete-all.
+
+### Fixed
+- CI `test-core` (zero optional extras) failed on `main` after M6 and M7:
+  tests importing `fhir.resources` / `pyarrow` are now gated with
+  `pytest.importorskip`.
+
 **M7 — Guardrails & Terminology — complete**.
 
 ### Added — M7 (tasks 7.2–7.6 — `openbtk.guardrails`)

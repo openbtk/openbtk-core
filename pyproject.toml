@@ -98,7 +98,15 @@ llms = [
 langchain = [
     "langchain-core>=0.3",
 ]
-all = ["openbtk[text,ehr,retrieval,llms,langchain]"]
+# Only needed to build and run a real LangGraph graph around
+# openbtk.integrations.langchain.as_langgraph_node. The adapter itself imports
+# neither langgraph nor anything beyond langchain-core (a node is a plain
+# callable); this extra exists so the node contract is tested against the
+# real library. Optional, never a core dependency (ADR-0001).
+langgraph = [
+    "langgraph>=0.2",
+]
+all = ["openbtk[text,ehr,retrieval,llms,langchain,langgraph]"]
 dev = [
     "pytest>=8.0",
     "pytest-cov>=5.0",
@@ -244,6 +252,10 @@ source_modules = [
     "openbtk.pipelines",
     "openbtk.guardrails",
     "openbtk.terminology",
+    "openbtk.embeddings",
+    "openbtk.llms",
+    "openbtk.retrieval",
+    "openbtk.eval",
     "openbtk.cli",
 ]
 forbidden_modules = ["langchain", "langchain_core", "langgraph"]
