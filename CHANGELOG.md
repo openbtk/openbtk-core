@@ -9,8 +9,8 @@ recorded here.
 
 ## [Unreleased]
 
-**M9 — v0.5 release readiness — built; `v0.5.0` deliberately NOT tagged.** Two
-PRD gates are open (below), and PyPI version numbers are permanent.
+**M9 — v0.5 release readiness — built; `v0.5.0` deliberately NOT tagged.** One
+PRD gate is open (below), and PyPI version numbers are permanent.
 
 ### Added — M9
 - `tests/release/test_v05_gates.py`: every checkable v0.5 gate from the PRD is a
@@ -50,11 +50,16 @@ PRD gates are open (below), and PyPI version numbers are permanent.
   adapter imports with zero extras; the adapter fails with an actionable
   message; all extras resolve together.
 
+### Closed — MkDocs site live
+- GitHub Pages was enabled on 2026-09-19 (source `gh-pages`); the site is served at
+  <https://openbtk.org/openbtk-core/> (the organisation's custom domain), and
+  `site_url` now says so, so canonical links no longer point at a redirect.
+  Checked by request: the index, quick start, benchmarks and LangChain pages
+  all return 200 and the benchmarks page carries the "Not run" n2c2 statement.
+
 ### Open gates for v0.5
 - **Published i2b2/n2c2 de-identification benchmark** — harness built, corpus
   not available (DUA). Deferred by the maintainer.
-- **MkDocs site live** — the site builds and deploys to `gh-pages`, but GitHub
-  Pages is not enabled for the repository, so the URL does not serve it.
 - Note: the LLM count is four provider classes plus three presets; counted as
   classes only it is four.
 

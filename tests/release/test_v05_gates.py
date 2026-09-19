@@ -9,16 +9,15 @@ adds is the audit that those suites, registrations, workflows and docs still
 exist and still meet the numeric thresholds -- so a gate cannot be quietly
 lost in a refactor.
 
-Two gates cannot be proven from inside the repository, and this file says so
-rather than pretending:
+One gate cannot be proven from inside the repository, and this file says so
+rather than pretending (a second, the live site, is checked by request and
+recorded in the CHANGELOG -- Pages is a repository setting, not code):
 
 * **Published de-id benchmark on i2b2/n2c2** -- the harness exists (tested),
   but the corpus is Data-Use-Agreement-restricted and has never been run. The
   gate test is a *strict* xfail: it flips to a failure the moment a real
   result is published, forcing whoever publishes it to remove the xfail and
   close the gate deliberately.
-* **MkDocs site live** -- the build and deploy workflow are checked here;
-  whether GitHub Pages is switched on is a repository setting.
 """
 
 from __future__ import annotations
@@ -195,6 +194,13 @@ class TestDocsSite:
         workflow = (_WORKFLOWS / "docs.yml").read_text(encoding="utf-8")
         assert "mkdocs build" in workflow
         assert "mike deploy" in workflow
+
+    def test_site_url_is_the_served_address_not_a_redirect(self) -> None:
+        """The site is served from the organisation's custom domain;
+        openbtk.github.io/openbtk-core only redirects there, and a canonical
+        link to a redirect is a broken habit."""
+        config = (_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+        assert "site_url: https://openbtk.org/openbtk-core/" in config
 
     def test_the_nav_covers_the_pages_a_v0_5_reader_needs(self) -> None:
         nav = (_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
