@@ -10,29 +10,31 @@
       
       
       
-        <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/">
+        <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/guides/clinical-text/">
       
       
+        <link rel="prev" href="../../tutorials/">
       
-        <link rel="next" href="quickstart/">
+      
+        <link rel="next" href="../deidentification/">
       
       
         
       
       
-      <link rel="icon" href="assets/images/favicon.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>OpenBTK</title>
+        <title>Clinical text - OpenBTK</title>
       
     
     
-      <link rel="stylesheet" href="assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -51,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="assets/_mkdocstrings.css">
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
     
-    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#openbtk" class="md-skip">
+        <a href="#clinical-text" class="md-skip">
           Skip to content
         </a>
       
@@ -98,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -118,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Home
+              Clinical text
             
           </span>
         </div>
@@ -234,7 +236,7 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -261,37 +263,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Home
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="." class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
         
   
   
@@ -307,59 +282,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#why" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#whats-built" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        What's built
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#where-to-go-next" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Where to go next
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -371,7 +293,7 @@
   
   
     <li class="md-nav__item">
-      <a href="quickstart/" class="md-nav__link">
+      <a href="../../quickstart/" class="md-nav__link">
         
   
   
@@ -398,7 +320,7 @@
   
   
     <li class="md-nav__item">
-      <a href="tutorials/" class="md-nav__link">
+      <a href="../../tutorials/" class="md-nav__link">
         
   
   
@@ -422,8 +344,10 @@
       
   
   
+    
   
   
+  
     
     
     
@@ -434,11 +358,11 @@
       
     
     
-    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
           <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
@@ -459,7 +383,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -474,10 +398,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="guides/clinical-text/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinical text
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -493,6 +444,59 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-the-steps-run-in-this-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why the steps run in this order
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-same-thing-as-a-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The same thing as a pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#limits-worth-knowing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Limits worth knowing
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -505,7 +509,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/deidentification/" class="md-nav__link">
+      <a href="../deidentification/" class="md-nav__link">
         
   
   
@@ -533,7 +537,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/ehr/" class="md-nav__link">
+      <a href="../ehr/" class="md-nav__link">
         
   
   
@@ -561,7 +565,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/evaluation/" class="md-nav__link">
+      <a href="../evaluation/" class="md-nav__link">
         
   
   
@@ -589,7 +593,7 @@
   
   
     <li class="md-nav__item">
-      <a href="guides/cli/" class="md-nav__link">
+      <a href="../cli/" class="md-nav__link">
         
   
   
@@ -617,7 +621,7 @@
   
   
     <li class="md-nav__item">
-      <a href="langchain/" class="md-nav__link">
+      <a href="../../langchain/" class="md-nav__link">
         
   
   
@@ -652,7 +656,7 @@
   
   
     <li class="md-nav__item">
-      <a href="benchmarks/" class="md-nav__link">
+      <a href="../../benchmarks/" class="md-nav__link">
         
   
   
@@ -731,7 +735,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/core/" class="md-nav__link">
+      <a href="../../api/core/" class="md-nav__link">
         
   
   
@@ -759,7 +763,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/deid/" class="md-nav__link">
+      <a href="../../api/deid/" class="md-nav__link">
         
   
   
@@ -787,7 +791,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/clinical_text/" class="md-nav__link">
+      <a href="../../api/clinical_text/" class="md-nav__link">
         
   
   
@@ -815,7 +819,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/ehr/" class="md-nav__link">
+      <a href="../../api/ehr/" class="md-nav__link">
         
   
   
@@ -843,7 +847,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/pipelines/" class="md-nav__link">
+      <a href="../../api/pipelines/" class="md-nav__link">
         
   
   
@@ -871,7 +875,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/providers/" class="md-nav__link">
+      <a href="../../api/providers/" class="md-nav__link">
         
   
   
@@ -899,7 +903,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/retrieval/" class="md-nav__link">
+      <a href="../../api/retrieval/" class="md-nav__link">
         
   
   
@@ -927,7 +931,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/guardrails/" class="md-nav__link">
+      <a href="../../api/guardrails/" class="md-nav__link">
         
   
   
@@ -955,7 +959,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/terminology/" class="md-nav__link">
+      <a href="../../api/terminology/" class="md-nav__link">
         
   
   
@@ -983,7 +987,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/eval/" class="md-nav__link">
+      <a href="../../api/eval/" class="md-nav__link">
         
   
   
@@ -1011,7 +1015,7 @@
   
   
     <li class="md-nav__item">
-      <a href="api/integrations/" class="md-nav__link">
+      <a href="../../api/integrations/" class="md-nav__link">
         
   
   
@@ -1066,10 +1070,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#why" class="md-nav__link">
+  <a href="#why-the-steps-run-in-this-order" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Why
+        Why the steps run in this order
       
     </span>
   </a>
@@ -1077,10 +1081,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#whats-built" class="md-nav__link">
+  <a href="#the-same-thing-as-a-pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        What's built
+        The same thing as a pipeline
       
     </span>
   </a>
@@ -1088,10 +1092,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#where-to-go-next" class="md-nav__link">
+  <a href="#limits-worth-knowing" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Where to go next
+        Limits worth knowing
       
     </span>
   </a>
@@ -1118,78 +1122,95 @@
   
 
 
-<h1 id="openbtk">OpenBTK<a class="headerlink" href="#openbtk" title="Permanent link">&para;</a></h1>
-<p><strong>The open-source layer between biomedical data and modern AI.</strong></p>
-<p>OpenBTK turns clinical text into model-ready, <strong>de-identified</strong>, <strong>auditable</strong>
-inputs — de-identification you can audit and benchmark, and run provenance
-every pipeline execution emits automatically. It runs on your laptop or
-behind your firewall, works with any LLM provider, and streams corpora far
-larger than memory.</p>
-<div class="admonition note">
-<p class="admonition-title">Status: v0.5 — pre-1.0, real, and honestly scoped</p>
-<p>Milestones <strong>M1–M9</strong> are built, tested, and released: core framework,
-de-identification, clinical text, EHR loading, providers and retrieval,
-guardrails and terminology, benchmarks, and LangChain interop.
-<code>pip install openbtk</code> gives you <code>0.5.0</code>. See <a href="quickstart/">Quick start</a>.</p>
-</div>
-<div class="admonition warning">
-<p class="admonition-title">The i2b2/n2c2 benchmark has not been run</p>
-<p>The harness exists and is tested, but that corpus is
-Data-Use-Agreement-restricted. The published figures are on a synthetic
-corpus, and the default recognizer does not detect names. See
-<a href="benchmarks/">Benchmarks</a>.</p>
-</div>
-<h2 id="why">Why<a class="headerlink" href="#why" title="Permanent link">&para;</a></h2>
-<p>Building a clinical RAG pipeline means weeks of undifferentiated plumbing: a
-note parser, a PHI de-identifier that actually catches MRNs, chunking that
-doesn't split the Assessment from the Plan, and an audit trail you'll be
-asked for later. Every team rebuilds it. Most get de-identification wrong,
-or pay a vendor.</p>
-<p><strong>Nothing open-source addresses the two things that actually gate
-deployment: is the PHI really gone, and can you prove what happened.</strong> Those
-two are what OpenBTK is for.</p>
-<h2 id="whats-built">What's built<a class="headerlink" href="#whats-built" title="Permanent link">&para;</a></h2>
+<h1 id="clinical-text">Clinical text<a class="headerlink" href="#clinical-text" title="Permanent link">&para;</a></h1>
+<p>The clinical-text modality turns notes into de-identified, section-aware chunks
+ready for embedding or retrieval. It needs no optional extra for the steps
+below (<code>pip install openbtk</code>).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="c1"># Importing registers the loaders, preprocessors and chunkers. The registry</span>
+<span class="c1"># logs each registration as JSON; a real application would leave that on stderr.</span>
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.clinical_text.chunking</span><span class="w"> </span><span class="kn">import</span> <span class="n">SectionAwareChunker</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.clinical_text.loaders</span><span class="w"> </span><span class="kn">import</span> <span class="n">PlainTextLoader</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.clinical_text.preprocessing</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+        <span class="n">DeidPreprocessor</span><span class="p">,</span>
+        <span class="n">SectionSegmenter</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.deid.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">DeidMode</span>
+
+<span class="n">notes</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">notes</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">"note1.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+    <span class="s2">"Chief Complaint:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Chest pain for two days.</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Assessment:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Likely musculoskeletal. Patient phone (555) 010-2345.</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Plan:</span><span class="se">\n</span><span class="s2">"</span>
+    <span class="s2">"Ibuprofen; follow up in one week.</span><span class="se">\n</span><span class="s2">"</span><span class="p">,</span>
+    <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+    <span class="p">(</span><span class="n">record</span><span class="p">,)</span> <span class="o">=</span> <span class="n">PlainTextLoader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">notes</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>  <span class="c1"># one record per .txt file</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">DeidPreprocessor</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="n">DeidMode</span><span class="o">.</span><span class="n">REDACT</span><span class="p">)</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="n">record</span> <span class="o">=</span> <span class="n">SectionSegmenter</span><span class="p">()</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">record</span><span class="p">)</span>
+    <span class="n">chunks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">SectionAwareChunker</span><span class="p">(</span><span class="n">max_tokens</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">record</span><span class="p">))</span>
+
+<span class="k">assert</span> <span class="s2">"010-2345"</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">record</span><span class="o">.</span><span class="n">text</span>  <span class="c1"># de-identified first</span>
+<span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">record</span><span class="o">.</span><span class="n">sections</span><span class="p">)</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"chief_complaint"</span><span class="p">,</span> <span class="s2">"assessment"</span><span class="p">,</span> <span class="s2">"plan"</span><span class="p">]</span>
+<span class="k">assert</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">section</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">chunks</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="s2">"chief_complaint"</span><span class="p">,</span> <span class="s2">"assessment"</span><span class="p">,</span> <span class="s2">"plan"</span><span class="p">]</span>
+<span class="n">notes</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="why-the-steps-run-in-this-order">Why the steps run in this order<a class="headerlink" href="#why-the-steps-run-in-this-order" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Load</strong> yields one <code>ClinicalTextRecord</code> at a time. Loaders stream; nothing
+   reads a corpus into memory.</li>
+<li><strong>De-identify</strong> before anything that records offsets. Redaction changes the
+   text's length, so a section span computed on the original would point at the
+   wrong characters afterwards.</li>
+<li><strong>Segment</strong> finds section headers (<code>Chief Complaint:</code>, <code>Assessment:</code>, <code>Plan:</code> ...)
+   and records each section's span on the record.</li>
+<li><strong>Chunk.</strong> <code>SectionAwareChunker</code> never splits across a section boundary, so
+   an Assessment is not cut off from its Plan. A section longer than
+   <code>max_tokens</code> is split inside itself.</li>
+</ol>
+<h2 id="the-same-thing-as-a-pipeline">The same thing as a pipeline<a class="headerlink" href="#the-same-thing-as-a-pipeline" title="Permanent link">&para;</a></h2>
+<p>The pipeline executor composes these steps from a YAML config, streams records
+through them, and emits a <code>RunManifest</code> (per-step counts, component identity,
+a digest of each input file; never note content):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">notes-to-chunks</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">load</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">loader.clinical_text.plain_text</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="nv">./notes</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deid</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">preprocessor.general.deidentify</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="nv">redact</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">load</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">segment</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">preprocessor.clinical_text.section_segment</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">deid</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chunk</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chunker.clinical_text.section_aware</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="nv">200</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">segment</span><span class="p p-Indicator">]</span>
+</code></pre></div>
+<p>Check it, then run it, with the <a href="../cli/">CLI</a>: <code>openbtk validate pipeline.yaml</code>,
+<code>openbtk run pipeline.yaml</code>.</p>
+<h2 id="limits-worth-knowing">Limits worth knowing<a class="headerlink" href="#limits-worth-knowing" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>A registry-driven component framework</strong> — loaders, preprocessors,
-  chunkers, guardrails and more, addressed by a permanent string key
-  (<code>&lt;category&gt;.&lt;scope&gt;.&lt;name&gt;</code>), config-driven rather than import-driven.</li>
-<li><strong>De-identification you can audit and benchmark</strong> — a rule-based
-  recognizer plus an optional spaCy-based NER recognizer, combined by an
-  ensemble with checked-in, measured F1 numbers (0.933 default, 0.922 with
-  the full ensemble).</li>
-<li><strong>A clinical text modality</strong> — loaders, section segmentation, and
-  section-aware chunking that never splits mid-section.</li>
-<li><strong>A streaming pipeline executor with real provenance</strong> — every run emits
-  a <code>RunManifest</code>: per-step record counts, component identity, guardrail
-  outcomes, and a content digest for each input source.</li>
-<li><strong>Streaming, not in-memory</strong> — 10,000,000 synthetic notes streamed
-  through the full four-stage pipeline at 0.074 GB peak RSS, measured.</li>
-<li><strong>EHR loading</strong> — FHIR R4 and OMOP into one <code>PatientRecord</code> schema, with
-  timelines, cohorts, and a serializer bridging EHR to clinical text.</li>
-<li><strong>Providers and retrieval</strong> — LLM and embedding providers behind one
-  interface with an off-site policy guard; FAISS, Chroma and Qdrant stores;
-  concept reranking; a RAG pipeline with source provenance.</li>
-<li><strong>Guardrails and terminology</strong> — PHI-leakage, terminology, groundedness
-  and EHR checks; a terminology service with a bundled ICD-10-CM subset.</li>
-<li><strong>Evaluation and interop</strong> — <a href="benchmarks/">reproducible benchmarks</a>,
-  retrieval metrics, and an optional <a href="langchain/">LangChain / LangGraph
-  adapter</a>.</li>
-</ul>
-<p>See the <a href="https://github.com/openbtk/openbtk-core">project README</a> and
-<a href="https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md">CHANGELOG</a>
-for the full, dated record of what has shipped.</p>
-<h2 id="where-to-go-next">Where to go next<a class="headerlink" href="#where-to-go-next" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="quickstart/">Quick start</a> — install and run a real pipeline.</li>
-<li><a href="tutorials/">Tutorials</a> — eight notebooks, run offline and executed in CI.</li>
-<li>Guides — <a href="guides/clinical-text/">clinical text</a>,
-  <a href="guides/deidentification/">de-identification</a>, <a href="guides/ehr/">EHR</a>,
-  <a href="guides/evaluation/">evaluation</a>, the <a href="guides/cli/">command line</a> and
-  <a href="langchain/">LangChain</a>. Every code example on them is executed by a test.</li>
-<li><a href="benchmarks/">Benchmarks</a> — every published number, how to reproduce it, and
-  what has not been measured.</li>
-<li><a href="api/core/">API reference</a> — generated from the source docstrings, so it
-  never claims more than what actually ships.</li>
+<li><strong>Token counts are approximate by default.</strong> <code>count_tokens_approximate</code> is a
+  labelled heuristic. Pass a real tokenizer's counter as <code>count_tokens=</code> to the
+  chunker when a model's context window is the constraint.</li>
+<li><strong>Names are not removed by default.</strong> The default recognizer finds structured
+  identifiers (SSN, MRN, phone, dates, ...). See the
+  <a href="../deidentification/">de-identification guide</a> for what to enable and what the
+  <a href="../../benchmarks/">benchmarks</a> do and do not show.</li>
+<li><code>MIMICNotesLoader</code> reads MIMIC-shaped CSV you already hold under your own data
+  use agreement; OpenBTK never downloads credentialed data.</li>
 </ul>
 
 
@@ -1240,10 +1261,10 @@ for the full, dated record of what has shipped.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": ".", "features": ["navigation.instant", "navigation.sections", "content.code.copy"], "search": "assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
     
     
-      <script src="assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

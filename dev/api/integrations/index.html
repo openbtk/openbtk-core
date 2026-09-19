@@ -1,0 +1,2885 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="The open-source layer between biomedical data and modern AI.">
+      
+      
+      
+        <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/api/integrations/">
+      
+      
+        <link rel="prev" href="../eval/">
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>LangChain adapter - OpenBTK</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#langchain-and-langgraph" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            OpenBTK
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              LangChain adapter
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="teal" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/openbtk/openbtk-core" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openbtk/openbtk-core
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    OpenBTK
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/openbtk/openbtk-core" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    openbtk/openbtk-core
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Tutorials
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guides
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guides
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/clinical-text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinical text
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/deidentification/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    De-identification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/ehr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EHR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command line
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../langchain/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain & LangGraph
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../benchmarks/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Benchmarks
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API reference
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deid/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    De-identification
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../clinical_text/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Clinical text
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../ehr/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    EHR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipelines/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipelines
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../providers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Providers
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../eval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain adapter
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LangChain adapter
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKEmbeddings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenBTKEmbeddings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.from_registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.chat_models.OpenBTKChatModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKChatModel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKVectorStore
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenBTKVectorStore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.store" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        store
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.from_texts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_texts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.documents.chunk_to_document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chunk_to_document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.documents.document_to_chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        document_to_chunk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.runnables.as_runnable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        as_runnable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.runnables.from_runnable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_runnable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.graph.as_langgraph_node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        as_langgraph_node
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKEmbeddings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenBTKEmbeddings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.provider" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        provider
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.from_registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_registry
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.chat_models.OpenBTKChatModel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKChatModel
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OpenBTKVectorStore
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="OpenBTKVectorStore">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.store" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        store
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.from_texts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_texts
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.documents.chunk_to_document" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        chunk_to_document
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.documents.document_to_chunk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        document_to_chunk
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.runnables.as_runnable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        as_runnable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.runnables.from_runnable" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_runnable
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.integrations.langchain.graph.as_langgraph_node" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        as_langgraph_node
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="langchain-and-langgraph">LangChain and LangGraph<a class="headerlink" href="#langchain-and-langgraph" title="Permanent link">&para;</a></h1>
+<p>The optional adapter, installed with <code>pip install "openbtk[langchain]"</code>. See the
+<a href="../../langchain/">guide</a> for worked examples.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings</span>
+
+
+<a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">OpenBTKEmbeddings</span><span class="p">(</span><span class="n">provider</span><span class="p">:</span> <span class="n">BaseEmbeddingProvider</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="langchain_core.embeddings.Embeddings">Embeddings</span></code></p>
+
+
+
+        <p>Expose a <code>BaseEmbeddingProvider</code> to LangChain.</p>
+<p>Documents are embedded in slices of the provider's own <code>batch_size</code> so a
+long list is never sent as one oversized request. The provider's
+<code>sends_data_offsite</code> flag is unchanged by wrapping: an offsite provider
+stays offsite, and a local-only policy is enforced where the provider is
+constructed -- see :meth:<code>from_registry</code>.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>provider</code>
+            </td>
+            <td>
+                  <code><span title="openbtk.core.base.BaseEmbeddingProvider">BaseEmbeddingProvider</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The provider to wrap.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>import numpy as np
+from openbtk.core.base import BaseEmbeddingProvider
+class Fixed(BaseEmbeddingProvider):
+...     sends_data_offsite = False
+...     dimension = 2
+...     def embed(self, texts):
+...         return np.ones((len(texts), 2), dtype=np.float32)
+OpenBTKEmbeddings(Fixed()).embed_query("hello")
+[1.0, 1.0]</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>src/openbtk/integrations/langchain/embeddings.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">40</span>
+<span class="normal">41</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">provider</span><span class="p">:</span> <span class="n">BaseEmbeddingProvider</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_provider</span> <span class="o">=</span> <span class="n">provider</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.provider" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">provider</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.provider" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">provider</span><span class="p">:</span> <span class="n">BaseEmbeddingProvider</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The wrapped OpenBTK provider.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.from_registry" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_registry</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings.from_registry" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_registry</span><span class="p">(</span><span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">PolicyConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenBTKEmbeddings</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build the provider registered under <code>key</code> and wrap it.</p>
+<p><code>policy</code> is forwarded to the registry, which refuses an offsite
+provider unless <code>policy.allow_offsite_providers</code> is true -- wrapping
+a provider for LangChain does not bypass the local-only guard.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="PolicyError">PolicyError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the provider sends data offsite and <code>policy</code>
+does not allow it.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/embeddings.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_registry</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">policy</span><span class="p">:</span> <span class="n">PolicyConfig</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">:</span> <span class="n">Any</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenBTKEmbeddings</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Build the provider registered under ``key`` and wrap it.</span>
+
+<span class="sd">    ``policy`` is forwarded to the registry, which refuses an offsite</span>
+<span class="sd">    provider unless ``policy.allow_offsite_providers`` is true -- wrapping</span>
+<span class="sd">    a provider for LangChain does not bypass the local-only guard.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        PolicyError: If the provider sends data offsite and ``policy``</span>
+<span class="sd">            does not allow it.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">EMBEDDING_REGISTRY</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">policy</span><span class="o">=</span><span class="n">policy</span><span class="p">,</span> <span class="o">**</span><span class="n">params</span><span class="p">))</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openbtk.integrations.langchain.chat_models.OpenBTKChatModel" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">openbtk.integrations.langchain.chat_models.OpenBTKChatModel</span>
+
+
+<a href="#openbtk.integrations.langchain.chat_models.OpenBTKChatModel" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="langchain_core.language_models.BaseChatModel">BaseChatModel</span></code></p>
+
+
+
+        <p>Expose a <code>BaseLLMProvider</code> as a LangChain chat model.</p>
+<p>Only system, user and assistant messages with plain-text content are
+supported -- anything else raises <code>ProviderError</code> rather than being
+flattened into a lossy prompt. Streaming is not overridden: OpenBTK's
+<code>BaseLLMProvider.stream</code> takes a prompt string, not a message list, so
+<code>.stream()</code> here falls back to LangChain's default of yielding the
+complete response as a single chunk.</p>
+<p>Construct it with <code>provider=</code> -- the <code>BaseLLMProvider</code> to wrap (a
+pydantic field, as every LangChain chat model's parameters are).</p>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>from openbtk.core.base import BaseLLMProvider
+from openbtk.core.schemas import LLMResponse
+class Echo(BaseLLMProvider):
+...     sends_data_offsite = False
+...     def generate(self, prompt, <strong>kw): return LLMResponse(text=prompt)
+...     def stream(self, prompt, </strong>kw): yield prompt
+...     def chat(self, messages, **kw):
+...         return LLMResponse(text=messages[-1].content.upper())
+OpenBTKChatModel(provider=Echo()).invoke("hi").content
+'HI'</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore</span>
+
+
+<a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">OpenBTKVectorStore</span><span class="p">(</span><span class="n">store</span><span class="p">:</span> <span class="n">BaseVectorStore</span><span class="p">,</span> <span class="n">embedding</span><span class="p">:</span> <span class="n">Embeddings</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_TEXT_KEY</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="langchain_core.vectorstores.VectorStore">VectorStore</span></code></p>
+
+
+
+        <p>Expose a <code>BaseVectorStore</code> and an <code>Embeddings</code> as a LangChain
+<code>VectorStore</code>.</p>
+<p>OpenBTK stores hold vectors and metadata, not documents, so each text is
+kept in the metadata under <code>text_key</code> (<code>"text"</code> -- the same key
+:class:<code>~openbtk.pipelines.rag.RAGPipeline</code> reads, so one index serves both
+APIs). A caller's own metadata may not use that key.</p>
+<p>Scores are the underlying store's own: their scale and direction (L2
+distance falls as similarity rises; inner product rises) depend on how the
+store was built, which this adapter cannot know. For that reason
+<code>similarity_search_with_relevance_scores</code> (a normalised 0-1 score) is
+unsupported rather than guessed at.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>store</code>
+            </td>
+            <td>
+                  <code><span title="openbtk.core.base.BaseVectorStore">BaseVectorStore</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The OpenBTK vector store.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>embedding</code>
+            </td>
+            <td>
+                  <code><span title="langchain_core.embeddings.Embeddings">Embeddings</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Embeds documents and queries. Wrap an OpenBTK provider with
+:class:<code>~openbtk.integrations.langchain.OpenBTKEmbeddings</code>.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>text_key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Metadata key holding each document's text.</p>
+              </div>
+            </td>
+            <td>
+                  <code><span title="openbtk.integrations.langchain.vectorstores._DEFAULT_TEXT_KEY">_DEFAULT_TEXT_KEY</span></code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>import numpy as np
+from openbtk.core.base import BaseVectorStore
+from openbtk.core.schemas import SearchResult
+from langchain_core.embeddings import DeterministicFakeEmbedding
+class Mem(BaseVectorStore):
+...     def <strong>init</strong>(self): self.rows = {}
+...     def upsert(self, ids, vectors, metadata):
+...         self.rows.update(zip(ids, metadata))
+...     def query(self, vector, top_k=5, filter=None):
+...         return [SearchResult(id=i, score=1.0, metadata=m)
+...                 for i, m in list(self.rows.items())[:top_k]]
+...     def delete(self, ids): pass
+vs = OpenBTKVectorStore(Mem(), DeterministicFakeEmbedding(size=4))
+_ = vs.add_texts(["note A"], ids=["a"])
+vs.similarity_search("anything")[0].page_content
+'note A'</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>src/openbtk/integrations/langchain/vectorstores.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="n">BaseVectorStore</span><span class="p">,</span>
+    <span class="n">embedding</span><span class="p">:</span> <span class="n">Embeddings</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">text_key</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_DEFAULT_TEXT_KEY</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_store</span> <span class="o">=</span> <span class="n">store</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_embedding</span> <span class="o">=</span> <span class="n">embedding</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_text_key</span> <span class="o">=</span> <span class="n">text_key</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.store" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">store</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.store" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">store</span><span class="p">:</span> <span class="n">BaseVectorStore</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The wrapped OpenBTK store.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.delete" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">delete</span>
+
+
+<a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.delete" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">delete</span><span class="p">(</span><span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Delete by id. Deleting everything (<code>ids=None</code>) is unsupported:
+<code>BaseVectorStore</code> has no clear operation.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/vectorstores.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">delete</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>  <span class="c1"># noqa: ARG002 -- LangChain's signature</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Delete by id. Deleting everything (``ids=None``) is unsupported:</span>
+<span class="sd">    ``BaseVectorStore`` has no clear operation."""</span>
+    <span class="k">if</span> <span class="n">ids</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="s2">"OpenBTKVectorStore.delete() needs explicit ids; "</span>
+            <span class="s2">"BaseVectorStore has no delete-all."</span>
+        <span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_store</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">True</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.from_texts" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_texts</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore.from_texts" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_texts</span><span class="p">(</span><span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">embedding</span><span class="p">:</span> <span class="n">Embeddings</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">store</span><span class="p">:</span> <span class="n">BaseVectorStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenBTKVectorStore</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build over <code>store</code> and index <code>texts</code>.</p>
+<p><code>store</code> is required: this adapter does not choose a backend (FAISS,
+Chroma, Qdrant...) on the caller's behalf.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/vectorstores.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_texts</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span>
+    <span class="n">texts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">embedding</span><span class="p">:</span> <span class="n">Embeddings</span><span class="p">,</span>
+    <span class="n">metadatas</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">ids</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">store</span><span class="p">:</span> <span class="n">BaseVectorStore</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>  <span class="c1"># noqa: ARG003 -- LangChain's signature</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OpenBTKVectorStore</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Build over ``store`` and index ``texts``.</span>
+
+<span class="sd">    ``store`` is required: this adapter does not choose a backend (FAISS,</span>
+<span class="sd">    Chroma, Qdrant...) on the caller's behalf.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="n">store</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
+            <span class="s2">"OpenBTKVectorStore.from_texts() needs store=&lt;a BaseVectorStore&gt;; "</span>
+            <span class="s2">"it does not pick a backend for you."</span>
+        <span class="p">)</span>
+    <span class="n">instance</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">store</span><span class="p">,</span> <span class="n">embedding</span><span class="p">)</span>
+    <span class="n">instance</span><span class="o">.</span><span class="n">add_texts</span><span class="p">(</span><span class="n">texts</span><span class="p">,</span> <span class="n">metadatas</span><span class="p">,</span> <span class="n">ids</span><span class="o">=</span><span class="n">ids</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">instance</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openbtk.integrations.langchain.documents.chunk_to_document" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">openbtk.integrations.langchain.documents.chunk_to_document</span>
+
+
+<a href="#openbtk.integrations.langchain.documents.chunk_to_document" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">chunk_to_document</span><span class="p">(</span><span class="n">chunk</span><span class="p">:</span> <span class="n">ClinicalTextChunk</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Document</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Convert a chunk to a LangChain <code>Document</code>.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="openbtk.core.errors.ProcessingError">ProcessingError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>chunk.metadata</code> uses a key this adapter
+reserves (<code>chunk_id</code>, <code>record_id</code>, <code>section</code>,
+<code>token_count</code>, <code>span_start</code>, <code>span_end</code>, <code>entities</code>).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>from openbtk.core.schemas import TextSpan
+chunk = ClinicalTextChunk(
+...     chunk_id="n1:0", record_id="n1", text="Plan: rest.",
+...     span=TextSpan(start=0, end=11, label="chunk", confidence=1.0),
+...     token_count=4,
+... )
+doc = chunk_to_document(chunk)
+doc.page_content, doc.id, doc.metadata["record_id"]
+('Plan: rest.', 'n1:0', 'n1')</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/documents.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span>
+<span class="normal">70</span>
+<span class="normal">71</span>
+<span class="normal">72</span>
+<span class="normal">73</span>
+<span class="normal">74</span>
+<span class="normal">75</span>
+<span class="normal">76</span>
+<span class="normal">77</span>
+<span class="normal">78</span>
+<span class="normal">79</span>
+<span class="normal">80</span>
+<span class="normal">81</span>
+<span class="normal">82</span>
+<span class="normal">83</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">chunk_to_document</span><span class="p">(</span><span class="n">chunk</span><span class="p">:</span> <span class="n">ClinicalTextChunk</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Document</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert a chunk to a LangChain ``Document``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ProcessingError: If ``chunk.metadata`` uses a key this adapter</span>
+<span class="sd">            reserves (``chunk_id``, ``record_id``, ``section``,</span>
+<span class="sd">            ``token_count``, ``span_start``, ``span_end``, ``entities``).</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; from openbtk.core.schemas import TextSpan</span>
+<span class="sd">        &gt;&gt;&gt; chunk = ClinicalTextChunk(</span>
+<span class="sd">        ...     chunk_id="n1:0", record_id="n1", text="Plan: rest.",</span>
+<span class="sd">        ...     span=TextSpan(start=0, end=11, label="chunk", confidence=1.0),</span>
+<span class="sd">        ...     token_count=4,</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; doc = chunk_to_document(chunk)</span>
+<span class="sd">        &gt;&gt;&gt; doc.page_content, doc.id, doc.metadata["record_id"]</span>
+<span class="sd">        ('Plan: rest.', 'n1:0', 'n1')</span>
+<span class="sd">    """</span>
+    <span class="n">clash</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">_RESERVED</span> <span class="o">&amp;</span> <span class="n">chunk</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">if</span> <span class="n">clash</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ProcessingError</span><span class="p">(</span>
+            <span class="s2">"ClinicalTextChunk.metadata uses keys reserved by the LangChain "</span>
+            <span class="sa">f</span><span class="s2">"adapter: </span><span class="si">{</span><span class="n">clash</span><span class="si">}</span><span class="s2">. Rename them before converting."</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"chunk_id"</span><span class="p">:</span> <span class="n">chunk</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span> <span class="s2">"reserved_keys"</span><span class="p">:</span> <span class="n">clash</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="n">metadata</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">chunk</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="n">_CHUNK_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">chunk_id</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="n">_RECORD_ID</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">record_id</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="n">_TOKEN_COUNT</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">token_count</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="n">_SPAN_START</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">start</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="n">_SPAN_END</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">span</span><span class="o">.</span><span class="n">end</span>
+    <span class="k">if</span> <span class="n">chunk</span><span class="o">.</span><span class="n">section</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">_SECTION</span><span class="p">]</span> <span class="o">=</span> <span class="n">chunk</span><span class="o">.</span><span class="n">section</span>
+    <span class="k">if</span> <span class="n">chunk</span><span class="o">.</span><span class="n">entities</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="n">_ENTITIES</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">model_dump</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">"json"</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">chunk</span><span class="o">.</span><span class="n">entities</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">Document</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">chunk</span><span class="o">.</span><span class="n">chunk_id</span><span class="p">,</span> <span class="n">page_content</span><span class="o">=</span><span class="n">chunk</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openbtk.integrations.langchain.documents.document_to_chunk" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">openbtk.integrations.langchain.documents.document_to_chunk</span>
+
+
+<a href="#openbtk.integrations.langchain.documents.document_to_chunk" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">document_to_chunk</span><span class="p">(</span><span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">record_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">token_counter</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClinicalTextChunk</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Convert a <code>Document</code> back to a chunk.</p>
+<p>A Document produced by :func:<code>chunk_to_document</code> round-trips exactly.
+For any other Document, <code>record_id</code> and <code>token_counter</code> fill in what
+the Document cannot say; the chunk id falls back to <code>Document.id</code>, and
+the span to the whole text.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>document</code>
+            </td>
+            <td>
+                  <code><span title="langchain_core.documents.Document">Document</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The Document to convert.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>record_id</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Overrides/fills <code>metadata["record_id"]</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>token_counter</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Callable">Callable</span>[[<span title="str">str</span>], <span title="int">int</span>] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Returns the exact subword count of a text. Required
+unless the Document carries <code>metadata["token_count"]</code>.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="openbtk.core.errors.ProcessingError">ProcessingError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the chunk id, record id or token count cannot be
+determined, or the metadata is not valid for a chunk.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/documents.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span>
+<span class="normal">101</span>
+<span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span>
+<span class="normal">106</span>
+<span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span>
+<span class="normal">117</span>
+<span class="normal">118</span>
+<span class="normal">119</span>
+<span class="normal">120</span>
+<span class="normal">121</span>
+<span class="normal">122</span>
+<span class="normal">123</span>
+<span class="normal">124</span>
+<span class="normal">125</span>
+<span class="normal">126</span>
+<span class="normal">127</span>
+<span class="normal">128</span>
+<span class="normal">129</span>
+<span class="normal">130</span>
+<span class="normal">131</span>
+<span class="normal">132</span>
+<span class="normal">133</span>
+<span class="normal">134</span>
+<span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">document_to_chunk</span><span class="p">(</span>
+    <span class="n">document</span><span class="p">:</span> <span class="n">Document</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">record_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">token_counter</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">],</span> <span class="nb">int</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ClinicalTextChunk</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Convert a ``Document`` back to a chunk.</span>
+
+<span class="sd">    A Document produced by :func:`chunk_to_document` round-trips exactly.</span>
+<span class="sd">    For any other Document, ``record_id`` and ``token_counter`` fill in what</span>
+<span class="sd">    the Document cannot say; the chunk id falls back to ``Document.id``, and</span>
+<span class="sd">    the span to the whole text.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document: The Document to convert.</span>
+<span class="sd">        record_id: Overrides/fills ``metadata["record_id"]``.</span>
+<span class="sd">        token_counter: Returns the exact subword count of a text. Required</span>
+<span class="sd">            unless the Document carries ``metadata["token_count"]``.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ProcessingError: If the chunk id, record id or token count cannot be</span>
+<span class="sd">            determined, or the metadata is not valid for a chunk.</span>
+<span class="sd">    """</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">ctx</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"document_id"</span><span class="p">:</span> <span class="n">document</span><span class="o">.</span><span class="n">id</span><span class="p">}</span>
+
+    <span class="n">chunk_id</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_CHUNK_ID</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="n">document</span><span class="o">.</span><span class="n">id</span>
+    <span class="n">resolved_record</span> <span class="o">=</span> <span class="n">record_id</span> <span class="k">if</span> <span class="n">record_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RECORD_ID</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_RECORD_ID</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">chunk_id</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ProcessingError</span><span class="p">(</span>
+            <span class="s2">"Cannot build a chunk: the Document has neither an id nor "</span>
+            <span class="s2">"metadata['chunk_id']."</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved_record</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ProcessingError</span><span class="p">(</span>
+            <span class="s2">"Cannot build a chunk: pass record_id= or set metadata['record_id']."</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">token_count</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_TOKEN_COUNT</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">token_count</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">token_counter</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ProcessingError</span><span class="p">(</span>
+                <span class="s2">"Cannot build a chunk: the Document has no metadata['token_count'] "</span>
+                <span class="s2">"and no token_counter was given. ClinicalTextChunk needs an exact "</span>
+                <span class="s2">"subword count; it is never estimated."</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="n">ctx</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="n">token_count</span> <span class="o">=</span> <span class="n">token_counter</span><span class="p">(</span><span class="n">document</span><span class="o">.</span><span class="n">page_content</span><span class="p">)</span>
+
+    <span class="n">text</span> <span class="o">=</span> <span class="n">document</span><span class="o">.</span><span class="n">page_content</span>
+    <span class="n">start</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_SPAN_START</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">end</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_SPAN_END</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+    <span class="n">section</span> <span class="o">=</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_SECTION</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">entities</span> <span class="o">=</span> <span class="p">[</span><span class="n">LinkedEntity</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">_ENTITIES</span><span class="p">,</span> <span class="p">[])]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ClinicalTextChunk</span><span class="p">(</span>
+            <span class="n">chunk_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">chunk_id</span><span class="p">),</span>
+            <span class="n">record_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">resolved_record</span><span class="p">),</span>
+            <span class="n">text</span><span class="o">=</span><span class="n">text</span><span class="p">,</span>
+            <span class="n">span</span><span class="o">=</span><span class="n">TextSpan</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">"chunk"</span><span class="p">,</span> <span class="n">confidence</span><span class="o">=</span><span class="mf">1.0</span><span class="p">),</span>
+            <span class="n">section</span><span class="o">=</span><span class="n">section</span><span class="p">,</span>
+            <span class="n">token_count</span><span class="o">=</span><span class="n">token_count</span><span class="p">,</span>
+            <span class="n">entities</span><span class="o">=</span><span class="n">entities</span><span class="p">,</span>
+            <span class="n">metadata</span><span class="o">=</span><span class="n">meta</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ProcessingError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Document is not a valid chunk: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">ctx</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openbtk.integrations.langchain.runnables.as_runnable" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">openbtk.integrations.langchain.runnables.as_runnable</span>
+
+
+<a href="#openbtk.integrations.langchain.runnables.as_runnable" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">as_runnable</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span> <span class="o">|</span> <span class="n">DeidEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Runnable</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Wrap <code>component</code> as a LangChain <code>Runnable</code> (see the module table).</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="openbtk.core.errors.ConfigError">ConfigError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If <code>component</code> is not one of the supported kinds.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>import contextlib, io
+with contextlib.redirect_stdout(io.StringIO()):  # registry debug logs
+...     from openbtk.guardrails.phi_leakage import PHILeakageGuardrail
+...     result = as_runnable(PHILeakageGuardrail()).invoke("Plan: rest.")
+result.passed
+True</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/runnables.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 48</span>
+<span class="normal"> 49</span>
+<span class="normal"> 50</span>
+<span class="normal"> 51</span>
+<span class="normal"> 52</span>
+<span class="normal"> 53</span>
+<span class="normal"> 54</span>
+<span class="normal"> 55</span>
+<span class="normal"> 56</span>
+<span class="normal"> 57</span>
+<span class="normal"> 58</span>
+<span class="normal"> 59</span>
+<span class="normal"> 60</span>
+<span class="normal"> 61</span>
+<span class="normal"> 62</span>
+<span class="normal"> 63</span>
+<span class="normal"> 64</span>
+<span class="normal"> 65</span>
+<span class="normal"> 66</span>
+<span class="normal"> 67</span>
+<span class="normal"> 68</span>
+<span class="normal"> 69</span>
+<span class="normal"> 70</span>
+<span class="normal"> 71</span>
+<span class="normal"> 72</span>
+<span class="normal"> 73</span>
+<span class="normal"> 74</span>
+<span class="normal"> 75</span>
+<span class="normal"> 76</span>
+<span class="normal"> 77</span>
+<span class="normal"> 78</span>
+<span class="normal"> 79</span>
+<span class="normal"> 80</span>
+<span class="normal"> 81</span>
+<span class="normal"> 82</span>
+<span class="normal"> 83</span>
+<span class="normal"> 84</span>
+<span class="normal"> 85</span>
+<span class="normal"> 86</span>
+<span class="normal"> 87</span>
+<span class="normal"> 88</span>
+<span class="normal"> 89</span>
+<span class="normal"> 90</span>
+<span class="normal"> 91</span>
+<span class="normal"> 92</span>
+<span class="normal"> 93</span>
+<span class="normal"> 94</span>
+<span class="normal"> 95</span>
+<span class="normal"> 96</span>
+<span class="normal"> 97</span>
+<span class="normal"> 98</span>
+<span class="normal"> 99</span>
+<span class="normal">100</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">as_runnable</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span> <span class="o">|</span> <span class="n">DeidEngine</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Runnable</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""Wrap ``component`` as a LangChain ``Runnable`` (see the module table).</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ConfigError: If ``component`` is not one of the supported kinds.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import contextlib, io</span>
+<span class="sd">        &gt;&gt;&gt; with contextlib.redirect_stdout(io.StringIO()):  # registry debug logs</span>
+<span class="sd">        ...     from openbtk.guardrails.phi_leakage import PHILeakageGuardrail</span>
+<span class="sd">        ...     result = as_runnable(PHILeakageGuardrail()).invoke("Plan: rest.")</span>
+<span class="sd">        &gt;&gt;&gt; result.passed</span>
+<span class="sd">        True</span>
+<span class="sd">    """</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">component</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">fn</span><span class="p">:</span> <span class="n">Any</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">BaseLLMProvider</span><span class="p">):</span>
+        <span class="n">llm</span> <span class="o">=</span> <span class="n">component</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">llm</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">prompt</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">BaseEmbeddingProvider</span><span class="p">):</span>
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="n">OpenBTKEmbeddings</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">embeddings</span><span class="o">.</span><span class="n">embed_documents</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">BasePreprocessor</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">process</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">BaseChunker</span><span class="p">):</span>
+        <span class="n">chunker</span> <span class="o">=</span> <span class="n">component</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">record</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">chunker</span><span class="o">.</span><span class="n">chunk</span><span class="p">(</span><span class="n">record</span><span class="p">))</span>
+
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">BaseGuardrail</span><span class="p">):</span>
+        <span class="n">fn</span> <span class="o">=</span> <span class="n">component</span><span class="o">.</span><span class="n">check</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">component</span><span class="p">,</span> <span class="n">DeidEngine</span><span class="p">):</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">component</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">fn</span><span class="p">(</span><span class="n">payload</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">text</span><span class="p">,</span> <span class="n">patient_id</span> <span class="o">=</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"text"</span><span class="p">],</span> <span class="n">payload</span><span class="p">[</span><span class="s2">"patient_id"</span><span class="p">]</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
+                    <span class="s1">'A DeidEngine runnable takes {"text": ..., "patient_id": ...}.'</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+            <span class="k">return</span> <span class="n">engine</span><span class="o">.</span><span class="n">deidentify</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">patient_id</span><span class="o">=</span><span class="n">patient_id</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"as_runnable() does not support </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">. Supported: </span><span class="si">{</span><span class="n">_SUPPORTED</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"component"</span><span class="p">:</span> <span class="n">name</span><span class="p">},</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">RunnableLambda</span><span class="p">(</span><span class="n">fn</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openbtk.integrations.langchain.runnables.from_runnable" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">openbtk.integrations.langchain.runnables.from_runnable</span>
+
+
+<a href="#openbtk.integrations.langchain.runnables.from_runnable" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_runnable</span><span class="p">(</span><span class="n">runnable</span><span class="p">:</span> <span class="n">Runnable</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunnablePreprocessor</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Wrap a text-to-text <code>Runnable</code> as an OpenBTK record preprocessor.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/runnables.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
+<span class="normal">136</span>
+<span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_runnable</span><span class="p">(</span><span class="n">runnable</span><span class="p">:</span> <span class="n">Runnable</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunnablePreprocessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Wrap a text-to-text ``Runnable`` as an OpenBTK record preprocessor."""</span>
+    <span class="k">return</span> <span class="n">RunnablePreprocessor</span><span class="p">(</span><span class="n">runnable</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="openbtk.integrations.langchain.graph.as_langgraph_node" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">openbtk.integrations.langchain.graph.as_langgraph_node</span>
+
+
+<a href="#openbtk.integrations.langchain.graph.as_langgraph_node" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">as_langgraph_node</span><span class="p">(</span><span class="n">component</span><span class="p">:</span> <span class="n">Component</span> <span class="o">|</span> <span class="n">DeidEngine</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">input_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+        <p>Wrap <code>component</code> as a LangGraph node.</p>
+<p>The node reads <code>state[input_key]</code>, runs the component exactly as
+:func:<code>~openbtk.integrations.langchain.as_runnable</code> documents, and returns
+<code>{output_key: result}</code> -- a partial update LangGraph merges into state.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>component</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="openbtk.core.base.Component" href="../core/#openbtk.core.base.Component">Component</a> | <a class="autorefs autorefs-internal" title="openbtk.deid.engine.DeidEngine" href="../deid/#openbtk.deid.engine.DeidEngine">DeidEngine</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Any component <code>as_runnable</code> supports.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>input_key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>State key holding the component's input.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>output_key</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>State key the result is written to.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>name</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The node's <code>__name__</code> (LangGraph's default node name).
+Defaults to the component's class name.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><span title="openbtk.core.errors.ConfigError">ConfigError</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>At call time, if <code>input_key</code> is missing from the state
+(the message names the key, never the state's contents).</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>import contextlib, io
+with contextlib.redirect_stdout(io.StringIO()):  # registry debug logs
+...     from openbtk.guardrails.phi_leakage import PHILeakageGuardrail
+...     node = as_langgraph_node(
+...         PHILeakageGuardrail(), input_key="draft", output_key="check"
+...     )
+...     update = node({"draft": "Plan: rest."})
+update["check"].passed
+True</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/integrations/langchain/graph.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">23</span>
+<span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span>
+<span class="normal">36</span>
+<span class="normal">37</span>
+<span class="normal">38</span>
+<span class="normal">39</span>
+<span class="normal">40</span>
+<span class="normal">41</span>
+<span class="normal">42</span>
+<span class="normal">43</span>
+<span class="normal">44</span>
+<span class="normal">45</span>
+<span class="normal">46</span>
+<span class="normal">47</span>
+<span class="normal">48</span>
+<span class="normal">49</span>
+<span class="normal">50</span>
+<span class="normal">51</span>
+<span class="normal">52</span>
+<span class="normal">53</span>
+<span class="normal">54</span>
+<span class="normal">55</span>
+<span class="normal">56</span>
+<span class="normal">57</span>
+<span class="normal">58</span>
+<span class="normal">59</span>
+<span class="normal">60</span>
+<span class="normal">61</span>
+<span class="normal">62</span>
+<span class="normal">63</span>
+<span class="normal">64</span>
+<span class="normal">65</span>
+<span class="normal">66</span>
+<span class="normal">67</span>
+<span class="normal">68</span>
+<span class="normal">69</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">as_langgraph_node</span><span class="p">(</span>
+    <span class="n">component</span><span class="p">:</span> <span class="n">Component</span> <span class="o">|</span> <span class="n">DeidEngine</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">input_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">output_key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">"""Wrap ``component`` as a LangGraph node.</span>
+
+<span class="sd">    The node reads ``state[input_key]``, runs the component exactly as</span>
+<span class="sd">    :func:`~openbtk.integrations.langchain.as_runnable` documents, and returns</span>
+<span class="sd">    ``{output_key: result}`` -- a partial update LangGraph merges into state.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        component: Any component ``as_runnable`` supports.</span>
+<span class="sd">        input_key: State key holding the component's input.</span>
+<span class="sd">        output_key: State key the result is written to.</span>
+<span class="sd">        name: The node's ``__name__`` (LangGraph's default node name).</span>
+<span class="sd">            Defaults to the component's class name.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ConfigError: At call time, if ``input_key`` is missing from the state</span>
+<span class="sd">            (the message names the key, never the state's contents).</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; import contextlib, io</span>
+<span class="sd">        &gt;&gt;&gt; with contextlib.redirect_stdout(io.StringIO()):  # registry debug logs</span>
+<span class="sd">        ...     from openbtk.guardrails.phi_leakage import PHILeakageGuardrail</span>
+<span class="sd">        ...     node = as_langgraph_node(</span>
+<span class="sd">        ...         PHILeakageGuardrail(), input_key="draft", output_key="check"</span>
+<span class="sd">        ...     )</span>
+<span class="sd">        ...     update = node({"draft": "Plan: rest."})</span>
+<span class="sd">        &gt;&gt;&gt; update["check"].passed</span>
+<span class="sd">        True</span>
+<span class="sd">    """</span>
+    <span class="n">runnable</span> <span class="o">=</span> <span class="n">as_runnable</span><span class="p">(</span><span class="n">component</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">node</span><span class="p">(</span><span class="n">state</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">input_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"Graph state has no </span><span class="si">{</span><span class="n">input_key</span><span class="si">!r}</span><span class="s2"> key for node </span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">."</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"input_key"</span><span class="p">:</span> <span class="n">input_key</span><span class="p">},</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">output_key</span><span class="p">:</span> <span class="n">runnable</span><span class="o">.</span><span class="n">invoke</span><span class="p">(</span><span class="n">state</span><span class="p">[</span><span class="n">input_key</span><span class="p">])}</span>
+
+    <span class="n">node</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">=</span> <span class="n">name</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">component</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="k">return</span> <span class="n">node</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.sections", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
