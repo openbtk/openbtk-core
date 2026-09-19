@@ -9,6 +9,55 @@ recorded here.
 
 ## [Unreleased]
 
+**M9 — v0.5 release readiness — built; `v0.5.0` deliberately NOT tagged.** Two
+PRD gates are open (below), and PyPI version numbers are permanent.
+
+### Added — M9
+- `tests/release/test_v05_gates.py`: every checkable v0.5 gate from the PRD is a
+  test (loaders registered, provider/store/guardrail/terminology counts, the
+  scheduled benchmark workflow, docs nav and workflows). The i2b2/n2c2 gate is a
+  **strict xfail**: publishing a real result makes it fail until the xfail is
+  removed, so the gate can only be closed on purpose.
+- CI `test-ehr`: installs `[ehr]`, runs the FHIR/OMOP/Synthea-shaped suites and
+  **fails if any test skips**. `test-core` installs zero extras and therefore
+  skips them by design, so before this the EHR gate was demonstrated only
+  incidentally.
+- `benchmark.yml`: the literal NFR-01 benchmark (10,000,000 synthetic notes
+  through load → de-identify → segment → chunk, peak RSS against 4 GB) runs
+  nightly and on demand, writing its result to the job summary. The data is
+  synthetic; MIMIC is credentialed and never used in CI.
+
+### Measured — M9
+- 10,000,000 synthetic notes through the full four-stage pipeline: peak RSS
+  **0.074 GB** against the 4 GB target (Windows, Python 3.12, one run on
+  2026-09-19, 34 min while other work shared the machine). This replaces the
+  0.056 GB recorded at M3 in README and docs; both are far under the target.
+  Peak RSS does not track corpus size (a 200,000-note run peaked at 0.097 GB),
+  so this is mostly interpreter and import baseline. The nightly workflow
+  produces the Linux figure.
+
+### Changed — M9
+- README, docs index and quick start still said only M1–M3 existed and that PyPI
+  held a `0.0.1` placeholder. They now describe M1–M8, the real PyPI `0.1.1`,
+  the extras, the verification limits of each area (cloud SDKs mocked in CI;
+  UMLS mapping unverified against the live service; groundedness is a
+  heuristic), and the missing n2c2 number. A test guards against the stale
+  wording returning.
+
+### Release readiness checked (not released)
+- sdist and wheel build; `twine check --strict` passes; the wheel installs in a
+  fresh venv with six core dependencies; every module outside the LangChain
+  adapter imports with zero extras; the adapter fails with an actionable
+  message; all extras resolve together.
+
+### Open gates for v0.5
+- **Published i2b2/n2c2 de-identification benchmark** — harness built, corpus
+  not available (DUA). Deferred by the maintainer.
+- **MkDocs site live** — the site builds and deploys to `gh-pages`, but GitHub
+  Pages is not enabled for the repository, so the URL does not serve it.
+- Note: the LLM count is four provider classes plus three presets; counted as
+  classes only it is four.
+
 **M8 — Benchmarks & Interop — complete**, with one honest gap: the n2c2/i2b2
 de-identification benchmark harness is built and tested, but **no i2b2/n2c2
 number is published because none has been produced** — that corpus is

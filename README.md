@@ -78,7 +78,7 @@ two are what OpenBTK is for.
   corpus appears anywhere in a serialised manifest.
 - **Streaming, not in-memory**: **10,000,000 synthetic notes streamed through
   the full four-stage pipeline (load → de-identify → segment → chunk) at
-  0.056 GB peak RSS** — measured, not projected. See
+  0.074 GB peak RSS** — measured, not projected. See
   [`tests/benchmark/test_memory.py`](tests/benchmark/test_memory.py).
 - **EHR loading**: FHIR R4 (`Bundle` and per-resource, streamed) and OMOP
   (core tables in `pyarrow` batches) into one `PatientRecord` schema, with
@@ -215,7 +215,7 @@ spaCy model: `python -m spacy download en_core_web_sm`.
   spaCy; net-new code only where nothing adequate exists (chunking is the
   main example so far).
 - **Streaming by default** — memory is `O(batch)`, not `O(corpus)`. Measured:
-  10M notes in 0.056 GB RSS, against a 4 GB target.
+  10M notes in 0.074 GB RSS, against a 4 GB target.
 - **Light core** — six runtime dependencies, no ML framework in core.
   Reading a clinical note does not require installing PyTorch.
 - **Safe and provable by construction** — de-identification and run

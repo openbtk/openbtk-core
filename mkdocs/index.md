@@ -48,7 +48,7 @@ two are what OpenBTK is for.
   a `RunManifest`: per-step record counts, component identity, guardrail
   outcomes, and a content digest for each input source.
 - **Streaming, not in-memory** — 10,000,000 synthetic notes streamed
-  through the full four-stage pipeline at 0.056 GB peak RSS, measured.
+  through the full four-stage pipeline at 0.074 GB peak RSS, measured.
 - **EHR loading** — FHIR R4 and OMOP into one `PatientRecord` schema, with
   timelines, cohorts, and a serializer bridging EHR to clinical text.
 - **Providers and retrieval** — LLM and embedding providers behind one
