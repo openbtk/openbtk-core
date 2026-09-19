@@ -31,23 +31,33 @@ theme:
 nav:
   - Home: index.md
   - Quick start: quickstart.md
+  - Tutorials: tutorials.md
+  - Guides:
+      - Clinical text: guides/clinical-text.md
+      - De-identification: guides/deidentification.md
+      - EHR: guides/ehr.md
+      - Evaluation: guides/evaluation.md
+      - Command line: guides/cli.md
+      - LangChain & LangGraph: langchain.md
   - Benchmarks: benchmarks.md
-  - LangChain & LangGraph: langchain.md
   - API reference:
       - Core: api/core.md
       - De-identification: api/deid.md
       - Clinical text: api/clinical_text.md
+      - EHR: api/ehr.md
       - Pipelines: api/pipelines.md
+      - Providers: api/providers.md
+      - Retrieval: api/retrieval.md
+      - Guardrails: api/guardrails.md
+      - Terminology: api/terminology.md
+      - Evaluation: api/eval.md
+      - LangChain adapter: api/integrations.md
 
-# Known, harmless false positive (verified, not silently worked around):
-# mkdocstrings/mkdocs_autorefs misreads a couple of this codebase's real
-# doctest Example blocks -- specifically, an >>> call's OUTPUT line that is
-# itself a Python list-of-strings literal (e.g. ['one two ', 'three four'])
-# -- as an attempted cross-reference, and warns that it cannot resolve it.
-# The rendered API page is correct either way; only `mkdocs build --strict`
-# treats the warning as fatal, which is why CI's docs.yml builds without
-# --strict. Tracked as a real, disclosed limitation of the doctest+
-# mkdocstrings combination, not swept under a blanket warning suppression.
+# CI builds with --strict, so any warning fails the docs build. One class of
+# warning is worth knowing about: mkdocstrings/mkdocs_autorefs misreads a
+# doctest whose OUTPUT line is a Python list-of-strings literal (for example
+# ['a', 'b']) as an attempted cross-reference. The fix is in the docstring, not
+# a suppression here: write the example as `... == ["a", "b"]` with output `True`.
 plugins:
   - search
   - mkdocstrings:

@@ -35,6 +35,8 @@ first place.
 from __future__ import annotations
 
 import hashlib
+import os
+import warnings
 from typing import TYPE_CHECKING, Any
 
 import structlog
@@ -74,6 +76,34 @@ _TRUNCATED_SUFFIX = "...[truncated]"
 # matter -- verified this matters: a module-level `log = get_logger(__name__)`
 # created before configure_logging() runs must still respect a later change.
 _allow_phi: bool = False
+
+# Minimum level an OpenBTK log line must have to be emitted. The default is
+# "debug" -- every line, unchanged from before this control existed. Quiet it
+# with OPENBTK_LOG_LEVEL=warning in the environment (read once, at import) or
+# set_log_level("warning") at any time; like _allow_phi it is consulted on every
+# call, so the order of get_logger() and set_log_level() does not matter.
+_LEVELS: dict[str, int] = {
+    "debug": 10,
+    "info": 20,
+    "warning": 30,
+    "error": 40,
+    "critical": 50,
+}
+_min_level: int = _LEVELS["debug"]
+
+
+def _level_from_env() -> int:
+    raw = os.environ.get("OPENBTK_LOG_LEVEL", "debug").strip().lower()
+    if raw not in _LEVELS:
+        warnings.warn(
+            f"Ignoring OPENBTK_LOG_LEVEL={raw!r}; expected one of {sorted(_LEVELS)}.",
+            stacklevel=2,
+        )
+        return _LEVELS["debug"]
+    return _LEVELS[raw]
+
+
+_min_level = _level_from_env()
 
 
 def _hash_identifier(value: Any) -> str:
@@ -121,6 +151,17 @@ def _redact_processor(
     return event_dict
 
 
+def _level_filter(
+    logger: Any,  # noqa: ARG001 -- structlog processor signature, unused by design
+    method_name: str,  # noqa: ARG001 -- ditto
+    event_dict: MutableMapping[str, Any],
+) -> MutableMapping[str, Any]:
+    """Drop events below the configured minimum level (see ``_min_level``)."""
+    if _LEVELS.get(str(event_dict.get("level", "")), 0) < _min_level:
+        raise structlog.DropEvent
+    return event_dict
+
+
 def get_logger(name: str) -> Any:
     """Return a PHI-safe structured logger for ``name``.
 
@@ -139,6 +180,7 @@ def get_logger(name: str) -> Any:
         processors=[
             structlog.contextvars.merge_contextvars,
             structlog.processors.add_log_level,
+            _level_filter,
             structlog.processors.TimeStamper(fmt="iso", utc=True),
             _redact_processor,
             structlog.processors.JSONRenderer(),
@@ -173,3 +215,25 @@ def configure_logging(*, allow_phi: bool = False) -> None:
                 "contain PHI."
             ),
         )
+
+
+def set_log_level(level: str) -> None:
+    """Set the minimum level of OpenBTK's own log lines, process-wide.
+
+    Args:
+        level: ``"debug"`` (the default: everything), ``"info"``, ``"warning"``,
+            ``"error"`` or ``"critical"``. The same setting is available before
+            import as the ``OPENBTK_LOG_LEVEL`` environment variable.
+
+    Raises:
+        ValueError: For any other value.
+
+    Example:
+        >>> set_log_level("warning")  # quiet the routine debug/info lines
+        >>> set_log_level("debug")  # restore the default
+    """
+    global _min_level
+    key = level.strip().lower()
+    if key not in _LEVELS:
+        raise ValueError(f"level must be one of {sorted(_LEVELS)}, got {level!r}")
+    _min_level = _LEVELS[key]

@@ -84,6 +84,17 @@ class TestResolveValidate:
         assert backend.resolve("X", CodeSystem.ICD10CM).display == "Bar"  # type: ignore[union-attr]
 
 
+class TestAuthority:
+    def test_authoritative_only_for_systems_the_file_has_rows_for(
+        self, tmp_path: Path
+    ) -> None:
+        backend = LocalVocabBackend(
+            path=_write_vocab(tmp_path / "v.csv", ["385093006,SNOMED,Pneumonia"])
+        )
+        assert backend.is_authoritative(CodeSystem.SNOMED) is True
+        assert backend.is_authoritative(CodeSystem.LOINC) is False
+
+
 class TestMap:
     def test_always_returns_empty_list(self, tmp_path: Path) -> None:
         path = _write_vocab(tmp_path / "vocab.csv", ["X,SNOMED,Foo"])

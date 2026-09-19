@@ -9,6 +9,72 @@ recorded here.
 
 ## [Unreleased]
 
+**M10 — Eval, CLI, docs — complete.** Writing the tutorials against the real
+code found three genuine defects, fixed below; none of them was visible to the
+existing test suite.
+
+### Added — M10
+- **`openbtk` command line** (`list`, `validate`, `run`, `deid`, `replay`,
+  `doctor`; also `python -m openbtk`). Built on `argparse`, not Typer: a CLI
+  framework would be a seventh runtime dependency for a core held at six, and it
+  works from a plain `pip install openbtk`. A command's result is the only thing
+  on stdout (library logging goes to stderr), so `--json` is pure JSON. Exit
+  codes: `0` ok, `1` it ran and failed or a check found a problem, `2` the
+  invocation was wrong.
+  - `validate` (and `PipelineConfig.validate_registry`) now checks each step's
+    parameters against its constructor signature (unknown or missing) and the
+    off-site policy, without instantiating anything; `Pipeline.validate()` adds
+    the executor's single-linear-chain rule.
+  - `replay` rebuilds a pipeline from a manifest's recorded config, re-runs it and
+    reports divergence in input content (SHA-256), per-step counts and status. A
+    directory input has no content hash, so only its record count is compared and
+    the report says so. A manifest with redacted secrets is refused, not replayed
+    with a placeholder.
+  - `doctor` reports installed extras, the spaCy model, and credentials **by name
+    only** (a value is never read into the report).
+- **Clinical QA evaluation** (`openbtk.eval.qa`): readers for the MedQA and
+  MedMCQA file formats (verified against the datasets' Hub cards; a hidden or
+  ambiguous answer key is refused, never guessed), a conservative answer parser,
+  `evaluate_qa` with a Wilson 95% interval, per-subject counts, token accounting,
+  and an `EvalManifest`. No dataset and no benchmark score ships (rule 14).
+- **Groundedness scoring** (`openbtk.eval.groundedness`): claim-level
+  faithfulness, and `evaluate_detector` to score the checker itself against human
+  labels. States plainly that the default checker is a word-overlap heuristic.
+- **`EvalManifest`** (FR-X-06): which component, which data (SHA-256), when, and
+  counts; never question, answer or note text.
+- **Documentation**: four guides (clinical text, de-identification, EHR,
+  evaluation) plus a command-line guide; API reference pages for EHR, providers,
+  retrieval, guardrails, terminology, evaluation and the LangChain adapter; a
+  tutorials page. Every guide code block is executed, every pipeline YAML block
+  validated, every `openbtk ...` command parsed, every API directive resolved, by
+  `tests/docsite`.
+- **Eight tutorial notebooks** (`notebooks/`), offline and synthetic-only, executed
+  top to bottom in fresh kernels by `tests/notebooks`. New optional `notebooks`
+  extra (nbclient, nbformat, ipykernel).
+- **CI**: `docs-build` (`mkdocs build --strict` on every branch), `test-docs` and
+  `test-notebooks` (all extras installed; fail on any skip). The docs build is now
+  strict; four doctests whose list-of-strings output tripped mkdocs autorefs were
+  rewritten.
+- `openbtk.core.logging.set_log_level()` / `OPENBTK_LOG_LEVEL`: quiet OpenBTK's own
+  log lines. The default is unchanged (every line).
+- `BaseTerminologyService.is_authoritative(system)` (default `True`).
+
+### Fixed — M10 (found by writing the tutorials)
+- **The default terminology guardrail blocked valid data.** The bundled backend is
+  a small ICD-10-CM *subset*, yet `validate()` returning `False` for anything
+  outside it made `TerminologyValidityGuardrail` (and so `EHRCodeValidityGuardrail`)
+  report real SNOMED, LOINC and most ICD-10-CM codes as "do not exist" with
+  severity **BLOCK**. A partial vocabulary can fail to confirm a code, not call it
+  invalid: those codes are now a WARNING ("unverifiable"). A BLOCK requires an
+  authoritative backend (a complete vocabulary).
+- **`max_tokens` was redacted from run manifests** (the credential pattern matched
+  "token"), erasing a chunker's size limit from the audit record and making any
+  pipeline with a chunker impossible to replay. Token-count keys are now exempt;
+  `access_token`, `hf_token` and the like are still redacted.
+- **`DeidMode.DATE_SHIFT` failed the whole document** if it contained any non-date
+  identifier (a phone number beside a date), because every detection was fed to the
+  date parser. Dates are shifted; every other identifier is now redacted.
+
 ## [0.5.0] — 2026-09-19
 
 ### Read this first

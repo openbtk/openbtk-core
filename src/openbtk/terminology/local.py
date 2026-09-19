@@ -106,6 +106,12 @@ class LocalVocabBackend(BaseTerminologyService):
     def validate(self, code: str, system: CodeSystem) -> bool:
         return self.resolve(code, system) is not None
 
+    def is_authoritative(self, system: CodeSystem) -> bool:
+        """True only for a system the supplied file has rows for: the file is
+        taken as that system's full vocabulary. A system it has no rows for is
+        simply not covered, so absence there proves nothing."""
+        return system in self._table()
+
     def map(
         self,
         code: str,  # noqa: ARG002 -- BaseTerminologyService interface, unused by design

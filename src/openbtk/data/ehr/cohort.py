@@ -134,8 +134,8 @@ class CohortBuilder:
         ...     ),
         ... ]
         >>> cohort = CohortBuilder(patients).include(has_condition("385093006"))
-        >>> [p.patient_id for p in cohort]
-        ['pt-1']
+        >>> [p.patient_id for p in cohort] == ["pt-1"]
+        True
     """
 
     def __init__(self, records: Iterable[PatientRecord]) -> None:

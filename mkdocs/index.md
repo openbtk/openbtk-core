@@ -66,5 +66,12 @@ for the full, dated record of what has shipped.
 ## Where to go next
 
 - [Quick start](quickstart.md) — install and run a real pipeline.
+- [Tutorials](tutorials.md) — eight notebooks, run offline and executed in CI.
+- Guides — [clinical text](guides/clinical-text.md),
+  [de-identification](guides/deidentification.md), [EHR](guides/ehr.md),
+  [evaluation](guides/evaluation.md), the [command line](guides/cli.md) and
+  [LangChain](langchain.md). Every code example on them is executed by a test.
+- [Benchmarks](benchmarks.md) — every published number, how to reproduce it, and
+  what has not been measured.
 - [API reference](api/core.md) — generated from the source docstrings, so it
   never claims more than what actually ships.

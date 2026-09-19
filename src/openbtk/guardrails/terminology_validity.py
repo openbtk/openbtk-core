@@ -125,8 +125,14 @@ class TerminologyValidityGuardrail(BaseGuardrail):
             except TerminologyError:
                 errored.append(label)
                 continue
-            if not valid:
+            if valid:
+                continue
+            # A backend that cannot say "does not exist" (a partial subset)
+            # has not found the code INVALID -- it has failed to confirm it.
+            if self._terminology.is_authoritative(system):
                 invalid.append(label)
+            else:
+                errored.append(label)
         if invalid:
             return GuardrailResult(
                 passed=False,
@@ -145,8 +151,9 @@ class TerminologyValidityGuardrail(BaseGuardrail):
                 guardrail_key=self.registry_key,
                 message=(
                     f"Could not verify {len(errored)} of {len(pairs)} code(s) "
-                    "-- terminology backend unavailable or unlicensed for "
-                    "that system."
+                    "-- the terminology backend is unavailable, unlicensed, or "
+                    "does not cover them (a partial vocabulary cannot say a "
+                    "code is invalid)."
                 ),
                 details={"unverifiable": errored},
             )

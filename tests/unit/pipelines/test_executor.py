@@ -16,6 +16,7 @@ import hashlib
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
+import pytest
 from pydantic import BaseModel, ConfigDict
 
 from openbtk.core.base import BaseChunker, BaseGuardrail, BaseLoader, BasePreprocessor
@@ -29,6 +30,7 @@ from openbtk.core.registry import (
 )
 from openbtk.core.schemas import GuardrailResult, GuardrailSeverity
 from openbtk.pipelines import Pipeline, Step
+from openbtk.pipelines.executor import _is_secret_key
 
 if TYPE_CHECKING:
     from collections.abc import Iterator
@@ -499,6 +501,66 @@ class TestSecretRedaction:
         params = first_step["params"]
         assert isinstance(params, dict)
         assert params["api_key"] == "[REDACTED]"
+
+    def test_a_token_count_is_a_setting_not_a_secret(self) -> None:
+        """Regression: ``max_tokens`` matched the credential pattern, so the
+        manifest recorded ``"[REDACTED]"`` for a chunker's size limit and the
+        run could not be replayed."""
+        manifest = (
+            Pipeline("test")
+            .add(
+                Step(
+                    "load",
+                    "loader.general.pipeline_test_lines",
+                    source=[],
+                    max_tokens=200,
+                    access_token=_FAKE_API_KEY,
+                )
+            )
+            .run()
+        )
+        steps_list = manifest.config["steps"]
+        assert isinstance(steps_list, list) and isinstance(steps_list[0], dict)
+        params = steps_list[0]["params"]
+        assert isinstance(params, dict)
+        assert params["max_tokens"] == 200
+        assert params["access_token"] == "[REDACTED]"
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "api_key",
+            "API_KEY",
+            "access_token",
+            "hf_token",
+            "auth_token",
+            "token",
+            "client_secret",
+            "password",
+            "db_password",
+            "credentials",
+            "tokenizer_key",
+        ],
+    )
+    def test_credential_shaped_keys_are_secret(self, key: str) -> None:
+        assert _is_secret_key(key)
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "max_tokens",
+            "overlap_tokens",
+            "Max_Tokens",
+            "prompt_tokens",
+            "completion_tokens",
+            "total_tokens",
+            "num_tokens",
+            "count_tokens",
+            "mode",
+        ],
+    )
+    def test_length_and_ordinary_keys_are_not(self, key: str) -> None:
+        assert not _is_secret_key(key)
 
 
 class TestDataDigest:

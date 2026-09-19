@@ -51,6 +51,9 @@ dependencies = [
     "typing-extensions>=4.12",
 ]
 
+[project.scripts]
+openbtk = "openbtk.cli:main"
+
 [project.optional-dependencies]
 text = [
     "scispacy>=0.5",
@@ -105,6 +108,12 @@ langchain = [
 # real library. Optional, never a core dependency (ADR-0001).
 langgraph = [
     "langgraph>=0.2",
+]
+# To execute the tutorial notebooks in notebooks/ (CI runs every one of them).
+notebooks = [
+    "nbclient>=0.10",
+    "nbformat>=5.9",
+    "ipykernel>=6.29",
 ]
 all = ["openbtk[text,ehr,retrieval,llms,langchain,langgraph]"]
 dev = [
@@ -180,6 +189,7 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["ANN", "ARG"]
+"notebooks/**" = ["ANN", "ARG", "T20", "E501"]   # tutorials print and read top-to-bottom
 "src/openbtk/cli/**" = ["T20"]     # the CLI prints legitimately
 
 [tool.ruff.lint.isort]

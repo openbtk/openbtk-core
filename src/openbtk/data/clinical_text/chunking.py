@@ -246,8 +246,8 @@ class FixedTokenChunker(BaseChunker[ClinicalTextRecord, ClinicalTextChunk]):
         ...     record_id="n1", source="synthea", text="one two three four"
         ... )
         >>> chunker = FixedTokenChunker(max_tokens=2)
-        >>> [c.text for c in chunker.chunk(record)]
-        ['one two ', 'three four']
+        >>> [c.text for c in chunker.chunk(record)] == ["one two ", "three four"]
+        True
     """
 
     def __init__(
@@ -297,8 +297,8 @@ class SectionAwareChunker(BaseChunker[ClinicalTextRecord, ClinicalTextChunk]):
         ...     },
         ... )
         >>> chunks = list(SectionAwareChunker(max_tokens=50).chunk(record))
-        >>> [c.section for c in chunks]
-        ['chief_complaint', 'plan']
+        >>> [c.section for c in chunks] == ["chief_complaint", "plan"]
+        True
     """
 
     def __init__(

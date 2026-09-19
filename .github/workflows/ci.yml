@@ -104,7 +104,16 @@ jobs:
       - name: Test suite (from outside the repository)
         working-directory: ${{ runner.temp }}
         shell: bash
-        run: pytest "${{ github.workspace }}/tests" -v -p no:cacheprovider
+        run: |
+          set +e
+          pytest "${{ github.workspace }}/tests" -v -rfE -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            # Surface the failing tests as an annotation, readable without log access.
+            echo "::error title=test-core failed::$(grep -E '^(FAILED|ERROR)' pytest.out | head -c 1500 | tr '\n' '|')"
+            exit "$status"
+          fi
 
   # v0.5 gate "FHIR R4 + OMOP loaders; Synthea round-trip": test-core installs
   # zero extras, so its EHR tests skip (by design). This job installs [ehr] and
@@ -171,6 +180,86 @@ jobs:
       - name: Suite passes without langchain (adapter tests excluded)
         working-directory: ${{ runner.temp }}
         run: pytest "${{ github.workspace }}/tests" --ignore="${{ github.workspace }}/tests/unit/integrations" -q -p no:cacheprovider
+
+  # Every code example on the documentation site is executed. Some need an extra
+  # (the EHR guide needs [ehr]; the adapter's API page needs [langchain]), which
+  # test-core does not install, so this job installs them and FAILS if anything
+  # skipped -- otherwise those examples would never run anywhere.
+  test-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr,langchain,langgraph]"
+      - name: Docs examples, none skipped (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          set +e
+          pytest "${{ github.workspace }}/tests/docsite" \
+                 "${{ github.workspace }}/tests/unit/integrations/test_docs_page.py" \
+                 -q -rfEs -p no:cacheprovider --junitxml=docs.xml 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            # Surface the failure as an annotation, readable without log access.
+            echo "::error title=docs tests failed::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          suite = ET.parse("docs.xml").getroot()
+          suite = suite if suite.tag == "testsuite" else suite[0]
+          skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
+          if tests <= 25 or skipped != 0:
+              print(f"::error title=docs skip check::{tests} tests, {skipped} skipped; an extra is missing")
+              raise SystemExit(1)
+          print(f"{tests} docs tests, 0 skipped")
+          PY
+
+  # The eight tutorial notebooks are EXECUTED, top to bottom, in fresh kernels.
+  # They need extras test-core does not install (ehr, langchain, langgraph, the
+  # notebook tooling, and faiss -- installed directly because the [retrieval]
+  # extra also pulls Chroma and Qdrant, which no notebook uses). Fails on any skip,
+  # or the tutorials would silently stop being tested.
+  test-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr,langchain,langgraph,notebooks]" faiss-cpu
+      - name: Execute every notebook (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          pytest "${{ github.workspace }}/tests/notebooks" -q -p no:cacheprovider --junitxml=nb.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          suite = ET.parse("nb.xml").getroot()
+          suite = suite if suite.tag == "testsuite" else suite[0]
+          skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
+          assert tests >= 50, f"suspiciously few notebook tests ran: {tests}"
+          assert skipped == 0, f"{skipped} notebook tests skipped -- an extra is missing"
+          print(f"{tests} notebook tests, 0 skipped")
+          PY
+
+  # The docs site builds with --strict on every branch, so a broken cross-reference
+  # or an unresolvable API directive is caught before merge, not after (docs.yml
+  # only runs on main). [langchain] because the adapter's API page imports it.
+  docs-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[docs,langchain]"
+      - run: mkdocs build --strict
 
   build:
     runs-on: ubuntu-latest

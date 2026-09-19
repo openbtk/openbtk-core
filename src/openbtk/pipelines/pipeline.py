@@ -15,8 +15,10 @@ from openbtk.core.config import (
     PolicyConfig,
     ProvenanceConfig,
     StepConfig,
+    ValidationIssue,
 )
-from openbtk.pipelines.executor import _Executor
+from openbtk.core.errors import ConfigError
+from openbtk.pipelines.executor import _Executor, _validate_linear_shape
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -130,6 +132,21 @@ class Pipeline:
     @classmethod
     def from_yaml(cls, path: str | Path) -> Pipeline:
         return cls.from_config(PipelineConfig.from_yaml(path))
+
+    def validate(self) -> list[ValidationIssue]:
+        """Everything that can be checked without instantiating a component or
+        touching data: the config's registry, parameter and policy checks
+        (:meth:`PipelineConfig.validate_registry`) plus the executor's own
+        shape rule (a single linear chain). An empty list means ``run()`` will
+        not be refused for any of these reasons -- not that it will succeed.
+        """
+        config = self.to_config()
+        issues = config.validate_registry()
+        try:
+            _validate_linear_shape(config.steps)
+        except ConfigError as e:
+            issues.append(ValidationIssue(severity="error", message=str(e)))
+        return issues
 
     def run(self) -> RunManifest:
         """Execute this pipeline, streaming records through every step.

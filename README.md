@@ -17,7 +17,9 @@ than memory.
 > Milestones **M1–M9** are built, tested and released: the core framework,
 > de-identification, clinical text, EHR loading, providers and retrieval,
 > guardrails and terminology, benchmarks, and LangChain interop.
-> `pip install openbtk` gives you `0.5.0`.
+> `pip install openbtk` gives you `0.5.0`. `main` also has the `openbtk` command
+> line, clinical-QA and groundedness evaluation, guides and eight tutorial
+> notebooks (M10), which ship with the next release.
 >
 > **The i2b2/n2c2 de-identification benchmark has not been run.** The harness
 > exists and is tested, but that corpus is released only under a Data Use
@@ -221,8 +223,7 @@ spaCy model: `python -m spacy download en_core_web_sm`.
 
 ## Roadmap
 
-**Next (M10):** an evaluation harness beyond de-identification and retrieval,
-a CLI, tutorials and a complete API reference. The one open v0.5 gate — the
+**Next (M11):** freeze the public API and prepare v1.0. The one open v0.5 gate — the
 published i2b2/n2c2 de-identification result (data access needed; see above)
 — is audited in [`tests/release/`](tests/release/).
 
@@ -242,6 +243,10 @@ system, or a dataset distributor.
 The site is live at <https://openbtk.org/openbtk-core/> (the `dev` build of
 `main`).
 
+- [Tutorial notebooks](notebooks/) — eight, offline, executed in CI.
+- [Guides and API reference](https://openbtk.org/openbtk-core/dev/) — clinical text,
+  de-identification, EHR, evaluation, the command line; every code example on the
+  guides is executed by a test.
 - [Benchmarks](mkdocs/benchmarks.md) — every published number, its
   reproduction command, and what has *not* been measured.
 - [LangChain and LangGraph](mkdocs/langchain.md) — the optional adapter; every

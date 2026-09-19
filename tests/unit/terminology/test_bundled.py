@@ -35,6 +35,12 @@ class TestValidate:
         assert backend.validate("bogus", CodeSystem.ICD10CM) is False
 
 
+class TestAuthority:
+    def test_the_subset_is_never_authoritative_for_any_system(self) -> None:
+        backend = BundledMinimalBackend()
+        assert all(not backend.is_authoritative(s) for s in CodeSystem)
+
+
 class TestMap:
     def test_always_returns_empty_list(self) -> None:
         backend = BundledMinimalBackend()
