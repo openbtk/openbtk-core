@@ -1,0 +1,1539 @@
+{
+  "api": {
+    "openbtk.core.base.BaseChunker": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "chunk": "(record: RecordT) -> Iterator[ChunkT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BaseDatasetAdapter": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "license": "property",
+        "load": "(**kwargs: Any) -> Any",
+        "name": "property",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "requires_credentials": "property"
+      }
+    },
+    "openbtk.core.base.BaseEmbeddingProvider": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "batch_size": "property",
+        "dimension": "property",
+        "embed": "(texts: list[str]) -> NDArray[np.float32]",
+        "embed_one": "(text: str) -> NDArray[np.float32]",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BaseFeatureExtractor": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "extract": "(chunk: ChunkT) -> dict[str, float]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BaseGuardrail": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BaseLLMProvider": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.core.base.BaseLoader": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "load": "(source: InputT) -> Iterator[RecordT]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BasePreprocessor": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "process": "(record: RecordT) -> RecordT",
+        "process_stream": "(records: Iterable[RecordT]) -> Iterator[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.base.BaseReranker": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "rerank": "(query: str, results: list[SearchResult], top_k: int | None = None) -> list[SearchResult]"
+      }
+    },
+    "openbtk.core.base.BaseSegmenter": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "segment": "(record: RecordT) -> Iterator[ChunkT]"
+      }
+    },
+    "openbtk.core.base.BaseTerminologyService": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "is_authoritative": "(system: CodeSystem) -> bool",
+        "map": "(code: str, from_system: CodeSystem, to_system: CodeSystem) -> list[Concept]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "resolve": "(code: str, system: CodeSystem) -> Concept | None",
+        "validate": "(code: str, system: CodeSystem) -> bool"
+      }
+    },
+    "openbtk.core.base.BaseVectorStore": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "delete": "(ids: list[str]) -> None",
+        "load": "class(path: str) -> BaseVectorStore",
+        "persist": "(path: str) -> None",
+        "provenance": "() -> ComponentProvenance",
+        "query": "(vector: NDArray[np.float32], top_k: int = 5, filter: dict[str, Any] | None = None) -> list[SearchResult]",
+        "registry_key": "= ''",
+        "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
+      }
+    },
+    "openbtk.core.base.Component": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''"
+      }
+    },
+    "openbtk.core.config.GuardrailConfig": {
+      "fields": {
+        "at": true,
+        "on_violation": false,
+        "type": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.config.PipelineConfig": {
+      "fields": {
+        "description": false,
+        "guardrails": false,
+        "name": true,
+        "policy": false,
+        "provenance": false,
+        "steps": true,
+        "version": false
+      },
+      "kind": "class",
+      "members": {
+        "from_yaml": "class(path: str | Path) -> PipelineConfig",
+        "json_schema_export": "class() -> dict[str, Any]",
+        "validate_registry": "() -> list[ValidationIssue]"
+      }
+    },
+    "openbtk.core.config.PolicyConfig": {
+      "fields": {
+        "allow_offsite_providers": false,
+        "fail_on_guardrail_block": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.config.ProvenanceConfig": {
+      "fields": {
+        "manifest_dir": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.config.StepConfig": {
+      "fields": {
+        "after": false,
+        "id": true,
+        "params": false,
+        "type": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.config.ValidationIssue": {
+      "fields": {
+        "message": true,
+        "severity": true,
+        "step_id": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.deprecation.OpenBTKDeprecationWarning": {
+      "init": "(...)",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.deprecation.deprecated": {
+      "kind": "function",
+      "signature": "(*, since: str, removal: str, use: str | None = None) -> Callable[[_F], _F]"
+    },
+    "openbtk.core.deprecation.warn_deprecated": {
+      "kind": "function",
+      "signature": "(name: str, *, since: str, removal: str, use: str | None = None, stacklevel: int = 2) -> None"
+    },
+    "openbtk.core.errors.AuthenticationError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.ConfigError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.DatasetError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.DeidError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.GuardrailViolation": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.LoaderError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.MissingDependencyError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.OpenBTKError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.PluginError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.PolicyError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.ProcessingError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.ProviderError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.RateLimitError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.RegistryError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.RetrievalError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.errors.TerminologyError": {
+      "init": "(message: str, *, context: dict[str, Any] | None = None) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.logging.configure_logging": {
+      "kind": "function",
+      "signature": "(*, allow_phi: bool = False) -> None"
+    },
+    "openbtk.core.logging.get_logger": {
+      "kind": "function",
+      "signature": "(name: str) -> Any"
+    },
+    "openbtk.core.logging.set_log_level": {
+      "kind": "function",
+      "signature": "(level: str) -> None"
+    },
+    "openbtk.core.provenance.ComponentProvenance": {
+      "fields": {
+        "class_name": true,
+        "config": false,
+        "model_identity": false,
+        "package_version": true,
+        "registry_key": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.provenance.DataDigest": {
+      "fields": {
+        "record_count": true,
+        "sha256": false,
+        "uri": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.provenance.GuardrailOutcome": {
+      "fields": {
+        "at": true,
+        "blocked_count": false,
+        "checked_count": true,
+        "guardrail_key": true,
+        "sample_messages": false,
+        "warned_count": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.provenance.ModelIdentity": {
+      "fields": {
+        "name": true,
+        "revision": true,
+        "source": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.provenance.RunManifest": {
+      "fields": {
+        "config": true,
+        "ended_at": false,
+        "error": false,
+        "guardrail_outcomes": false,
+        "input_digests": false,
+        "manifest_version": false,
+        "run_id": true,
+        "started_at": true,
+        "status": true,
+        "steps": false,
+        "token_usage": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.provenance.StepProvenance": {
+      "fields": {
+        "component": true,
+        "error": false,
+        "records_in": true,
+        "records_out": true,
+        "status": true,
+        "step_id": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.registry.ComponentInfo": {
+      "fields": {
+        "class_name": true,
+        "docstring": false,
+        "module": true,
+        "registry_key": true,
+        "signature": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.registry.Registry": {
+      "init": "(category: str, base_type: type[T]) -> None",
+      "kind": "class",
+      "members": {
+        "create": "(key: str, *, policy: PolicyConfig | None = None, **kwargs: Any) -> T",
+        "create_from_config": "(config: dict[str, Any], *, policy: PolicyConfig | None = None) -> T",
+        "describe": "(key: str) -> ComponentInfo",
+        "get": "(key: str) -> type[T]",
+        "is_registered": "(key: str) -> bool",
+        "list_keys": "() -> list[str]",
+        "register": "(key: str) -> Callable[[type[T]], type[T]]",
+        "register_alias": "(alias: str, existing_key: str, *, since: str | None = None, removal: str | None = None) -> None"
+      }
+    },
+    "openbtk.core.registry.get_registry": {
+      "kind": "function",
+      "signature": "(category: str) -> Registry[Any]"
+    },
+    "openbtk.core.registry.list_categories": {
+      "kind": "function",
+      "signature": "() -> list[str]"
+    },
+    "openbtk.core.retry.retry_with_backoff": {
+      "kind": "function",
+      "signature": "(func: Callable[[], T], *, max_attempts: int = 5, base_delay: float = 1.0, max_delay: float = 60.0, jitter: float = 0.1, sleep: Callable[[float], None] = <sleep>) -> T"
+    },
+    "openbtk.core.schemas.CodeSystem": {
+      "kind": "enum",
+      "members": {
+        "CPT": "CPT",
+        "ICD10CM": "ICD10CM",
+        "LOINC": "LOINC",
+        "RXNORM": "RXNORM",
+        "SNOMED": "SNOMED",
+        "UCUM": "UCUM"
+      }
+    },
+    "openbtk.core.schemas.Concept": {
+      "fields": {
+        "code": true,
+        "display": true,
+        "system": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.GuardrailResult": {
+      "fields": {
+        "details": false,
+        "guardrail_key": true,
+        "message": true,
+        "passed": true,
+        "severity": true,
+        "spans": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.GuardrailSeverity": {
+      "kind": "enum",
+      "members": {
+        "BLOCK": "block",
+        "INFO": "info",
+        "WARNING": "warning"
+      }
+    },
+    "openbtk.core.schemas.LLMResponse": {
+      "fields": {
+        "text": true,
+        "usage": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.LinkedEntity": {
+      "fields": {
+        "codes": false,
+        "cui": false,
+        "historical": false,
+        "negated": false,
+        "span": true,
+        "subject": false,
+        "text": true,
+        "uncertain": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.Message": {
+      "fields": {
+        "content": true,
+        "role": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.RAGAnswer": {
+      "fields": {
+        "sources": false,
+        "text": true,
+        "usage": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.SearchResult": {
+      "fields": {
+        "id": true,
+        "metadata": false,
+        "score": true,
+        "source": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.SourceRef": {
+      "fields": {
+        "char_end": false,
+        "char_start": false,
+        "chunk_id": false,
+        "record_id": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.TextSpan": {
+      "fields": {
+        "confidence": true,
+        "end": true,
+        "label": true,
+        "start": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.core.schemas.TokenUsage": {
+      "fields": {
+        "completion_tokens": false,
+        "prompt_tokens": false,
+        "total_tokens": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.clinical_text.chunking.FixedTokenChunker": {
+      "init": "(*, max_tokens: int = 512, overlap_tokens: int = 0, count_tokens: Callable[[str], int] = <count_tokens_approximate>) -> None",
+      "kind": "class",
+      "members": {
+        "chunk": "(record: ClinicalTextRecord) -> Iterator[ClinicalTextChunk]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'chunker.clinical_text.fixed_token'"
+      }
+    },
+    "openbtk.data.clinical_text.chunking.SectionAwareChunker": {
+      "init": "(*, max_tokens: int = 512, overlap_tokens: int = 0, count_tokens: Callable[[str], int] = <count_tokens_approximate>) -> None",
+      "kind": "class",
+      "members": {
+        "chunk": "(record: ClinicalTextRecord) -> Iterator[ClinicalTextChunk]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'chunker.clinical_text.section_aware'"
+      }
+    },
+    "openbtk.data.clinical_text.datasets.N2C2DeidDataset": {
+      "init": "(*, path: str | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "license": "property",
+        "load": "(**kwargs: Any) -> Iterator[LabelledDocument]",
+        "name": "property",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'dataset.clinical_text.n2c2_deid'",
+        "requires_credentials": "property"
+      }
+    },
+    "openbtk.data.clinical_text.loaders.JSONLLoader": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[ClinicalTextRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.clinical_text.jsonl'"
+      }
+    },
+    "openbtk.data.clinical_text.loaders.MIMICNotesLoader": {
+      "init": "(*, chunk_size: int = 1000) -> None",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[ClinicalTextRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.clinical_text.mimic_notes'"
+      }
+    },
+    "openbtk.data.clinical_text.loaders.PlainTextLoader": {
+      "init": "(*, note_type: str | None = None, encoding: str = 'utf-8') -> None",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[ClinicalTextRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.clinical_text.plain_text'"
+      }
+    },
+    "openbtk.data.clinical_text.preprocessing.DeidPreprocessor": {
+      "init": "(*, mode: DeidMode = <DeidMode.REDACT: 'redact'>, recall_bias: RecallBias = 'high', recognizers: Sequence[str] = ('rule',)) -> None",
+      "kind": "class",
+      "members": {
+        "process": "(record: ClinicalTextRecord) -> ClinicalTextRecord",
+        "process_stream": "(records: Iterable[RecordT]) -> Iterator[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'preprocessor.general.deidentify'"
+      }
+    },
+    "openbtk.data.clinical_text.preprocessing.SectionSegmenter": {
+      "init": "(*, backend: Literal['rule', 'medspacy'] = 'rule') -> None",
+      "kind": "class",
+      "members": {
+        "process": "(record: ClinicalTextRecord) -> ClinicalTextRecord",
+        "process_stream": "(records: Iterable[RecordT]) -> Iterator[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'preprocessor.clinical_text.section_segment'",
+        "requires_model_download": "= False"
+      }
+    },
+    "openbtk.data.clinical_text.schemas.ClinicalTextChunk": {
+      "fields": {
+        "chunk_id": true,
+        "entities": false,
+        "metadata": false,
+        "record_id": true,
+        "section": false,
+        "span": true,
+        "text": true,
+        "token_count": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.clinical_text.schemas.ClinicalTextRecord": {
+      "fields": {
+        "deid_status": false,
+        "encounter_ref": false,
+        "metadata": false,
+        "note_type": false,
+        "patient_ref": false,
+        "record_id": true,
+        "sections": false,
+        "source": true,
+        "text": true,
+        "timestamp": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.clinical_text.tokenization.count_tokens_approximate": {
+      "kind": "function",
+      "signature": "(text: str) -> int"
+    },
+    "openbtk.data.clinical_text.tokenization.count_tokens_exact": {
+      "kind": "function",
+      "signature": "(text: str, *, model_name: str = 'microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext') -> int"
+    },
+    "openbtk.data.ehr.cohort.CohortBuilder": {
+      "init": "(records: Iterable[PatientRecord]) -> None",
+      "kind": "class",
+      "members": {
+        "exclude": "(predicate: Predicate) -> CohortBuilder",
+        "include": "(predicate: Predicate) -> CohortBuilder"
+      }
+    },
+    "openbtk.data.ehr.cohort.age_between": {
+      "kind": "function",
+      "signature": "(min_age: int, max_age: int, *, as_of: date | None = None) -> Predicate"
+    },
+    "openbtk.data.ehr.cohort.has_condition": {
+      "kind": "function",
+      "signature": "(code: str, *, system: CodeSystem | None = None) -> Predicate"
+    },
+    "openbtk.data.ehr.cohort.has_medication": {
+      "kind": "function",
+      "signature": "(code: str, *, system: CodeSystem | None = None) -> Predicate"
+    },
+    "openbtk.data.ehr.cohort.has_procedure": {
+      "kind": "function",
+      "signature": "(code: str, *, system: CodeSystem | None = None) -> Predicate"
+    },
+    "openbtk.data.ehr.fhir.FHIRLoader": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[PatientRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.ehr.fhir'"
+      }
+    },
+    "openbtk.data.ehr.omop.OMOPLoader": {
+      "init": "(*, batch_size: int = 10000, condition_system: CodeSystem = <CodeSystem.SNOMED: 'SNOMED'>, drug_system: CodeSystem = <CodeSystem.RXNORM: 'RXNORM'>, procedure_system: CodeSystem = <CodeSystem.CPT: 'CPT'>, measurement_system: CodeSystem = <CodeSystem.LOINC: 'LOINC'>) -> None",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[PatientRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.ehr.omop'"
+      }
+    },
+    "openbtk.data.ehr.schemas.CodedEvent": {
+      "fields": {
+        "code": true,
+        "display": false,
+        "encounter_ref": false,
+        "status": false,
+        "system": true,
+        "timestamp": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.ehr.schemas.Demographics": {
+      "fields": {
+        "birth_date": false,
+        "deceased": false,
+        "deceased_date": false,
+        "ethnicity": false,
+        "gender": false,
+        "race": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.ehr.schemas.Encounter": {
+      "fields": {
+        "encounter_id": true,
+        "encounter_type": false,
+        "end": false,
+        "start": false,
+        "status": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.ehr.schemas.Measurement": {
+      "fields": {
+        "code": true,
+        "display": false,
+        "encounter_ref": false,
+        "reference_range": false,
+        "system": false,
+        "timestamp": false,
+        "unit": false,
+        "value": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.ehr.schemas.PatientRecord": {
+      "fields": {
+        "conditions": false,
+        "deid_status": false,
+        "demographics": true,
+        "encounters": false,
+        "medications": false,
+        "metadata": false,
+        "observations": false,
+        "patient_id": true,
+        "procedures": false,
+        "source_system": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.data.ehr.temporal.TemporalNormalizer": {
+      "init": "(*, anchor_missing_timestamps: bool = True) -> None",
+      "kind": "class",
+      "members": {
+        "process": "(record: PatientRecord) -> PatientRecord",
+        "process_stream": "(records: Iterable[RecordT]) -> Iterator[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'preprocessor.ehr.temporal'"
+      }
+    },
+    "openbtk.deid.engine.DeidEngine": {
+      "init": "(*, mode: DeidMode = <DeidMode.SURROGATE: 'surrogate'>, recall_bias: RecallBias = 'high', recognizers: Sequence[str] = ('rule',), consistency_key: bytes | None = None, consistency_store: ConsistencyStore | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "deidentify": "(text: str, *, patient_id: str, document_id: str | None = None) -> DeidResult"
+      }
+    },
+    "openbtk.deid.labelled.LabelledDocument": {
+      "fields": {
+        "document_id": true,
+        "spans": true,
+        "text": true,
+        "unscored_spans": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.labelled.LabelledSpan": {
+      "fields": {
+        "category": true,
+        "end": true,
+        "start": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.recognizers.base.BaseRecognizer": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "detect": "(text: str) -> list[Detection]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "requires_model_download": "= False"
+      }
+    },
+    "openbtk.deid.recognizers.rule.RuleRecognizer": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "detect": "(text: str) -> list[Detection]",
+        "method": "= 'rule'",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'recognizer.general.rule'",
+        "requires_model_download": "= False"
+      }
+    },
+    "openbtk.deid.schemas.DeidMode": {
+      "kind": "enum",
+      "members": {
+        "DATE_SHIFT": "date_shift",
+        "HASH": "hash",
+        "REDACT": "redact",
+        "SURROGATE": "surrogate",
+        "TAG": "tag"
+      }
+    },
+    "openbtk.deid.schemas.DeidReport": {
+      "fields": {
+        "detections": true,
+        "document_id": true,
+        "engine_config_hash": true,
+        "entity_counts": true,
+        "residual_risk": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.schemas.DeidResult": {
+      "fields": {
+        "report": true,
+        "text": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.schemas.DeidStatus": {
+      "kind": "enum",
+      "members": {
+        "DEIDENTIFIED": "deidentified",
+        "RAW": "raw",
+        "SURROGATE": "surrogate",
+        "UNKNOWN": "unknown"
+      }
+    },
+    "openbtk.deid.schemas.Detection": {
+      "fields": {
+        "category": true,
+        "confidence": true,
+        "method": true,
+        "span": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.schemas.PHICategory": {
+      "kind": "enum",
+      "members": {
+        "ACCOUNT_NUMBER": "account_number",
+        "BIOMETRIC_IDENTIFIER": "biometric_identifier",
+        "CERTIFICATE_LICENSE_NUMBER": "certificate_license_number",
+        "DATE": "date",
+        "DEVICE_IDENTIFIER": "device_identifier",
+        "EMAIL": "email",
+        "FAX_NUMBER": "fax_number",
+        "FULL_FACE_PHOTO": "full_face_photo",
+        "GEOGRAPHIC_SUBDIVISION": "geographic_subdivision",
+        "HEALTH_PLAN_BENEFICIARY_NUMBER": "health_plan_beneficiary_number",
+        "IP_ADDRESS": "ip_address",
+        "MEDICAL_RECORD_NUMBER": "medical_record_number",
+        "NAME": "name",
+        "OTHER_UNIQUE_IDENTIFIER": "other_unique_identifier",
+        "PHONE_NUMBER": "phone_number",
+        "SSN": "ssn",
+        "URL": "url",
+        "VEHICLE_IDENTIFIER": "vehicle_identifier"
+      }
+    },
+    "openbtk.deid.schemas.RiskEstimate": {
+      "fields": {
+        "level": true,
+        "rationale": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.embeddings.huggingface.HuggingFaceEmbeddingProvider": {
+      "init": "(*, model: str, revision: str, dimension: int, pooling: Pooling = 'mean', device: str = 'cpu', max_length: int = 512) -> None",
+      "kind": "class",
+      "members": {
+        "batch_size": "property",
+        "dimension": "property",
+        "embed": "(texts: list[str]) -> NDArray[np.float32]",
+        "embed_one": "(text: str) -> NDArray[np.float32]",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'embedding.general.huggingface'",
+        "sends_data_offsite": "= False"
+      }
+    },
+    "openbtk.embeddings.openai.OpenAIEmbeddingProvider": {
+      "init": "(*, model: str = 'text-embedding-3-small', dimension: int | None = None, api_key: str | None = None, base_url: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "batch_size": "property",
+        "dimension": "property",
+        "embed": "(texts: list[str]) -> NDArray[np.float32]",
+        "embed_one": "(text: str) -> NDArray[np.float32]",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'embedding.general.openai'",
+        "sends_data_offsite": "= True"
+      }
+    },
+    "openbtk.embeddings.presets.create_embedding_preset": {
+      "kind": "function",
+      "signature": "(name: str, **overrides: Any) -> BaseEmbeddingProvider"
+    },
+    "openbtk.embeddings.presets.list_embedding_presets": {
+      "kind": "function",
+      "signature": "() -> list[str]"
+    },
+    "openbtk.eval.deid.CategoryMetrics": {
+      "fields": {
+        "false_negatives": true,
+        "false_positives": true,
+        "true_positives": true
+      },
+      "kind": "class",
+      "members": {
+        "f1": "property",
+        "precision": "property",
+        "recall": "property"
+      }
+    },
+    "openbtk.eval.deid.EvaluationResult": {
+      "fields": {
+        "binary": false,
+        "n_documents": false,
+        "per_category": false,
+        "unscored_gold_spans": false
+      },
+      "kind": "class",
+      "members": {
+        "overall": "property"
+      }
+    },
+    "openbtk.eval.deid.evaluate_deid": {
+      "kind": "function",
+      "signature": "(engine: DeidEngine, documents: Iterable[_DocumentLike]) -> EvaluationResult"
+    },
+    "openbtk.eval.deid.format_markdown": {
+      "kind": "function",
+      "signature": "(result: EvaluationResult, *, title: str = 'De-identification') -> str"
+    },
+    "openbtk.eval.deid.report_dict": {
+      "kind": "function",
+      "signature": "(result: EvaluationResult) -> dict[str, object]"
+    },
+    "openbtk.eval.groundedness.DetectorReport": {
+      "fields": {
+        "false_negatives": true,
+        "false_positives": true,
+        "true_negatives": true,
+        "true_positives": true
+      },
+      "kind": "class",
+      "members": {
+        "as_dict": "() -> dict[str, JsonValue]",
+        "f1": "property",
+        "precision": "property",
+        "recall": "property"
+      }
+    },
+    "openbtk.eval.groundedness.GroundedExample": {
+      "fields": {
+        "answer": true,
+        "context": false,
+        "example_id": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.groundedness.GroundednessReport": {
+      "fields": {
+        "ended_at": true,
+        "fully_grounded_examples": true,
+        "n_claims": true,
+        "n_examples": true,
+        "started_at": true,
+        "unsupported_claims": true
+      },
+      "kind": "class",
+      "members": {
+        "as_dict": "() -> dict[str, JsonValue]",
+        "faithfulness": "property",
+        "grounded_rate": "property",
+        "supported_claims": "property"
+      }
+    },
+    "openbtk.eval.groundedness.LabelledExample": {
+      "fields": {
+        "answer": true,
+        "context": false,
+        "example_id": true,
+        "grounded": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.groundedness.evaluate_detector": {
+      "kind": "function",
+      "signature": "(examples: Iterable[LabelledExample], guardrail: GroundednessGuardrail | None = None) -> DetectorReport"
+    },
+    "openbtk.eval.groundedness.groundedness_manifest": {
+      "kind": "function",
+      "signature": "(report: GroundednessReport) -> EvalManifest"
+    },
+    "openbtk.eval.groundedness.score_groundedness": {
+      "kind": "function",
+      "signature": "(examples: Iterable[GroundedExample], guardrail: GroundednessGuardrail | None = None) -> GroundednessReport"
+    },
+    "openbtk.eval.manifest.EvalManifest": {
+      "fields": {
+        "component": false,
+        "ended_at": true,
+        "eval_id": true,
+        "input_digests": false,
+        "kind": true,
+        "manifest_version": false,
+        "report": true,
+        "started_at": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.manifest.build_manifest": {
+      "kind": "function",
+      "signature": "(kind: str, report: dict[str, JsonValue], *, started_at: datetime, ended_at: datetime | None = None, component: ComponentProvenance | None = None, input_digests: Sequence[DataDigest] = ()) -> EvalManifest"
+    },
+    "openbtk.eval.manifest.file_digest": {
+      "kind": "function",
+      "signature": "(path: str | Path, *, record_count: int) -> DataDigest"
+    },
+    "openbtk.eval.qa.LLMAnswerer": {
+      "init": "(provider: BaseLLMProvider, **generation: Any) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.qa.MCQItem": {
+      "fields": {
+        "answer": true,
+        "item_id": true,
+        "options": true,
+        "question": true,
+        "subject": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.qa.QAReport": {
+      "fields": {
+        "correct": true,
+        "ended_at": true,
+        "n": true,
+        "per_subject": false,
+        "results": false,
+        "started_at": true,
+        "token_usage": false,
+        "unanswered": true
+      },
+      "kind": "class",
+      "members": {
+        "accuracy": "property",
+        "accuracy_ci95": "property",
+        "as_dict": "() -> dict[str, JsonValue]"
+      }
+    },
+    "openbtk.eval.qa.evaluate_qa": {
+      "kind": "function",
+      "signature": "(answerer: Callable[[str], str], items: Iterable[MCQItem], *, keep_results: bool = False) -> QAReport"
+    },
+    "openbtk.eval.qa.format_prompt": {
+      "kind": "function",
+      "signature": "(item: MCQItem) -> str"
+    },
+    "openbtk.eval.qa.parse_choice": {
+      "kind": "function",
+      "signature": "(text: str, letters: Iterable[str]) -> str | None"
+    },
+    "openbtk.eval.qa.qa_manifest": {
+      "kind": "function",
+      "signature": "(report: QAReport, *, component: ComponentProvenance | None = None, source: str | Path | None = None) -> EvalManifest"
+    },
+    "openbtk.eval.qa.read_medmcqa_jsonl": {
+      "kind": "function",
+      "signature": "(path: str | Path) -> Iterator[MCQItem]"
+    },
+    "openbtk.eval.qa.read_medqa_jsonl": {
+      "kind": "function",
+      "signature": "(path: str | Path) -> Iterator[MCQItem]"
+    },
+    "openbtk.eval.retrieval.RetrievalQuery": {
+      "fields": {
+        "query": true,
+        "query_id": true,
+        "relevance": true
+      },
+      "kind": "class",
+      "members": {
+        "relevant_ids": "property"
+      }
+    },
+    "openbtk.eval.retrieval.RetrievalReport": {
+      "fields": {
+        "ks": true,
+        "mrr": true,
+        "n_queries": true,
+        "ndcg_at_k": true,
+        "recall_at_k": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.retrieval.evaluate_retrieval": {
+      "kind": "function",
+      "signature": "(retrieve: Callable[[str], Sequence[str]], queries: Iterable[RetrievalQuery], *, ks: Sequence[int] = (1, 5, 10)) -> RetrievalReport"
+    },
+    "openbtk.eval.retrieval.ndcg_at_k": {
+      "kind": "function",
+      "signature": "(ranked_ids: Sequence[str], relevance: Mapping[str, float], k: int) -> float"
+    },
+    "openbtk.eval.retrieval.recall_at_k": {
+      "kind": "function",
+      "signature": "(ranked_ids: Sequence[str], relevant: Iterable[str], k: int) -> float"
+    },
+    "openbtk.eval.retrieval.reciprocal_rank": {
+      "kind": "function",
+      "signature": "(ranked_ids: Sequence[str], relevant: Iterable[str]) -> float"
+    },
+    "openbtk.eval.retrieval.retriever_from": {
+      "kind": "function",
+      "signature": "(embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, *, top_k: int = 10, id_of: Callable[[SearchResult], str] | None = None) -> Callable[[str], list[str]]"
+    },
+    "openbtk.guardrails.ehr.EHRCodeValidityGuardrail": {
+      "init": "(*, terminology: BaseTerminologyService | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.ehr.code_validity'"
+      }
+    },
+    "openbtk.guardrails.ehr.ReferentialIntegrityGuardrail": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.ehr.referential'"
+      }
+    },
+    "openbtk.guardrails.ehr.UnitPlausibilityGuardrail": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.ehr.units'"
+      }
+    },
+    "openbtk.guardrails.groundedness.GroundednessCheckInput": {
+      "fields": {
+        "answer": true,
+        "context": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.guardrails.groundedness.GroundednessGuardrail": {
+      "init": "(*, support_threshold: float = 0.5, decompose_claims: Callable[[str], list[str]] = <_default_decompose_claims>, is_supported: Callable[[str, list[str]], bool] | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.general.groundedness'"
+      }
+    },
+    "openbtk.guardrails.phi_leakage.PHILeakageGuardrail": {
+      "init": "(*, recognizers: tuple[str, ...] = ('rule',)) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.general.phi_leakage'"
+      }
+    },
+    "openbtk.guardrails.pipeline.GuardrailPipeline": {
+      "init": "(guardrails: Sequence[BaseGuardrail | str], *, policy: PolicyConfig | None = None, short_circuit: bool = True) -> None",
+      "kind": "class",
+      "members": {
+        "run": "(payload: Any) -> GuardrailPipelineResult"
+      }
+    },
+    "openbtk.guardrails.pipeline.GuardrailPipelineResult": {
+      "fields": {
+        "passed": true,
+        "results": true,
+        "short_circuited": false
+      },
+      "kind": "class",
+      "members": {
+        "to_guardrail_outcomes": "(at: str) -> list[GuardrailOutcome]"
+      }
+    },
+    "openbtk.guardrails.terminology_validity.TerminologyValidityGuardrail": {
+      "init": "(*, terminology: BaseTerminologyService | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.general.terminology'"
+      }
+    },
+    "openbtk.integrations.langchain.chat_models.OpenBTKChatModel": {
+      "fields": {
+        "cache": false,
+        "callbacks": false,
+        "custom_get_token_ids": false,
+        "disable_streaming": false,
+        "metadata": false,
+        "name": false,
+        "output_version": false,
+        "profile": false,
+        "provider": true,
+        "rate_limiter": false,
+        "tags": false,
+        "verbose": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.integrations.langchain.documents.chunk_to_document": {
+      "kind": "function",
+      "signature": "(chunk: ClinicalTextChunk) -> Document"
+    },
+    "openbtk.integrations.langchain.documents.document_to_chunk": {
+      "kind": "function",
+      "signature": "(document: Document, *, record_id: str | None = None, token_counter: Callable[[str], int] | None = None) -> ClinicalTextChunk"
+    },
+    "openbtk.integrations.langchain.embeddings.OpenBTKEmbeddings": {
+      "init": "(provider: BaseEmbeddingProvider) -> None",
+      "kind": "class",
+      "members": {
+        "embed_documents": "(texts: list[str]) -> list[list[float]]",
+        "embed_query": "(text: str) -> list[float]",
+        "from_registry": "class(key: str, *, policy: PolicyConfig | None = None, **params: Any) -> OpenBTKEmbeddings",
+        "provider": "property"
+      }
+    },
+    "openbtk.integrations.langchain.graph.as_langgraph_node": {
+      "kind": "function",
+      "signature": "(component: Component | DeidEngine, *, input_key: str, output_key: str, name: str | None = None) -> Callable[[Mapping[str, Any]], dict[str, Any]]"
+    },
+    "openbtk.integrations.langchain.runnables.as_runnable": {
+      "kind": "function",
+      "signature": "(component: Component | DeidEngine) -> Runnable[Any, Any]"
+    },
+    "openbtk.integrations.langchain.runnables.from_runnable": {
+      "kind": "function",
+      "signature": "(runnable: Runnable[str, str]) -> RunnablePreprocessor"
+    },
+    "openbtk.integrations.langchain.vectorstores.OpenBTKVectorStore": {
+      "init": "(store: BaseVectorStore, embedding: Embeddings, *, text_key: str = 'text') -> None",
+      "kind": "class",
+      "members": {
+        "add_texts": "(texts: Iterable[str], metadatas: list[dict[str, Any]] | None = None, *, ids: list[str] | None = None, **kwargs: Any) -> list[str]",
+        "delete": "(ids: list[str] | None = None, **kwargs: Any) -> bool | None",
+        "embeddings": "property",
+        "from_texts": "class(texts: list[str], embedding: Embeddings, metadatas: list[dict[str, Any]] | None = None, *, ids: list[str] | None = None, store: BaseVectorStore | None = None, **kwargs: Any) -> OpenBTKVectorStore",
+        "similarity_search": "(query: str, k: int = 4, **kwargs: Any) -> list[Document]",
+        "similarity_search_by_vector": "(embedding: list[float], k: int = 4, **kwargs: Any) -> list[Document]",
+        "similarity_search_with_score": "(query: str, k: int = 4, **kwargs: Any) -> list[tuple[Document, float]]",
+        "store": "property"
+      }
+    },
+    "openbtk.llms.anthropic.AnthropicProvider": {
+      "init": "(*, model: str = 'claude-opus-5', max_tokens: int = 4096, api_key: str | None = None, base_url: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.anthropic'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.llms.huggingface.HuggingFaceLocalProvider": {
+      "init": "(*, model: str, revision: str, device: str = 'cpu', max_new_tokens: int = 256, do_sample: bool = False) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.huggingface_local'",
+        "sends_data_offsite": "= False",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.llms.openai.OpenAIProvider": {
+      "init": "(*, model: str = 'gpt-4o-mini', api_key: str | None = None, base_url: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.openai'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.llms.openai_compatible.OpenAICompatibleProvider": {
+      "init": "(*, base_url: str, model: str, api_key: str | None = None, max_retries: int = 5, timeout: float = 60.0) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.openai_compatible'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.llms.presets.create_llm_preset": {
+      "kind": "function",
+      "signature": "(name: str, **overrides: Any) -> BaseLLMProvider"
+    },
+    "openbtk.llms.presets.list_llm_presets": {
+      "kind": "function",
+      "signature": "() -> list[str]"
+    },
+    "openbtk.pipelines.pipeline.Pipeline": {
+      "init": "(name: str, *, version: int = 1, description: str | None = None, policy: PolicyConfig | None = None, provenance: ProvenanceConfig | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "add": "(step: Step) -> Pipeline",
+        "from_config": "class(config: PipelineConfig) -> Pipeline",
+        "from_yaml": "class(path: str | Path) -> Pipeline",
+        "guard": "(guardrail_type: str, *, at: str | list[str], on_violation: Literal['block', 'warn'] = 'block') -> Pipeline",
+        "run": "() -> RunManifest",
+        "to_config": "() -> PipelineConfig",
+        "validate": "() -> list[ValidationIssue]"
+      }
+    },
+    "openbtk.pipelines.pipeline.Step": {
+      "init": "(step_id: str, type: str, *, after: list[str] | None = None, **params: Any) -> None",
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.pipelines.rag.RAGPipeline": {
+      "init": "(*, embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, llm: BaseLLMProvider, reranker: BaseReranker | None = None, top_k: int = 5, candidate_pool_size: int | None = None, text_metadata_key: str = 'text', record_id_metadata_key: str = 'record_id', chunk_id_metadata_key: str = 'chunk_id') -> None",
+      "kind": "class",
+      "members": {
+        "ask": "(question: str, **generate_kwargs: Any) -> RAGAnswer"
+      }
+    },
+    "openbtk.pipelines.timeline.PatientTimelineSerializer": {
+      "init": "(*, encounter_label: str = 'Encounter', condition_label: str = 'Condition', medication_label: str = 'Medication', procedure_label: str = 'Procedure', observation_label: str = 'Lab', encounter_template: Callable[[Encounter], str] = <_default_encounter_template>, condition_template: Callable[[CodedEvent], str] = <_default_coded_event_template>, medication_template: Callable[[CodedEvent], str] = <_default_coded_event_template>, procedure_template: Callable[[CodedEvent], str] = <_default_coded_event_template>, observation_template: Callable[[Measurement], str] = <_default_observation_template>, source: str = 'ehr-timeline') -> None",
+      "kind": "class",
+      "members": {
+        "serialize": "(patient: PatientRecord) -> ClinicalTextRecord"
+      }
+    },
+    "openbtk.retrieval.chroma.ChromaVectorStore": {
+      "init": "(*, path: str | None = None, collection_name: str = 'openbtk_default') -> None",
+      "kind": "class",
+      "members": {
+        "delete": "(ids: list[str]) -> None",
+        "load": "class(path: str) -> BaseVectorStore",
+        "persist": "(path: str) -> None",
+        "provenance": "() -> ComponentProvenance",
+        "query": "(vector: NDArray[np.float32], top_k: int = 5, filter: dict[str, Any] | None = None) -> list[SearchResult]",
+        "registry_key": "= 'vectorstore.general.chroma'",
+        "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
+      }
+    },
+    "openbtk.retrieval.faiss.FAISSVectorStore": {
+      "init": "(*, dimension: int, metric: Metric = 'l2') -> None",
+      "kind": "class",
+      "members": {
+        "delete": "(ids: list[str]) -> None",
+        "load": "class(path: str) -> FAISSVectorStore",
+        "persist": "(path: str) -> None",
+        "provenance": "() -> ComponentProvenance",
+        "query": "(vector: NDArray[np.float32], top_k: int = 5, filter: dict[str, Any] | None = None) -> list[SearchResult]",
+        "registry_key": "= 'vectorstore.general.faiss'",
+        "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
+      }
+    },
+    "openbtk.retrieval.qdrant.QdrantVectorStore": {
+      "init": "(*, dimension: int, metric: Metric = 'cosine', path: str | None = None, collection_name: str = 'openbtk_default') -> None",
+      "kind": "class",
+      "members": {
+        "delete": "(ids: list[str]) -> None",
+        "load": "class(path: str) -> BaseVectorStore",
+        "persist": "(path: str) -> None",
+        "provenance": "() -> ComponentProvenance",
+        "query": "(vector: NDArray[np.float32], top_k: int = 5, filter: dict[str, Any] | None = None) -> list[SearchResult]",
+        "registry_key": "= 'vectorstore.general.qdrant'",
+        "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
+      }
+    },
+    "openbtk.retrieval.reranker.ConceptOverlapReranker": {
+      "init": "(*, extract_concepts: Callable[[str], Iterable[str]], cuis_metadata_key: str = 'cuis') -> None",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'reranker.general.concept_overlap'",
+        "rerank": "(query: str, results: list[SearchResult], top_k: int | None = None) -> list[SearchResult]"
+      }
+    },
+    "openbtk.terminology.bundled.BundledMinimalBackend": {
+      "init": "()",
+      "kind": "class",
+      "members": {
+        "is_authoritative": "(system: CodeSystem) -> bool",
+        "map": "(code: str, from_system: CodeSystem, to_system: CodeSystem) -> list[Concept]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'terminology.general.bundled_minimal'",
+        "resolve": "(code: str, system: CodeSystem) -> Concept | None",
+        "validate": "(code: str, system: CodeSystem) -> bool"
+      }
+    },
+    "openbtk.terminology.cache.CachedTerminologyService": {
+      "init": "(*, backend: BaseTerminologyService, cache_dir: str, ttl_seconds: float = 86400.0) -> None",
+      "kind": "class",
+      "members": {
+        "is_authoritative": "(system: CodeSystem) -> bool",
+        "map": "(code: str, from_system: CodeSystem, to_system: CodeSystem) -> list[Concept]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= ''",
+        "resolve": "(code: str, system: CodeSystem) -> Concept | None",
+        "validate": "(code: str, system: CodeSystem) -> bool"
+      }
+    },
+    "openbtk.terminology.local.LocalVocabBackend": {
+      "init": "(*, path: str) -> None",
+      "kind": "class",
+      "members": {
+        "is_authoritative": "(system: CodeSystem) -> bool",
+        "map": "(code: str, from_system: CodeSystem, to_system: CodeSystem) -> list[Concept]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'terminology.general.local'",
+        "resolve": "(code: str, system: CodeSystem) -> Concept | None",
+        "validate": "(code: str, system: CodeSystem) -> bool"
+      }
+    },
+    "openbtk.terminology.umls.UMLSRestBackend": {
+      "init": "(*, api_key: str, timeout: float = 10.0) -> None",
+      "kind": "class",
+      "members": {
+        "is_authoritative": "(system: CodeSystem) -> bool",
+        "map": "(code: str, from_system: CodeSystem, to_system: CodeSystem) -> list[Concept]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'terminology.general.umls'",
+        "resolve": "(code: str, system: CodeSystem) -> Concept | None",
+        "sends_data_offsite": "= True",
+        "validate": "(code: str, system: CodeSystem) -> bool"
+      }
+    }
+  },
+  "cli": {
+    "deid": [
+      "--force",
+      "--mode",
+      "--out",
+      "--recognizers",
+      "input"
+    ],
+    "doctor": [
+      "--json",
+      "--require"
+    ],
+    "list": [
+      "--json",
+      "category"
+    ],
+    "replay": [
+      "--json",
+      "--new-manifest",
+      "manifest"
+    ],
+    "run": [
+      "--json",
+      "--manifest",
+      "config"
+    ],
+    "validate": [
+      "--json",
+      "config"
+    ]
+  },
+  "schema_versions": {
+    "EvalManifest": "1.0.0",
+    "RunManifest": "1.0.0"
+  },
+  "top_level": [
+    "CHUNKER_REGISTRY",
+    "DATASET_REGISTRY",
+    "EMBEDDING_REGISTRY",
+    "FEATURE_EXTRACTOR_REGISTRY",
+    "GUARDRAIL_REGISTRY",
+    "LLM_REGISTRY",
+    "LOADER_REGISTRY",
+    "OpenBTKError",
+    "PREPROCESSOR_REGISTRY",
+    "RERANKER_REGISTRY",
+    "SEGMENTER_REGISTRY",
+    "TERMINOLOGY_REGISTRY",
+    "VECTORSTORE_REGISTRY",
+    "__version__",
+    "get_registry"
+  ]
+}
