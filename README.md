@@ -241,6 +241,9 @@ system, or a dataset distributor.
 
 ## Documentation
 
+The site is live at <https://openbtk.org/openbtk-core/> (the `dev` build of
+`main`).
+
 - [Benchmarks](mkdocs/benchmarks.md) — every published number, its
   reproduction command, and what has *not* been measured.
 - [LangChain and LangGraph](mkdocs/langchain.md) — the optional adapter; every
