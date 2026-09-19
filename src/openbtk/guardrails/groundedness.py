@@ -183,6 +183,7 @@ class GroundednessGuardrail(BaseGuardrail):
                 severity=GuardrailSeverity.INFO,
                 guardrail_key=self.registry_key,
                 message="No claims to check.",
+                details={"claim_count": 0},
             )
         unsupported_spans: list[TextSpan] = []
         cursor = 0
@@ -216,4 +217,5 @@ class GroundednessGuardrail(BaseGuardrail):
             severity=GuardrailSeverity.INFO,
             guardrail_key=self.registry_key,
             message=f"All {len(claims)} claim(s) are supported.",
+            details={"claim_count": len(claims)},
         )
