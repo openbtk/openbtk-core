@@ -86,6 +86,11 @@ class BundledMinimalBackend(BaseTerminologyService):
     def validate(self, code: str, system: CodeSystem) -> bool:
         return self.resolve(code, system) is not None
 
+    def is_authoritative(self, system: CodeSystem) -> bool:  # noqa: ARG002
+        """Never: this is a small subset, so a code missing from it (or from a
+        system it does not cover at all) is merely unconfirmed, not invalid."""
+        return False
+
     def map(
         self,
         code: str,  # noqa: ARG002 -- BaseTerminologyService interface, unused by design

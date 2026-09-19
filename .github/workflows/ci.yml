@@ -201,6 +201,34 @@ jobs:
           print(f"{tests} docs tests, 0 skipped")
           PY
 
+  # The eight tutorial notebooks are EXECUTED, top to bottom, in fresh kernels.
+  # They need extras test-core does not install (ehr, langchain, langgraph, the
+  # notebook tooling, and faiss -- installed directly because the [retrieval]
+  # extra also pulls Chroma and Qdrant, which no notebook uses). Fails on any skip,
+  # or the tutorials would silently stop being tested.
+  test-notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,ehr,langchain,langgraph,notebooks]" faiss-cpu
+      - name: Execute every notebook (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          pytest "${{ github.workspace }}/tests/notebooks" -q -p no:cacheprovider --junitxml=nb.xml
+          python - <<'PY'
+          import xml.etree.ElementTree as ET
+          suite = ET.parse("nb.xml").getroot()
+          suite = suite if suite.tag == "testsuite" else suite[0]
+          skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
+          assert tests >= 50, f"suspiciously few notebook tests ran: {tests}"
+          assert skipped == 0, f"{skipped} notebook tests skipped -- an extra is missing"
+          print(f"{tests} notebook tests, 0 skipped")
+          PY
+
   # The docs site builds with --strict on every branch, so a broken cross-reference
   # or an unresolvable API directive is caught before merge, not after (docs.yml
   # only runs on main). [langchain] because the adapter's API page imports it.

@@ -89,6 +89,26 @@ class TestResolveCaching:
         assert backend.resolve_calls == 1
 
 
+class TestAuthorityIsDelegated:
+    def test_a_complete_backend_stays_authoritative_through_the_cache(
+        self, tmp_path: Path
+    ) -> None:
+        cached = CachedTerminologyService(
+            backend=_CountingBackend(), cache_dir=str(tmp_path)
+        )
+        assert cached.is_authoritative(CodeSystem.SNOMED) is True  # the default
+
+    def test_a_partial_backend_stays_partial_through_the_cache(
+        self, tmp_path: Path
+    ) -> None:
+        from openbtk.terminology.bundled import BundledMinimalBackend
+
+        cached = CachedTerminologyService(
+            backend=BundledMinimalBackend(), cache_dir=str(tmp_path)
+        )
+        assert cached.is_authoritative(CodeSystem.ICD10CM) is False
+
+
 class TestMapCaching:
     def test_second_call_does_not_hit_the_backend(self, tmp_path: Path) -> None:
         backend = _CountingBackend()

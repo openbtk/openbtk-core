@@ -18,7 +18,8 @@ if TYPE_CHECKING:
 
 import pytest
 
-from openbtk.core.logging import configure_logging, get_logger
+from openbtk.core import logging as openbtk_logging
+from openbtk.core.logging import configure_logging, get_logger, set_log_level
 
 _DENY_LIST_KEYS = [
     "raw_text",
@@ -138,3 +139,79 @@ class TestAllowPhiToggle:
         configure_logging(allow_phi=False)
         out = _capture(lambda: log.info("e", raw_text="SHOULD BE GONE"))
         assert "raw_text" not in out
+
+
+class TestLogLevel:
+    """set_log_level / OPENBTK_LOG_LEVEL: quiet OpenBTK's own log lines without
+    changing the default (every line) or touching the redaction chain."""
+
+    @pytest.fixture(autouse=True)
+    def _restore_default(self) -> Iterator[None]:
+        yield
+        set_log_level("debug")
+
+    def _emit_all(self) -> str:
+        log = get_logger("level-test")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            log.debug("lvl.debug")
+            log.info("lvl.info")
+            log.warning("lvl.warning")
+            log.error("lvl.error")
+        return buf.getvalue()
+
+    def test_the_default_emits_every_level(self) -> None:
+        out = self._emit_all()
+        assert all(
+            f"lvl.{name}" in out for name in ("debug", "info", "warning", "error")
+        )
+
+    def test_a_minimum_level_drops_the_lines_below_it(self) -> None:
+        set_log_level("warning")
+        out = self._emit_all()
+        assert "lvl.debug" not in out and "lvl.info" not in out
+        assert "lvl.warning" in out and "lvl.error" in out
+
+    def test_it_applies_to_loggers_created_before_the_call(self) -> None:
+        log = get_logger("early")
+        set_log_level("error")
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            log.warning("early.warning")
+            log.error("early.error")
+        assert "early.warning" not in buf.getvalue() and "early.error" in buf.getvalue()
+
+    def test_the_level_is_case_and_space_insensitive(self) -> None:
+        set_log_level("  WARNING ")
+        assert "lvl.info" not in self._emit_all()
+
+    def test_an_unknown_level_is_refused(self) -> None:
+        with pytest.raises(ValueError, match="level must be one of"):
+            set_log_level("verbose")
+
+    def test_redaction_still_applies_at_any_level(self) -> None:
+        set_log_level("info")
+        fake_ssn = "123-45-6789"  # phi-fixture-ok: fictitious, obviously fake
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            get_logger("r").info("r.event", ssn=fake_ssn)
+        assert fake_ssn not in buf.getvalue()
+
+    def test_the_environment_variable_sets_the_initial_level(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("OPENBTK_LOG_LEVEL", "Warning")
+        assert openbtk_logging._level_from_env() == 30
+
+    def test_an_unset_environment_variable_means_debug(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.delenv("OPENBTK_LOG_LEVEL", raising=False)
+        assert openbtk_logging._level_from_env() == 10
+
+    def test_a_bad_environment_value_warns_and_falls_back_to_debug(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        monkeypatch.setenv("OPENBTK_LOG_LEVEL", "loud")
+        with pytest.warns(UserWarning, match="OPENBTK_LOG_LEVEL"):
+            assert openbtk_logging._level_from_env() == 10

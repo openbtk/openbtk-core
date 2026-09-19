@@ -1,9 +1,17 @@
 # Command line
 
+!!! note "New since 0.5.0"
+    The `openbtk` command is on `main` and ships with the next release. Until then install
+    from source: `pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"`.
+
 `pip install openbtk` installs an `openbtk` command (also `python -m openbtk`).
 The library's own log lines go to **stderr**; a command's result is the only
 thing on **stdout**, so `--json` output can be piped straight into `jq` or a
 script.
+
+OpenBTK's library log lines are verbose by default (every registration is a
+`debug` line). Quiet them with `OPENBTK_LOG_LEVEL=warning` in the environment, or
+`openbtk.core.logging.set_log_level("warning")` in code.
 
 | Command | Does |
 |---|---|
@@ -58,9 +66,11 @@ openbtk replay run.json
 ```
 
 `replay` rebuilds the pipeline from the config recorded in the manifest, runs it
-again, and compares the two: input file content (by SHA-256), each step's record
-counts, and the final status. Exit `0` means they match; exit `1` lists what
-changed, which is how you find out that the data moved or that a step is not
+again, and compares the two: input content, each step's record counts, and the
+final status. A single input file is compared by SHA-256. A directory has no
+content hash, so for it only the record count is compared and the report says so
+(a note, not a failure). Exit `0` means they match; exit `1` lists what changed,
+which is how you find out that the data moved or that a step is not
 deterministic. A manifest whose config had secrets redacted cannot be replayed on
 its own (it says which fields); re-run from the original config with the secrets
 supplied as `${ENV_VAR}`.

@@ -72,7 +72,7 @@ class TestCompare:
             steps=[_step("a", 0, 3)],
             digests=[DataDigest(uri="f", sha256="h", record_count=3)],
         )
-        assert _compare(m, m) == []
+        assert _compare(m, m) == ([], [])
 
     def test_each_kind_of_difference_is_named(self) -> None:
         old = _manifest(
@@ -95,15 +95,30 @@ class TestCompare:
             ],
             status="failed",
         )
-        text = "\n".join(_compare(old, new))
+        diffs, unverified = _compare(old, new)
+        text = "\n".join(diffs)
         assert "input changed: content changed" in text
         assert "input count: 3 record(s) then, 4 now" in text
-        assert "input unhashed: not hashed" in text
         assert "input dropped: no longer read" in text
         assert "step a: 0->3 then, 0->5 now" in text
         assert "step gone: missing from the replay" in text
         assert "status: success then, failed now" in text
         assert "input same" not in text
+        # An input with no hash on either side is not a divergence.
+        assert "unhashed" not in text and unverified == ["unhashed"]
+
+    def test_an_unhashed_input_with_a_different_count_is_still_a_divergence(
+        self,
+    ) -> None:
+        old = _manifest(digests=[DataDigest(uri="dir", sha256=None, record_count=2)])
+        new = _manifest(digests=[DataDigest(uri="dir", sha256=None, record_count=3)])
+        diffs, unverified = _compare(old, new)
+        assert diffs == ["input dir: 2 record(s) then, 3 now"] and unverified == []
+
+    def test_a_hash_on_one_side_only_is_unverified_not_divergent(self) -> None:
+        old = _manifest(digests=[DataDigest(uri="f", sha256="h", record_count=2)])
+        new = _manifest(digests=[DataDigest(uri="f", sha256=None, record_count=2)])
+        assert _compare(old, new) == ([], ["f"])
 
 
 class TestRedactedPaths:

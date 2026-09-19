@@ -52,7 +52,7 @@ has no way to enforce that.
 | `TAG` | its category, e.g. `[PHONE_NUMBER]` | a downstream model should know something was there |
 | `HASH` | a keyed hash | you need to tell two occurrences apart |
 | `SURROGATE` | realistic fake data, consistent per patient | you want text that still reads naturally |
-| `DATE_SHIFT` | the same date moved by a per-patient offset | intervals between events must survive |
+| `DATE_SHIFT` | each date moved by one per-patient offset (other identifiers are redacted) | intervals between events must survive |
 
 ```python
 import contextlib

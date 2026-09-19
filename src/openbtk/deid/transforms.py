@@ -29,6 +29,7 @@ Five modes:
     to the same patient shifts by the same amount, so the *interval*
     between any two of a patient's dates is preserved exactly --
     docs/07_TEST_CHARTER.md section 3.4's named property.
+    Every non-date identifier found alongside them is redacted (``[REDACTED]``).
 """
 
 from __future__ import annotations
@@ -186,7 +187,13 @@ class Transform:
                 original=original,
                 surrogate_factory=lambda: self._next_surrogate(category),
             )
-        # DeidMode.DATE_SHIFT is the only remaining member.
+        # DeidMode.DATE_SHIFT is the only remaining member. It defines a
+        # replacement for DATES only; every other identifier in the same text
+        # (a phone number, an SSN) still has to go, and REDACT is the
+        # conservative choice. (Before this branch existed, any non-date span
+        # was fed to the date parser and the whole document failed.)
+        if category is not PHICategory.DATE:
+            return "[REDACTED]"
         shift = _patient_shift_days(self._key, patient_id)
         shifted = _parse_date(original) + timedelta(days=shift)
         return shifted.isoformat()

@@ -159,6 +159,31 @@ class TestDateShift:
         )
         assert "1958-03-14" not in result
 
+    def test_other_identifiers_beside_a_date_are_redacted_not_parsed_as_dates(
+        self,
+    ) -> None:
+        """Regression: DATE_SHIFT used to feed EVERY detection to the date
+        parser, so a phone number next to a date made the whole document fail."""
+        text = "Seen 03/14/2024. Call (555) 010-2345."
+        detections = [
+            _det(PHICategory.DATE, 5, 15),
+            _det(PHICategory.PHONE_NUMBER, 22, 36),
+        ]
+        result = Transform(DeidMode.DATE_SHIFT, key=_KEY).apply(
+            text, detections, patient_id="p1"
+        )
+        assert "010-2345" not in result and "[REDACTED]" in result
+        assert "03/14/2024" not in result
+        assert result.startswith("Seen ") and "Call [REDACTED]." in result
+
+    def test_a_document_with_no_dates_at_all_still_de_identifies(self) -> None:
+        result = Transform(DeidMode.DATE_SHIFT, key=_KEY).apply(
+            "SSN 123-45-6789.",  # phi-fixture-ok: fictitious
+            [_det(PHICategory.SSN, 4, 15)],
+            patient_id="p1",
+        )
+        assert result == "SSN [REDACTED]."
+
     def test_unparseable_date_raises_deid_error(self) -> None:
         text = "DOB: not-a-date."
         det = _det(PHICategory.DATE, 5, 15)

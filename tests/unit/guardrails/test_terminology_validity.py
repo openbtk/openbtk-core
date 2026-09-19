@@ -24,6 +24,27 @@ def _patient(**overrides: object) -> PatientRecord:
     return PatientRecord(**defaults)  # type: ignore[arg-type]
 
 
+class _FullVocabulary(BaseTerminologyService):
+    """A complete vocabulary for its systems: absence IS a real answer, so a
+    missing code is genuinely invalid (the default is_authoritative == True)."""
+
+    def __init__(self, *valid: tuple[str, CodeSystem]) -> None:
+        self._valid = set(valid)
+
+    def resolve(self, code: str, system: CodeSystem) -> Concept | None:
+        if (code, system) in self._valid:
+            return Concept(code=code, system=system, display=code)
+        return None
+
+    def validate(self, code: str, system: CodeSystem) -> bool:
+        return (code, system) in self._valid
+
+    def map(
+        self, code: str, from_system: CodeSystem, to_system: CodeSystem
+    ) -> list[Concept]:
+        return []
+
+
 class _AlwaysErrorsBackend(BaseTerminologyService):
     def resolve(self, code: str, system: CodeSystem) -> Concept | None:
         raise TerminologyError("backend unavailable")
@@ -43,12 +64,53 @@ class TestBareTuplePayload:
         result = guardrail.check(("E11.9", CodeSystem.ICD10CM))
         assert result.passed is True
 
-    def test_invalid_code_blocks(self) -> None:
-        guardrail = TerminologyValidityGuardrail()
+    def test_a_code_missing_from_a_complete_vocabulary_blocks(self) -> None:
+        guardrail = TerminologyValidityGuardrail(
+            terminology=_FullVocabulary(("E11.9", CodeSystem.ICD10CM))
+        )
         result = guardrail.check(("Z99.999", CodeSystem.ICD10CM))
         assert result.passed is False
         assert result.severity == GuardrailSeverity.BLOCK
         assert "ICD10CM:Z99.999" in result.details["invalid"]
+
+
+class TestPartialVocabularyCannotAccuse:
+    """Regression: the default backend is a small SUBSET. Before
+    is_authoritative existed, any real code outside it (every SNOMED and LOINC
+    code, and most ICD-10-CM ones) was reported as 'does not exist' and BLOCKED,
+    so the default guardrail halted pipelines on valid data. A partial
+    vocabulary can fail to confirm a code; it cannot call it invalid."""
+
+    def test_an_unconfirmed_code_is_a_warning_not_a_block(self) -> None:
+        result = TerminologyValidityGuardrail().check(("Z99.999", CodeSystem.ICD10CM))
+        assert result.passed is False
+        assert result.severity == GuardrailSeverity.WARNING
+        assert result.details["unverifiable"] == ["ICD10CM:Z99.999"]
+        assert "invalid" not in result.details
+        assert "do not exist" not in result.message
+
+    def test_a_real_snomed_code_is_never_called_invalid_by_the_bundled_subset(
+        self,
+    ) -> None:
+        result = TerminologyValidityGuardrail().check(("73211009", CodeSystem.SNOMED))
+        assert result.severity == GuardrailSeverity.WARNING
+        assert result.details["unverifiable"] == ["SNOMED:73211009"]
+
+    def test_a_confirmed_code_still_passes_alongside_unconfirmed_ones(self) -> None:
+        result = TerminologyValidityGuardrail().check(
+            [("E11.9", CodeSystem.ICD10CM), ("73211009", CodeSystem.SNOMED)]
+        )
+        assert result.severity == GuardrailSeverity.WARNING
+        assert result.details["unverifiable"] == ["SNOMED:73211009"]
+
+    def test_a_definitely_invalid_code_still_outranks_an_unconfirmed_one(self) -> None:
+        guardrail = TerminologyValidityGuardrail(
+            terminology=_FullVocabulary(("E11.9", CodeSystem.ICD10CM))
+        )
+        result = guardrail.check(
+            [("Z99.999", CodeSystem.ICD10CM), ("E11.9", CodeSystem.ICD10CM)]
+        )
+        assert result.severity == GuardrailSeverity.BLOCK
 
 
 class TestCodedEventPayload:
@@ -75,7 +137,9 @@ class TestListPayload:
         assert "2 code(s) valid" in result.message
 
     def test_list_with_one_invalid(self) -> None:
-        guardrail = TerminologyValidityGuardrail()
+        guardrail = TerminologyValidityGuardrail(
+            terminology=_FullVocabulary(("E11.9", CodeSystem.ICD10CM))
+        )
         events = [
             CodedEvent(code="E11.9", system=CodeSystem.ICD10CM),
             CodedEvent(code="bogus", system=CodeSystem.ICD10CM),
@@ -97,7 +161,9 @@ class TestPatientRecordPayload:
         assert result.passed is True
 
     def test_an_invalid_code_anywhere_blocks(self) -> None:
-        guardrail = TerminologyValidityGuardrail()
+        guardrail = TerminologyValidityGuardrail(
+            terminology=_FullVocabulary(("E11.9", CodeSystem.ICD10CM))
+        )
         patient = _patient(
             observations=[Measurement(code="not-real", system=CodeSystem.ICD10CM)]
         )

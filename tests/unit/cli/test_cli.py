@@ -76,6 +76,10 @@ steps:
   - id: deid
     type: preprocessor.general.deidentify
     after: [load]
+  - id: chunk
+    type: chunker.clinical_text.section_aware
+    params: {{max_tokens: 40}}
+    after: [deid]
 """,
         encoding="utf-8",
     )
@@ -322,6 +326,33 @@ class TestReplay:
         assert code == 1
         out = capsys.readouterr().out
         assert "DIVERGED" in out and "content changed" in out
+
+    def test_a_directory_input_replays_cleanly_with_a_note_about_the_hash(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        """A directory has no content hash. Replay must not call that a
+        divergence (it made every directory-based pipeline exit 1); it compares
+        the record count and says the content was not verified."""
+        cfg = _config(tmp_path, _notes(tmp_path))
+        first, second = tmp_path / "d1.json", tmp_path / "d2.json"
+        assert main(["run", str(cfg), "--manifest", str(first)]) == 0
+        capsys.readouterr()
+        code = main(["replay", str(first), "--new-manifest", str(second)])
+        out = capsys.readouterr().out
+        assert code == 0 and "replay matches the recorded run" in out
+        assert "has no content hash" in out and "only its record count" in out
+
+    def test_a_directory_that_gained_a_note_diverges_by_record_count(
+        self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
+    ) -> None:
+        notes = _notes(tmp_path)
+        cfg = _config(tmp_path, notes)
+        first, second = tmp_path / "d1.json", tmp_path / "d2.json"
+        assert main(["run", str(cfg), "--manifest", str(first)]) == 0
+        (notes / "n2.txt").write_text("Plan:\nRest.\n", encoding="utf-8")
+        capsys.readouterr()
+        code = main(["replay", str(first), "--new-manifest", str(second)])
+        assert code == 1 and "1 record(s) then, 2 now" in capsys.readouterr().out
 
     def test_a_changed_record_count_is_reported(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]

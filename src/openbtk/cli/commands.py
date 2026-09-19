@@ -189,24 +189,36 @@ def _redacted_paths(value: Any, prefix: str = "") -> list[str]:
     return found
 
 
-def _compare(old: RunManifest, new: RunManifest) -> list[str]:
-    """Human-readable differences between a recorded run and its replay:
-    input content, per-step counts, and final status. Empty means identical."""
+def _compare(old: RunManifest, new: RunManifest) -> tuple[list[str], list[str]]:
+    """Compare a recorded run with its replay.
+
+    Returns ``(differences, unverified)``. ``differences`` are real divergences:
+    input content or record count, per-step counts, final status. ``unverified``
+    names inputs whose content could not be compared because one side has no
+    SHA-256 (a directory, or a file over the hashing size cap) -- for those only
+    the record count is compared, and the report says so instead of pretending
+    the content matched or calling it a divergence.
+    """
     diffs: list[str] = []
+    unverified: list[str] = []
     new_digests = {d.uri: d for d in new.input_digests}
     for d in old.input_digests:
         other = new_digests.get(d.uri)
         if other is None:
             diffs.append(f"input {d.uri}: no longer read")
-        elif d.sha256 is None or other.sha256 is None:
-            diffs.append(f"input {d.uri}: not hashed, content cannot be compared")
-        elif d.sha256 != other.sha256:
+        elif (
+            d.sha256 is not None
+            and other.sha256 is not None
+            and (d.sha256 != other.sha256)
+        ):
             diffs.append(f"input {d.uri}: content changed since the recorded run")
         elif d.record_count != other.record_count:
             diffs.append(
                 f"input {d.uri}: {d.record_count} record(s) then, "
                 f"{other.record_count} now"
             )
+        elif d.sha256 is None or other.sha256 is None:
+            unverified.append(d.uri)
     new_steps = {s.step_id: s for s in new.steps}
     for s in old.steps:
         other_step = new_steps.get(s.step_id)
@@ -222,7 +234,7 @@ def _compare(old: RunManifest, new: RunManifest) -> list[str]:
             )
     if old.status != new.status:
         diffs.append(f"status: {old.status} then, {new.status} now")
-    return diffs
+    return diffs, unverified
 
 
 def cmd_replay(args: argparse.Namespace) -> Result:
@@ -258,19 +270,29 @@ def cmd_replay(args: argparse.Namespace) -> Result:
     if errors:
         return 2, "\n".join(_format_issue(i) for i in errors) + "\n"
     new, new_path = _run_config(config, args.new_manifest)
-    diffs = _compare(old, new)
+    diffs, unverified = _compare(old, new)
     if args.json:
         return (1 if diffs else 0), _json(
-            {"matches": not diffs, "differences": diffs, "manifest": str(new_path)}
+            {
+                "matches": not diffs,
+                "differences": diffs,
+                "unverified_inputs": unverified,
+                "manifest": str(new_path),
+            }
         )
+    notes = "".join(
+        f"note: input {uri} has no content hash (a directory or a very large "
+        "file), so only its record count was compared.\n"
+        for uri in unverified
+    )
     if diffs:
+        listing = "\n".join(f"  - {d}" for d in diffs)
         return 1, (
             _summary(new, new_path)
-            + "replay DIVERGED from the recorded run:\n"
-            + "\n".join(f"  - {d}" for d in diffs)
-            + "\n"
+            + f"replay DIVERGED from the recorded run:\n{listing}\n"
+            + notes
         )
-    return 0, _summary(new, new_path) + "replay matches the recorded run.\n"
+    return 0, _summary(new, new_path) + "replay matches the recorded run.\n" + notes
 
 
 # --------------------------------------------------------------------- deid

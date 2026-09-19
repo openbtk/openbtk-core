@@ -26,6 +26,7 @@ from typing import TYPE_CHECKING, Any
 
 import pytest
 
+from openbtk.core.schemas import GuardrailSeverity
 from openbtk.data import ehr as _ehr  # noqa: F401 -- registers FHIRLoader
 from openbtk.deid import DeidEngine, DeidMode
 from openbtk.guardrails.ehr import (
@@ -177,9 +178,14 @@ class TestEHRGuardrailsComposeOverARealPatientRecord:
         proven, not just documented."""
         patient = _load_patient(tmp_path)
         result = EHRCodeValidityGuardrail().check(patient)
+        # Not confirmed -- but NOT accused: a subset with no SNOMED or LOINC at
+        # all cannot say these real codes are invalid, only that it cannot verify
+        # them (a WARNING, never a BLOCK that would halt real patients).
         assert result.passed is False
-        assert "SNOMED:385093006" in result.details["invalid"]
-        assert "LOINC:6690-2" in result.details["invalid"]
+        assert result.severity == GuardrailSeverity.WARNING
+        assert "SNOMED:385093006" in result.details["unverifiable"]
+        assert "LOINC:6690-2" in result.details["unverifiable"]
+        assert "invalid" not in result.details
 
     def test_a_real_referential_violation_is_caught_and_attributed(
         self, tmp_path: Path

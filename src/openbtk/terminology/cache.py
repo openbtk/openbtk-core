@@ -104,6 +104,9 @@ class CachedTerminologyService(BaseTerminologyService):
     def validate(self, code: str, system: CodeSystem) -> bool:
         return self.resolve(code, system) is not None
 
+    def is_authoritative(self, system: CodeSystem) -> bool:
+        return self._backend.is_authoritative(system)
+
     def map(
         self, code: str, from_system: CodeSystem, to_system: CodeSystem
     ) -> list[Concept]:

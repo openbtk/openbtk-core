@@ -95,6 +95,14 @@ class TestTerminologyContract:
             valid = service.validate(code, system)
             assert (resolved is not None) == valid
 
+    def test_is_authoritative_is_a_bool_for_every_system(
+        self, key: str, tmp_path: Path
+    ) -> None:
+        """Says whether validate()'s False means "does not exist" or "cannot
+        confirm", so a guardrail never calls a valid code invalid."""
+        service = _new_instance(key, tmp_path)
+        assert all(isinstance(service.is_authoritative(s), bool) for s in CodeSystem)
+
     def test_map_returns_a_list_of_concepts(self, key: str, tmp_path: Path) -> None:
         _skip_if_real_call_unavailable(key)
         service = _new_instance(key, tmp_path)

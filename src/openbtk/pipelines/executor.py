@@ -84,12 +84,26 @@ _SECRET_KEY_RE = re.compile(r"(key|token|secret|password|credential)", re.IGNORE
 interpolated ``${OPENAI_API_KEY}``-shaped value must never be written back
 into a serialised manifest."""
 
+_TOKEN_COUNT_KEY_RE = re.compile(
+    r"(?:^|_)(?:max|min|overlap|num|count|total|prompt|completion)_tokens$",
+    re.IGNORECASE,
+)
+"""Keys that contain "token" but are LENGTHS, not credentials -- ``max_tokens``
+is a chunker's size limit and every LLM's output cap. Redacting them (as the
+pattern above alone would) erased a real setting from the audit record and made
+any pipeline with a chunker impossible to replay. The exemption is deliberately
+narrow: ``access_token``, ``hf_token`` and the like are still redacted."""
+
+
+def _is_secret_key(key: str) -> bool:
+    return bool(_SECRET_KEY_RE.search(key)) and not _TOKEN_COUNT_KEY_RE.search(key)
+
 
 def _redact_secrets(value: Any) -> Any:
     """Recursively replace any dict value whose key looks like a credential."""
     if isinstance(value, dict):
         return {
-            k: "[REDACTED]" if _SECRET_KEY_RE.search(k) else _redact_secrets(v)
+            k: "[REDACTED]" if _is_secret_key(k) else _redact_secrets(v)
             for k, v in value.items()
         }
     if isinstance(value, list):

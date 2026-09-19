@@ -587,6 +587,20 @@ class BaseTerminologyService(Component):
             TerminologyError: If the backend is unavailable or unlicensed.
         """
 
+    def is_authoritative(self, system: CodeSystem) -> bool:  # noqa: ARG002
+        """Whether a ``False`` from :meth:`validate` for ``system`` means the
+        code definitely does not exist, as opposed to "this backend cannot
+        confirm it".
+
+        A complete vocabulary (the full UMLS, a whole vocabulary release the
+        caller supplied) is authoritative: absence is a real answer. A partial
+        one -- the small bundled ICD-10-CM subset, or a supplied file that
+        simply has no rows for ``system`` -- is not: absence proves nothing, so
+        a guardrail must report "unverifiable", not "invalid". Defaults to
+        ``True``; a backend that knows it is incomplete overrides it.
+        """
+        return True
+
     @abstractmethod
     def map(
         self, code: str, from_system: CodeSystem, to_system: CodeSystem
