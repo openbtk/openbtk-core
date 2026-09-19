@@ -9,6 +9,43 @@ recorded here.
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-09-19
+
+### Read this first
+
+**The de-identification benchmark on i2b2/n2c2 has not been run.** The harness
+and dataset adapter ship and are tested, but that corpus is released only under
+a Data Use Agreement and was not available. Every de-identification number in
+this release (F1 0.933 rule-only, 0.922 with NER) is on a **synthetic** corpus:
+a regression gate, not evidence of real-world accuracy. The default
+`DeidEngine` detects structured identifiers (SSN, MRN, phone, dates, ...) but
+**does not detect names or street addresses**; enable the opt-in NER recognizer
+for those. This is the one open gate for a "credible" v0.5 and it is tracked, not
+hidden. See `mkdocs/benchmarks.md`.
+
+Also worth knowing before you rely on it:
+- LLM and embedding providers are exercised in CI against **mocked** SDKs and
+  models; calls against live services run only when you supply keys or models.
+- The UMLS terminology `map()` call has not been verified against the live
+  service. The groundedness guardrail is a word-overlap heuristic, not entailment.
+- The i2b2/n2c2 XML reader was written from the published annotation scheme and
+  has only been run on hand-built files.
+- The 10M-note memory figure (0.074 GB peak RSS) is one Windows run on
+  synthetic notes.
+
+### What is new since 0.1.1
+
+The first PyPI release carrying EHR loading, the provider and retrieval layer,
+guardrails and terminology, the evaluation harness and the LangChain adapter:
+M5 (LLM and embedding providers, FAISS/Chroma/Qdrant, concept reranking, RAG
+with source provenance), M6 (FHIR R4 and OMOP loading, timelines, cohorts, the
+EHR-to-text serializer), M7 (PHI-leakage, terminology, groundedness and EHR
+guardrails; terminology service), M8 (de-identification and retrieval
+evaluation, benchmark harness, LangChain/LangGraph adapter) and M9 (release
+gates, nightly memory benchmark, documentation brought up to date, live docs
+site). Package classifier moves from Pre-Alpha to Alpha. The six-dependency
+core is unchanged; everything else is an optional extra.
+
 **M9 — v0.5 release readiness — built; `v0.5.0` deliberately NOT tagged.** One
 PRD gate is open (below), and PyPI version numbers are permanent.
 
@@ -996,6 +1033,7 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.5.0
 [0.1.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.1
 [0.0.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.0.1

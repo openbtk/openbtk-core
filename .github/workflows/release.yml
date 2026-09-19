@@ -133,12 +133,26 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with: {name: dist, path: .}
+      # Hand-written notes (limits stated up front) come first; GitHub's
+      # generated notes are appended after them. A tag with no notes file
+      # still releases, with a pointer to the CHANGELOG.
+      - id: notes
+        shell: bash
+        run: |
+          f=".github/release-notes/${GITHUB_REF_NAME}.md"
+          if [ ! -f "$f" ]; then
+            f="release-notes.md"
+            echo "See [CHANGELOG.md](https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md)." > "$f"
+          fi
+          echo "path=$f" >> "$GITHUB_OUTPUT"
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/*
             sbom.json
+          body_path: ${{ steps.notes.outputs.path }}
           generate_release_notes: true
           prerelease: ${{ contains(github.ref_name, 'rc') || contains(github.ref_name, 'a') || contains(github.ref_name, 'b') || startsWith(github.ref_name, 'v0.0.') }}

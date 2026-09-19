@@ -19,7 +19,7 @@ keywords = [
     "phi", "ehr", "fhir", "omop", "llm", "rag", "hipaa",
 ]
 classifiers = [
-    "Development Status :: 2 - Pre-Alpha",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Healthcare Industry",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
