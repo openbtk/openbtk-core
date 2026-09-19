@@ -188,16 +188,25 @@ jobs:
       - name: Docs examples, none skipped (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
+          set +e
           pytest "${{ github.workspace }}/tests/docs" \
                  "${{ github.workspace }}/tests/unit/integrations/test_docs_page.py" \
-                 -q -p no:cacheprovider --junitxml=docs.xml
+                 -q -rfEs -p no:cacheprovider --junitxml=docs.xml 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" -ne 0 ]; then
+            # Surface the failure as an annotation, readable without log access.
+            echo "::error title=docs tests failed::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
           python - <<'PY'
           import xml.etree.ElementTree as ET
           suite = ET.parse("docs.xml").getroot()
           suite = suite if suite.tag == "testsuite" else suite[0]
           skipped, tests = int(suite.get("skipped")), int(suite.get("tests"))
-          assert tests > 25, f"suspiciously few docs tests ran: {tests}"
-          assert skipped == 0, f"{skipped} docs tests skipped -- an extra is missing"
+          if tests <= 25 or skipped != 0:
+              print(f"::error title=docs skip check::{tests} tests, {skipped} skipped; an extra is missing")
+              raise SystemExit(1)
           print(f"{tests} docs tests, 0 skipped")
           PY
 
