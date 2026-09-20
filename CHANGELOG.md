@@ -9,6 +9,43 @@ recorded here.
 
 ## [Unreleased]
 
+## [0.6.0] — 2026-09-20
+
+### Read this first
+
+**The de-identification benchmark on i2b2/n2c2 still has not been run.** The
+harness and adapter ship and are tested, but that corpus is released only under a
+Data Use Agreement and was not available. Every de-identification number
+published (F1 0.933 rule-only, 0.922 with NER) is on a **synthetic** corpus: a
+regression gate, not evidence of real-world accuracy. The default `DeidEngine`
+**does not detect names or street addresses**; enable the opt-in NER recognizer
+for those. Providers are tested against mocked SDKs and models in CI; the UMLS
+`map()` call is unverified against the live service; the groundedness check is a
+word-overlap heuristic. See `mkdocs/benchmarks.md`.
+
+**Behaviour changes since 0.5.0 that can change your output** (all fix defects; see
+"Fixed" below):
+- `TerminologyValidityGuardrail` / `EHRCodeValidityGuardrail` with the default
+  bundled backend now return a **WARNING ("unverifiable")** for a code the bundled
+  subset cannot confirm, where 0.5.0 returned a **BLOCK ("does not exist")**. A
+  BLOCK now requires a backend that is authoritative for that system. If you
+  relied on the old BLOCK, inject a complete vocabulary.
+- `DeidMode.DATE_SHIFT` now redacts non-date identifiers found beside dates; in
+  0.5.0 such a document raised `DeidError`.
+- Run manifests now record token-count settings such as `max_tokens` instead of
+  `[REDACTED]`; credentials (`api_key`, `access_token`, ...) are still redacted.
+- `PipelineConfig.validate_registry()` now reports unknown or missing step
+  parameters and off-site components under a local-only policy; previously these
+  surfaced only when the run tried to construct the component.
+
+### What is new since 0.5.0
+
+The `openbtk` command line, clinical QA and groundedness evaluation with eval
+manifests, four guides plus a CLI guide, a full API reference, and eight
+tutorial notebooks that are executed in CI. The six-dependency core is unchanged;
+everything else is an optional extra (a new `notebooks` extra runs the
+tutorials).
+
 **M10 — Eval, CLI, docs — complete.** Writing the tutorials against the real
 code found three genuine defects, fixed below; none of them was visible to the
 existing test suite.
@@ -1099,7 +1136,8 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.6.0
 [0.5.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.5.0
 [0.1.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.1
 [0.0.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.0.1
