@@ -52,7 +52,16 @@ this repository and are not claimed.
   Identity comes from the component's provenance; every metric must come from an
   `EvalManifest` (there is no way to type a score in); sections that need judgement
   read "Not provided." unless you write them.
-- New guides: guardrails, terminology, retrieval; the evaluation guide gains model cards.
+- **Summarisation metrics** (FR-X-05): `openbtk.eval.summarisation` with ROUGE (wraps
+  `rouge-score`, extra `eval`) and BERTScore. BERTScore is implemented here on
+  `transformers` because the `bert-score` package cannot pin a model revision; the model,
+  its commit and the layer are all required. Checked against the reference package: the
+  first version disagreed on recall (the reference lets `[CLS]`/`[SEP]` take part in
+  matching, with zero weight in the average), which the check caught and the
+  implementation now reproduces to within 1e-7. No idf weighting or baseline rescaling.
+  Reports hold scores, never text; `summarisation_manifest` feeds model cards.
+- New guides: guardrails, terminology, retrieval; the evaluation guide gains summaries
+  and model cards.
 
 ### Security
 Found by an internal review ([`mkdocs/security-review.md`](mkdocs/security-review.md)).

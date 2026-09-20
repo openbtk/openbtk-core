@@ -192,3 +192,62 @@ What is written for you, and what is not:
 - For a whole run, `cards_from_run(manifest)` writes one card per distinct model the run
   used. For a model you fine-tuned, build a `ModelCard` from its `ModelIdentity` and say
   what you trained it on.
+
+## Summaries: ROUGE and BERTScore
+
+For a discharge summary or similar, `evaluate_summaries` compares each candidate with a
+reference on ROUGE (word, word-pair and longest-common-subsequence overlap) and, if you
+give it a scorer, BERTScore (similarity in a language model's embedding space, which credits
+a paraphrase that ROUGE misses).
+
+```python
+from openbtk.eval.summarisation import SummaryPair, evaluate_summaries
+
+pairs = [
+    SummaryPair(
+        example_id="d1",
+        reference="the patient is stable today",
+        candidate="the patient is stable",
+    ),
+]
+report = evaluate_summaries(pairs, use_stemmer=False)
+
+# The candidate has 4 of the reference's 5 words and nothing extra:
+assert report.rouge["rouge1"].precision == 1.0
+assert report.rouge["rouge1"].recall == 0.8
+assert report.as_dict()["n"] == 1
+```
+
+Read these numbers for what they are:
+
+- They measure **similarity to a reference, not correctness.** A fluent summary that
+  leaves out the one abnormal result can score well, and a faithful paraphrase can score
+  badly. Compare systems on your own data with them, next to the groundedness check above;
+  do not use them as a safety measure.
+- ROUGE wraps Google's `rouge-score` (the `eval` extra). Its tokenizer keeps only `a-z`
+  and `0-9`, so accented letters and symbols such as `%` or `>` are dropped before
+  scoring, a real limit for clinical text.
+- **BERTScore needs choices OpenBTK will not make for you.** You give the model, its
+  pinned commit *and* the layer, and it downloads nothing until first use:
+
+```python
+from openbtk.eval.summarisation import BertScorer
+
+scorer = BertScorer(
+    model="distilbert-base-uncased",
+    revision="12040accade4e8a0f71eabdb258fecc2e7e948be",
+    layer=5,
+)
+assert scorer.provenance().model_identity.revision.startswith("12040acc")
+# evaluate_summaries(pairs, bertscorer=scorer)  # downloads the model, needs torch
+```
+
+  OpenBTK implements BERTScore itself rather than wrapping the `bert-score` package,
+  because that package fetches its model by name with no way to pin a revision. The
+  implementation reproduces the reference package's raw scores (five sentence pairs agree
+  to within 1e-7; the test that checks this carries the recorded values), but supports
+  neither idf weighting nor baseline rescaling, so its numbers are comparable only with
+  other *raw* scores from the same model and layer.
+- The report holds scores and counts, never text. `summarisation_manifest(report,
+  bertscorer=scorer)` records when it ran, the scores, and the BERTScore model, so a score
+  can go on a [model card](#model-cards) through its manifest.

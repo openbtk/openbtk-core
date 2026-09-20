@@ -75,6 +75,20 @@ answer text. Published numbers and what they do and do not show are on the
 
 ::: openbtk.eval.groundedness.groundedness_manifest
 
+## Summaries: ROUGE and BERTScore
+
+::: openbtk.eval.summarisation.evaluate_summaries
+
+::: openbtk.eval.summarisation.rouge_scores
+
+::: openbtk.eval.summarisation.BertScorer
+
+::: openbtk.eval.summarisation.SummaryPair
+
+::: openbtk.eval.summarisation.SummarisationReport
+
+::: openbtk.eval.summarisation.summarisation_manifest
+
 ## Model cards
 
 ::: openbtk.eval.model_card.ModelCard

@@ -31,6 +31,7 @@ EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "ehr": ("fhir.resources", "pyarrow", "pandas", "hl7apy"),
     "retrieval": ("faiss", "chromadb", "qdrant_client"),
     "llms": ("openai", "anthropic", "torch"),
+    "eval": ("rouge_score",),
     "bedrock": ("boto3",),
     "vertex": ("google.genai",),
     "langchain": ("langchain_core",),

@@ -1,7 +1,7 @@
 """The GitHub Actions workflows are code that only runs after you push, so a mistake in
 one is found by a red X on a pull request. These checks catch the two mistakes that have
 actually happened: a workflow that is not valid YAML, and an action referenced by a
-                   mutable tag instead of a commit (security review finding S-6)."""
+mutable tag instead of a commit (security review finding S-6)."""
 
 from __future__ import annotations
 

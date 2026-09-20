@@ -1259,6 +1259,49 @@
       "kind": "function",
       "signature": "(embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, *, top_k: int = 10, id_of: Callable[[SearchResult], str] | None = None) -> Callable[[str], list[str]]"
     },
+    "openbtk.eval.summarisation.BertScorer": {
+      "init": "(*, model: str, revision: str, layer: int, device: str = 'cpu', max_length: int = 512) -> None",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "score": "(reference: str, candidate: str) -> Prf"
+      }
+    },
+    "openbtk.eval.summarisation.SummarisationReport": {
+      "fields": {
+        "bertscore": false,
+        "ended_at": true,
+        "examples": false,
+        "n": true,
+        "rouge": false,
+        "started_at": true
+      },
+      "kind": "class",
+      "members": {
+        "as_dict": "() -> dict[str, JsonValue]"
+      }
+    },
+    "openbtk.eval.summarisation.SummaryPair": {
+      "fields": {
+        "candidate": true,
+        "example_id": true,
+        "reference": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.summarisation.evaluate_summaries": {
+      "kind": "function",
+      "signature": "(pairs: Iterable[SummaryPair], *, rouge_types: Sequence[str] = ('rouge1', 'rouge2', 'rougeL'), use_stemmer: bool = True, bertscorer: BertScorer | None = None) -> SummarisationReport"
+    },
+    "openbtk.eval.summarisation.rouge_scores": {
+      "kind": "function",
+      "signature": "(reference: str, candidate: str, *, types: Sequence[str] = ('rouge1', 'rouge2', 'rougeL'), use_stemmer: bool = True) -> dict[str, Prf]"
+    },
+    "openbtk.eval.summarisation.summarisation_manifest": {
+      "kind": "function",
+      "signature": "(report: SummarisationReport, *, bertscorer: BertScorer | None = None, input_digests: Sequence[DataDigest] = ()) -> EvalManifest"
+    },
     "openbtk.guardrails.dose.DoseLimit": {
       "fields": {
         "aliases": false,

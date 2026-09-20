@@ -193,7 +193,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[dev,ehr,langchain,langgraph]"
+      - run: pip install -e ".[dev,ehr,eval,langchain,langgraph]"
       - name: Docs examples, none skipped (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
@@ -351,12 +351,20 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[dev,bedrock,vertex]" openai
+      - run: pip install -e ".[dev,bedrock,vertex,eval]" openai
       - name: Providers against the real SDKs (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
           pytest "${{ github.workspace }}/tests/unit/llms/test_cloud_sdk_shapes.py" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
           if grep -Eq "skipped" pytest.out; then
             echo "::error title=test-cloud-sdks::a check was skipped, so an SDK is not installed"
+            exit 1
+          fi
+      - name: Summarisation metrics against the real rouge-score (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          pytest "${{ github.workspace }}/tests/unit/eval/test_summarisation.py" -m "not slow" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
+          if grep -Eq "skipped" pytest.out; then
+            echo "::error title=test-cloud-sdks::a summarisation check was skipped, so rouge-score is not installed"
             exit 1
           fi
