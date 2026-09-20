@@ -265,7 +265,7 @@ jobs:
           mkdocs build --strict 2>&1 | tee mkdocs.out
           status=${PIPESTATUS[0]}
           if [ "$status" != "0" ]; then
-            echo "::error title=docs-build failed::$(grep -E 'WARNING|ERROR|Error' mkdocs.out | head -c 1500 | tr '\n' '|')"
+            echo "::error title=docs-build failed::$(tail -c 1500 mkdocs.out | tr '\n%' '||')"
           fi
           exit "$status"
 
