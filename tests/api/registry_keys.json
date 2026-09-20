@@ -41,7 +41,8 @@
     "preprocessor.general.deidentify"
   ],
   "reranker": [
-    "reranker.general.concept_overlap"
+    "reranker.general.concept_overlap",
+    "reranker.general.cross_encoder"
   ],
   "segmenter": [],
   "terminology": [

@@ -32,6 +32,7 @@ from typing import TYPE_CHECKING, Any
 
 from openbtk.core.logging import get_logger
 from openbtk.core.schemas import Message, RAGAnswer, SourceRef
+from openbtk.retrieval.hybrid import reciprocal_rank_fusion
 
 if TYPE_CHECKING:
     from openbtk.core.base import (
@@ -41,6 +42,7 @@ if TYPE_CHECKING:
         BaseVectorStore,
     )
     from openbtk.core.schemas import SearchResult
+    from openbtk.retrieval.hybrid import BM25Index
 
 log = get_logger(__name__)
 
@@ -61,11 +63,18 @@ class RAGPipeline:
             are fetched and reranked down to ``top_k``; without one,
             ``top_k`` results are used directly in the vector store's own
             order.
+        bm25: Optional. A :class:`~openbtk.retrieval.hybrid.BM25Index` over the
+            same chunks (index both with the same ids). When given, the question
+            is also run through BM25 and the two rankings are fused by reciprocal
+            rank (FR-R-05), so an exact term the embedding model misses can still
+            surface. See :mod:`openbtk.retrieval.hybrid` for its limits.
+        fusion_k: The reciprocal-rank-fusion smoothing constant (only used with
+            ``bm25``).
         top_k: Number of chunks to ground the answer in.
-        candidate_pool_size: How many results to fetch before reranking.
-            Defaults to ``top_k * 4`` when ``reranker`` is given (a real
-            reranker needs a wider candidate pool to be worth running at
-            all), or ``top_k`` itself otherwise.
+        candidate_pool_size: How many results to fetch (from each retriever)
+            before fusing and reranking. Defaults to ``top_k * 4`` when
+            ``reranker`` or ``bm25`` is given (both need a wider candidate pool
+            to be worth running at all), or ``top_k`` itself otherwise.
         text_metadata_key: Metadata key holding each chunk's own text --
             see this module's own docstring for the indexing convention
             this whole class depends on.
@@ -84,6 +93,8 @@ class RAGPipeline:
         vectorstore: BaseVectorStore,
         llm: BaseLLMProvider,
         reranker: BaseReranker | None = None,
+        bm25: BM25Index | None = None,
+        fusion_k: int = 60,
         top_k: int = 5,
         candidate_pool_size: int | None = None,
         text_metadata_key: str = _DEFAULT_TEXT_KEY,
@@ -94,9 +105,11 @@ class RAGPipeline:
         self._vectorstore = vectorstore
         self._llm = llm
         self._reranker = reranker
+        self._bm25 = bm25
+        self._fusion_k = fusion_k
         self._top_k = top_k
         self._candidate_pool_size = candidate_pool_size or (
-            top_k * 4 if reranker is not None else top_k
+            top_k * 4 if reranker is not None or bm25 is not None else top_k
         )
         self._text_key = text_metadata_key
         self._record_id_key = record_id_metadata_key
@@ -124,11 +137,19 @@ class RAGPipeline:
             top_k=self._top_k,
             candidate_pool_size=self._candidate_pool_size,
             reranking=self._reranker is not None,
+            hybrid=self._bm25 is not None,
         )
         query_vector = self._embedding.embed_one(question)
         candidates = self._vectorstore.query(
             query_vector, top_k=self._candidate_pool_size
         )
+        if self._bm25 is not None:
+            sparse = self._bm25.search(question, top_k=self._candidate_pool_size)
+            candidates = reciprocal_rank_fusion(
+                [candidates, sparse],
+                k=self._fusion_k,
+                top_k=self._candidate_pool_size,
+            )
         if self._reranker is not None:
             candidates = self._reranker.rerank(question, candidates, top_k=self._top_k)
         else:

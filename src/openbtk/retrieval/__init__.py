@@ -1,4 +1,4 @@
-"""Vector stores and rerankers, including concept-aware reranking.
+"""Vector stores, rerankers and hybrid (dense + BM25) retrieval.
 
 Same registration-side-effect pattern as ``openbtk.llms``/``openbtk.
 embeddings``'s own ``__init__.py`` files: importing this package is what
@@ -13,6 +13,6 @@ extraction is an injected dependency, not something it imports itself).
 
 from __future__ import annotations
 
-from openbtk.retrieval import chroma, faiss, qdrant, reranker
+from openbtk.retrieval import chroma, cross_encoder, faiss, hybrid, qdrant, reranker
 
-__all__ = ["chroma", "faiss", "qdrant", "reranker"]
+__all__ = ["chroma", "cross_encoder", "faiss", "hybrid", "qdrant", "reranker"]

@@ -37,6 +37,7 @@ nav:
       - De-identification: guides/deidentification.md
       - EHR: guides/ehr.md
       - Guardrails: guides/guardrails.md
+      - Retrieval: guides/retrieval.md
       - Terminology: guides/terminology.md
       - Evaluation: guides/evaluation.md
       - Command line: guides/cli.md

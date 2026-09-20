@@ -1503,7 +1503,7 @@
       "members": {}
     },
     "openbtk.pipelines.rag.RAGPipeline": {
-      "init": "(*, embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, llm: BaseLLMProvider, reranker: BaseReranker | None = None, top_k: int = 5, candidate_pool_size: int | None = None, text_metadata_key: str = 'text', record_id_metadata_key: str = 'record_id', chunk_id_metadata_key: str = 'chunk_id') -> None",
+      "init": "(*, embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, llm: BaseLLMProvider, reranker: BaseReranker | None = None, bm25: BM25Index | None = None, fusion_k: int = 60, top_k: int = 5, candidate_pool_size: int | None = None, text_metadata_key: str = 'text', record_id_metadata_key: str = 'record_id', chunk_id_metadata_key: str = 'chunk_id') -> None",
       "kind": "class",
       "members": {
         "ask": "(question: str, **generate_kwargs: Any) -> RAGAnswer"
@@ -1529,6 +1529,15 @@
         "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
       }
     },
+    "openbtk.retrieval.cross_encoder.CrossEncoderReranker": {
+      "init": "(*, model: str = 'ncbi/MedCPT-Cross-Encoder', revision: str | None = None, text_metadata_key: str = 'text', batch_size: int = 16, max_length: int = 512, device: str = 'cpu') -> None",
+      "kind": "class",
+      "members": {
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'reranker.general.cross_encoder'",
+        "rerank": "(query: str, results: list[SearchResult], top_k: int | None = None) -> list[SearchResult]"
+      }
+    },
     "openbtk.retrieval.faiss.FAISSVectorStore": {
       "init": "(*, dimension: int, metric: Metric = 'l2') -> None",
       "kind": "class",
@@ -1541,6 +1550,23 @@
         "registry_key": "= 'vectorstore.general.faiss'",
         "upsert": "(ids: list[str], vectors: NDArray[np.float32], metadata: list[dict[str, Any]]) -> None"
       }
+    },
+    "openbtk.retrieval.hybrid.BM25Index": {
+      "init": "(*, k1: float = 1.5, b: float = 0.75, tokenizer: Callable[[str], list[str]] = <default_tokenizer>, text_metadata_key: str = 'text') -> None",
+      "kind": "class",
+      "members": {
+        "delete": "(ids: Sequence[str]) -> None",
+        "search": "(query: str, top_k: int = 5) -> list[SearchResult]",
+        "upsert": "(ids: Sequence[str], texts: Sequence[str], metadata: Sequence[dict[str, JsonValue]] | None = None) -> None"
+      }
+    },
+    "openbtk.retrieval.hybrid.default_tokenizer": {
+      "kind": "function",
+      "signature": "(text: str) -> list[str]"
+    },
+    "openbtk.retrieval.hybrid.reciprocal_rank_fusion": {
+      "kind": "function",
+      "signature": "(rankings: Sequence[Sequence[SearchResult]], *, k: int = 60, weights: Sequence[float] | None = None, top_k: int | None = None) -> list[SearchResult]"
     },
     "openbtk.retrieval.qdrant.QdrantVectorStore": {
       "init": "(*, dimension: int, metric: Metric = 'cosine', path: str | None = None, collection_name: str = 'openbtk_default') -> None",
