@@ -23,9 +23,12 @@
   ],
   "llm": [
     "llm.general.anthropic",
+    "llm.general.azure_openai",
+    "llm.general.bedrock",
     "llm.general.huggingface_local",
     "llm.general.openai",
-    "llm.general.openai_compatible"
+    "llm.general.openai_compatible",
+    "llm.general.vertex"
   ],
   "loader": [
     "loader.clinical_text.jsonl",

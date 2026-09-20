@@ -75,6 +75,14 @@ answer text. Published numbers and what they do and do not show are on the
 
 ::: openbtk.eval.groundedness.groundedness_manifest
 
+## Model cards
+
+::: openbtk.eval.model_card.ModelCard
+
+::: openbtk.eval.model_card.CardEvaluation
+
+::: openbtk.eval.model_card.cards_from_run
+
 ## Manifests
 
 ::: openbtk.eval.manifest.EvalManifest

@@ -1120,6 +1120,45 @@
       "kind": "function",
       "signature": "(path: str | Path, *, record_count: int) -> DataDigest"
     },
+    "openbtk.eval.model_card.CardEvaluation": {
+      "fields": {
+        "eval_id": true,
+        "inputs": false,
+        "kind": true,
+        "metric": true,
+        "value": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.eval.model_card.ModelCard": {
+      "fields": {
+        "component_key": false,
+        "contact": false,
+        "description": false,
+        "ethical_considerations": false,
+        "evaluations": false,
+        "generated_at": false,
+        "intended_use": false,
+        "limitations": false,
+        "model": true,
+        "openbtk_version": false,
+        "out_of_scope_use": false,
+        "settings": false,
+        "training_data": false
+      },
+      "kind": "class",
+      "members": {
+        "for_component": "class(component: Component | ComponentProvenance, *, description: str | None = None, intended_use: str | None = None, out_of_scope_use: str | None = None, training_data: str | None = None, limitations: str | None = None, ethical_considerations: str | None = None, contact: str | None = None) -> ModelCard",
+        "to_markdown": "() -> str",
+        "with_evaluation": "(manifest: EvalManifest, metric: str, *, name: str | None = None) -> ModelCard",
+        "write": "(path: str | Path) -> Path"
+      }
+    },
+    "openbtk.eval.model_card.cards_from_run": {
+      "kind": "function",
+      "signature": "(manifest: RunManifest, **text: str | None) -> list[ModelCard]"
+    },
     "openbtk.eval.qa.LLMAnswerer": {
       "init": "(provider: BaseLLMProvider, **generation: Any) -> None",
       "kind": "class",
@@ -1408,6 +1447,34 @@
         "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
       }
     },
+    "openbtk.llms.azure_openai.AzureOpenAIProvider": {
+      "init": "(*, model: str, azure_endpoint: str | None = None, api_key: str | None = None, api_version: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.azure_openai'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
+    "openbtk.llms.bedrock.BedrockProvider": {
+      "init": "(*, model: str, region_name: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.bedrock'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
+    },
     "openbtk.llms.huggingface.HuggingFaceLocalProvider": {
       "init": "(*, model: str, revision: str, device: str = 'cpu', max_new_tokens: int = 256, do_sample: bool = False) -> None",
       "kind": "class",
@@ -1457,6 +1524,20 @@
     "openbtk.llms.presets.list_llm_presets": {
       "kind": "function",
       "signature": "() -> list[str]"
+    },
+    "openbtk.llms.vertex.VertexAIProvider": {
+      "init": "(*, model: str, project: str | None = None, location: str | None = None, max_retries: int = 5) -> None",
+      "kind": "class",
+      "members": {
+        "chat": "(messages: list[Message], **kwargs: Any) -> LLMResponse",
+        "generate": "(prompt: str, **kwargs: Any) -> LLMResponse",
+        "model_identity": "() -> ModelIdentity",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'llm.general.vertex'",
+        "sends_data_offsite": "= True",
+        "stream": "(prompt: str, **kwargs: Any) -> Iterator[str]",
+        "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
+      }
     },
     "openbtk.pipelines.join.MatchedEvent": {
       "fields": {

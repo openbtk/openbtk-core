@@ -31,6 +31,8 @@ EXTRA_MODULES: dict[str, tuple[str, ...]] = {
     "ehr": ("fhir.resources", "pyarrow", "pandas", "hl7apy"),
     "retrieval": ("faiss", "chromadb", "qdrant_client"),
     "llms": ("openai", "anthropic", "torch"),
+    "bedrock": ("boto3",),
+    "vertex": ("google.genai",),
     "langchain": ("langchain_core",),
     "langgraph": ("langgraph",),
 }
@@ -49,6 +51,9 @@ CORE_DEPENDENCIES = (
 CREDENTIAL_ENV_VARS = (
     "OPENAI_API_KEY",
     "ANTHROPIC_API_KEY",
+    "AZURE_OPENAI_API_KEY",
+    "AWS_ACCESS_KEY_ID",
+    "GOOGLE_APPLICATION_CREDENTIALS",
     "HF_TOKEN",
     "UMLS_API_KEY",
 )

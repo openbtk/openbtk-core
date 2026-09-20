@@ -41,7 +41,18 @@ this repository and are not claimed.
   cross-encoder pinned to its verified commit; local, lazy, keeps unscorable results.
 - **Hybrid retrieval** (FR-R-05): `BM25Index` and `reciprocal_rank_fusion`;
   `RAGPipeline(bm25=...)` fuses exact-term hits with the vector store's before reranking.
-- New guides: guardrails, terminology, retrieval.
+- **Cloud LLM providers** (FR-V-01): `llm.general.azure_openai`, `llm.general.bedrock`
+  (Converse API) and `llm.general.vertex` (`google-genai`); extras `bedrock` and
+  `vertex`. Each is tested against fake SDKs **and** against the real SDK libraries
+  offline (Bedrock's request passes botocore's own validator; the Vertex request is
+  built from real `google.genai` types; real error objects are translated), with a CI
+  job that fails on a skip. **None has been run against a live AWS, Google Cloud or
+  Azure account.** An argument a provider cannot express is refused, not dropped.
+- **Model cards** (FR-P-06): `openbtk.eval.model_card.ModelCard` and `cards_from_run`.
+  Identity comes from the component's provenance; every metric must come from an
+  `EvalManifest` (there is no way to type a score in); sections that need judgement
+  read "Not provided." unless you write them.
+- New guides: guardrails, terminology, retrieval; the evaluation guide gains model cards.
 
 ### Security
 Found by an internal review ([`mkdocs/security-review.md`](mkdocs/security-review.md)).

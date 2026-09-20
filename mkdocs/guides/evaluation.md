@@ -140,3 +140,55 @@ assert evaluate_detector(judged).f1 == 1.0
     `is_supported` (an entailment model or an LLM judge) for a stronger check, and
     run `evaluate_detector` on your own labelled examples before trusting any
     faithfulness number.
+
+## Model cards
+
+A model card is the short document that travels with a model: what it is, what it is for,
+how well it does, where it fails. OpenBTK already records the facts a card needs, so it
+assembles them: the exact model and pinned revision a component used, and the scores an
+evaluation produced.
+
+```python
+from datetime import UTC, datetime
+
+from openbtk.eval.manifest import EvalManifest
+from openbtk.eval.model_card import ModelCard
+from openbtk.retrieval.cross_encoder import CrossEncoderReranker
+
+card = ModelCard.for_component(
+    CrossEncoderReranker(),
+    intended_use="Reordering retrieved passages for clinical question answering.",
+    limitations="Not evaluated on non-English text or on notes over 512 tokens.",
+)
+
+# A score reaches a card only from an evaluation run's manifest.
+run = EvalManifest(
+    eval_id="retrieval-2026-09",
+    kind="retrieval",
+    started_at=datetime(2026, 9, 1, tzinfo=UTC),
+    ended_at=datetime(2026, 9, 1, tzinfo=UTC),
+    report={"recall_at_5": 0.5},
+)
+card = card.with_evaluation(run, "recall_at_5", name="Recall@5")
+
+text = card.to_markdown()
+assert "ncbi/MedCPT-Cross-Encoder" in text
+assert "| Recall@5 | 0.5 | `retrieval-2026-09` (retrieval) |" in text
+assert "## Training data\n\nNot provided." in text  # nothing invented
+```
+
+What is written for you, and what is not:
+
+- The **identity** (model, pinned revision, source, the OpenBTK component and its
+  settings) comes from the component's provenance, and the **evaluation table** from
+  `EvalManifest`s you attach, each with its id and input digests.
+- Everything that needs judgement (intended use, out-of-scope use, training data,
+  limitations, ethical considerations) is text *you* provide. A section you leave out
+  reads "Not provided." A card never describes a model's training data, invents
+  limitations or praises it.
+- **There is no way to type a score into a card.** `with_evaluation` reads a number from a
+  manifest's report and refuses one that is not there, so no figure appears without the
+  run that produced it. A card with no evaluation says so.
+- For a whole run, `cards_from_run(manifest)` writes one card per distinct model the run
+  used. For a model you fine-tuned, build a `ModelCard` from its `ModelIdentity` and say
+  what you trained it on.
