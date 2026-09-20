@@ -1,4 +1,4 @@
-"""EHR / EMR: FHIR + OMOP loaders, temporal normalisation, cohort building.
+"""EHR / EMR: FHIR, OMOP and HL7 v2 loaders, temporal normalisation, cohort building.
 See docs/05_DATA_MODALITY_SPEC.md section 2.
 
 ``PatientTimelineSerializer`` (task 6.5) is NOT re-exported here -- it lives
@@ -17,6 +17,6 @@ first real use (CLAUDE.md rule 5).
 
 from __future__ import annotations
 
-from openbtk.data.ehr import cohort, fhir, omop, temporal
+from openbtk.data.ehr import cohort, fhir, hl7v2, omop, temporal
 
-__all__ = ["cohort", "fhir", "omop", "temporal"]
+__all__ = ["cohort", "fhir", "hl7v2", "omop", "temporal"]

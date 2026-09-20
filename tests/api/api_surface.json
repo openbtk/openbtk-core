@@ -683,6 +683,16 @@
         "registry_key": "= 'loader.ehr.fhir'"
       }
     },
+    "openbtk.data.ehr.hl7v2.HL7v2Loader": {
+      "init": "(*, default_utc_offset_hours: float = 0.0, encoding: str = 'utf-8') -> None",
+      "kind": "class",
+      "members": {
+        "load": "(source: str) -> Iterator[PatientRecord]",
+        "load_all": "(source: InputT) -> list[RecordT]",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'loader.ehr.hl7v2'"
+      }
+    },
     "openbtk.data.ehr.omop.OMOPLoader": {
       "init": "(*, batch_size: int = 10000, condition_system: CodeSystem = <CodeSystem.SNOMED: 'SNOMED'>, drug_system: CodeSystem = <CodeSystem.RXNORM: 'RXNORM'>, procedure_system: CodeSystem = <CodeSystem.CPT: 'CPT'>, measurement_system: CodeSystem = <CodeSystem.LOINC: 'LOINC'>) -> None",
       "kind": "class",

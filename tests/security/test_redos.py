@@ -178,3 +178,36 @@ def test_the_dose_guardrail_is_linear_on_adversarial_text(name: str) -> None:
     )
     text = _repeat(_DOSE_TEXTS[name])
     _within_budget(lambda: guardrail.check(text))
+
+
+# ------------------------------------------------------------ HL7 v2 helpers (FR-E-03)
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["1" * SIZE, "1" * 4 + "+" * SIZE, "2024" + "0" * SIZE, ("^" * SIZE)],
+    ids=["digits", "offset-run", "zeros", "separators"],
+)
+def test_the_hl7_field_helpers_are_linear_on_adversarial_text(text: str) -> None:
+    from openbtk.data.ehr import hl7v2
+
+    def work() -> None:
+        hl7v2._timestamp(text, 0)
+        hl7v2._date(text)
+        hl7v2._coding(text)
+        hl7v2._component(text, 3)
+        hl7v2._patient_id(text)
+        hl7v2._unescape(text)
+
+    _within_budget(work)
+
+
+@pytest.mark.parametrize(
+    "text",
+    ["MSH|" * (SIZE // 4), "\r" * SIZE, "MSH|\r" * (SIZE // 5), "\\" * SIZE],
+    ids=["msh-run", "line-breaks", "msh-lines", "backslashes"],
+)
+def test_the_hl7_message_splitter_is_linear_on_adversarial_text(text: str) -> None:
+    from openbtk.data.ehr import hl7v2
+
+    _within_budget(lambda: list(hl7v2._split_messages(text)))

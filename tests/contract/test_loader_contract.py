@@ -59,6 +59,8 @@ if importlib.util.find_spec("fhir") is None:
     _MISSING_DEPENDENCY_BY_KEY["loader.ehr.fhir"] = "fhir.resources"
 if importlib.util.find_spec("pyarrow") is None:
     _MISSING_DEPENDENCY_BY_KEY["loader.ehr.omop"] = "pyarrow"
+if importlib.util.find_spec("hl7apy") is None:
+    _MISSING_DEPENDENCY_BY_KEY["loader.ehr.hl7v2"] = "hl7apy"
 
 
 def _skip_if_missing_dependency(key: str) -> None:
@@ -111,6 +113,18 @@ def _make_source(key: str, tmp_path: Path) -> Any:
             (tmp_path / f"{patient_id}.json").write_text(
                 json.dumps(bundle), encoding="utf-8"
             )
+        return str(tmp_path)
+    if key == "loader.ehr.hl7v2":
+        # HL7 v2 is plain text -- writing a message needs no hl7apy at all. Two
+        # ADT messages about two patients in one file: a valid two-record source.
+        for patient_id in ("PT1", "PT2"):
+            message = "\r".join(
+                [
+                    "MSH|^~\\&|APP|FAC|RCV|FAC|20240314101500||ADT^A01|M1|P|2.5",
+                    f"PID|1||{patient_id}^^^HOSP^MR||DOE^JANE||19800601|F",
+                ]
+            )
+            (tmp_path / f"{patient_id}.hl7").write_text(message, encoding="utf-8")
         return str(tmp_path)
     if key == "loader.ehr.omop":
         # Unlike the JSON case above, a real Parquet file genuinely needs

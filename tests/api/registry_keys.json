@@ -32,6 +32,7 @@
     "loader.clinical_text.mimic_notes",
     "loader.clinical_text.plain_text",
     "loader.ehr.fhir",
+    "loader.ehr.hl7v2",
     "loader.ehr.omop"
   ],
   "preprocessor": [

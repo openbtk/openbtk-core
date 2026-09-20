@@ -1,6 +1,6 @@
 # EHR
 
-The EHR modality loads FHIR R4 and OMOP into a single `PatientRecord` schema, so
+The EHR modality loads FHIR R4, OMOP and HL7 v2 into a single `PatientRecord` schema, so
 everything downstream (timelines, cohorts, guardrails) is source-agnostic.
 
 ```bash
@@ -119,6 +119,53 @@ folder.cleanup()
 * **`PatientTimelineSerializer`** turns a record into a normal
   `ClinicalTextRecord`. That is the seam between the two modalities: the output
   goes through the same de-identification, segmentation and chunking as any note.
+
+## HL7 v2 messages
+
+Many hospitals still send admissions and results as HL7 v2 messages. `HL7v2Loader`
+reads a directory of `*.hl7` files (each may hold many messages) and folds the messages
+about one patient into one `PatientRecord`:
+
+```python
+import contextlib
+import io
+import pathlib
+import tempfile
+
+with contextlib.redirect_stdout(io.StringIO()):
+    from openbtk.data.ehr.hl7v2 import HL7v2Loader
+
+messages = [
+    r"MSH|^~\&|APP|FAC|RCV|FAC|20240314101500+0000||ADT^A01|M1|P|2.5",
+    "PID|1||PT0001^^^HOSP^MR||DOE^JANE||19800601|F",
+    "DG1|1||I10^Essential hypertension^I10C||20240314",
+]
+folder = tempfile.TemporaryDirectory()
+(pathlib.Path(folder.name) / "adt.hl7").write_text(
+    "\r".join(messages), encoding="utf-8"
+)
+
+with contextlib.redirect_stdout(io.StringIO()):
+    (record,) = HL7v2Loader().load(folder.name)
+assert record.patient_id == "PT0001" and record.demographics.gender == "female"
+assert record.conditions[0].display == "Essential hypertension"
+folder.cleanup()
+```
+
+What it reads and how, so you can judge whether it fits your feed:
+
+- It reads `PID` (identifier, birth date, sex, race, ethnic group, death), `PV1` (visit
+  number, class, admit and discharge times), `DG1`, `OBX`, `RXE`/`RXA` and `PR1`.
+  Everything else is ignored, and **names, addresses and phone numbers are never read**.
+- A code is mapped only through coding-system names HL7 defines for the code sets
+  OpenBTK models: `SCT` (SNOMED CT), `LN` (LOINC), `I10C` (ICD-10-CM), `RXNORM`, `C4`
+  (CPT-4). Plain `I10` is the WHO ICD-10, a different code set, and is *not* treated as
+  ICD-10-CM. An event with no mappable code is skipped and counted in a log line, not
+  raised.
+- A timestamp with no UTC offset is assumed to be UTC. HL7 v2 does not label local time,
+  so if your interface engine emits it, pass `default_utc_offset_hours=`.
+- The patient identifier (`PID-3`) is PHI. De-identify the records before they leave your
+  environment, as for any other source.
 
 ## From EHR to retrieval-ready text
 
