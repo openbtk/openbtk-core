@@ -15,6 +15,7 @@
     "guardrail.ehr.code_validity",
     "guardrail.ehr.referential",
     "guardrail.ehr.units",
+    "guardrail.general.dose_plausibility",
     "guardrail.general.groundedness",
     "guardrail.general.phi_leakage",
     "guardrail.general.terminology"

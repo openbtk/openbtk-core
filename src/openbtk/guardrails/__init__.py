@@ -1,5 +1,5 @@
 """Clinical guardrails: PHI leakage, terminology validity, groundedness,
-EHR-specific checks (docs/03_ARCHITECTURE.md section 8.3).
+dose plausibility, EHR-specific checks (docs/03_ARCHITECTURE.md section 8.3).
 
 Cross-modal -- a guardrail is not owned by a modality module (FR-G-08).
 ``GuardrailPipeline`` (``openbtk.guardrails.pipeline``) composes several
@@ -13,12 +13,19 @@ them need a heavy optional dependency merely to be *defined*.
 
 from __future__ import annotations
 
-from openbtk.guardrails import ehr, groundedness, phi_leakage, terminology_validity
+from openbtk.guardrails import (
+    dose,
+    ehr,
+    groundedness,
+    phi_leakage,
+    terminology_validity,
+)
 from openbtk.guardrails.pipeline import GuardrailPipeline, GuardrailPipelineResult
 
 __all__ = [
     "GuardrailPipeline",
     "GuardrailPipelineResult",
+    "dose",
     "ehr",
     "groundedness",
     "phi_leakage",

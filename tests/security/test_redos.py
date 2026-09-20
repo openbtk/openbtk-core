@@ -153,3 +153,28 @@ def test_abbreviations_still_do_not_end_a_sentence() -> None:
         "Seen by Dr. Lee today. ",
         "Plan: 5 mg. daily.",
     ]
+
+
+# ------------------------------------------------------------ dose guardrail (FR-G-05)
+
+_DOSE_TEXTS = {
+    "drug-and-number-repeated": "examplamine 5 ",
+    "drug-repeated": "examplamine ",
+    "digits": "1",
+    "digits-and-dots": "1.",
+    "clause-breaks": "examplamine 5 mg. ",
+    "frequency-words": "every 6 hours ",
+    "spaces": " ",
+    "ranges": "1-2 ",
+}
+
+
+@pytest.mark.parametrize("name", sorted(_DOSE_TEXTS))
+def test_the_dose_guardrail_is_linear_on_adversarial_text(name: str) -> None:
+    from openbtk.guardrails.dose import DoseLimit, DosePlausibilityGuardrail
+
+    guardrail = DosePlausibilityGuardrail(
+        limits=[DoseLimit(drug="examplamine", max_single=1, source="synthetic")]
+    )
+    text = _repeat(_DOSE_TEXTS[name])
+    _within_budget(lambda: guardrail.check(text))

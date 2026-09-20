@@ -1148,6 +1148,29 @@
       "kind": "function",
       "signature": "(embedding: BaseEmbeddingProvider, vectorstore: BaseVectorStore, *, top_k: int = 10, id_of: Callable[[SearchResult], str] | None = None) -> Callable[[str], list[str]]"
     },
+    "openbtk.guardrails.dose.DoseLimit": {
+      "fields": {
+        "aliases": false,
+        "drug": true,
+        "max_daily": false,
+        "max_single": false,
+        "min_single": false,
+        "routes": false,
+        "source": true,
+        "unit": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.guardrails.dose.DosePlausibilityGuardrail": {
+      "init": "(*, reference: str | None = None, limits: Sequence[DoseLimit | Mapping[str, object]] | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.general.dose_plausibility'"
+      }
+    },
     "openbtk.guardrails.ehr.EHRCodeValidityGuardrail": {
       "init": "(*, terminology: BaseTerminologyService | None = None) -> None",
       "kind": "class",
