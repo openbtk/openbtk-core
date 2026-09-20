@@ -102,10 +102,23 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install from TestPyPI
         shell: bash
+        env:
+          VERSION: ${{ needs.build.outputs.version }}
+        # TestPyPI's index can lag an upload by a minute: v0.6.0's first run failed here
+        # ten seconds after the upload and installed fine on a later attempt. Retry for
+        # a few minutes; a wheel that is genuinely broken still fails, just later.
         run: |
-          pip install --index-url https://test.pypi.org/simple/ \
-                      --extra-index-url https://pypi.org/simple/ \
-                      "openbtk==${{ needs.build.outputs.version }}"
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if pip install --index-url https://test.pypi.org/simple/ \
+                           --extra-index-url https://pypi.org/simple/ \
+                           "openbtk==$VERSION"; then
+              exit 0
+            fi
+            echo "::warning::openbtk==$VERSION not installable from TestPyPI yet (attempt $attempt of 10); waiting for the index"
+            sleep 20
+          done
+          echo "::error::openbtk==$VERSION could not be installed from TestPyPI after 10 attempts"
+          exit 1
       - name: Smoke test the published artefact
         shell: bash
         run: |
