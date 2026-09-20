@@ -44,6 +44,8 @@ from openbtk.core.config import PolicyConfig
 from openbtk.core.registry import LLM_REGISTRY
 from openbtk.core.schemas import LLMResponse, Message
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseLLMProvider
 
@@ -136,7 +138,7 @@ class _Answer(BaseModel):
     value: str
 
 
-@pytest.mark.parametrize("key", LLM_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(LLM_REGISTRY))
 class TestLLMContract:
     def test_declares_sends_data_offsite(self, key: str) -> None:
         provider = _new_instance(key)

@@ -15,7 +15,7 @@ import pytest
 
 from openbtk.core.registry import PREPROCESSOR_REGISTRY
 
-from .conftest import FixtureRecord
+from .conftest import FixtureRecord, enrolled
 
 if TYPE_CHECKING:
     from openbtk.core.base import BasePreprocessor
@@ -46,7 +46,7 @@ def _make_record(key: str, record_id: str, text: str) -> Any:
     return FixtureRecord(record_id=record_id, text=text)
 
 
-@pytest.mark.parametrize("key", PREPROCESSOR_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(PREPROCESSOR_REGISTRY))
 class TestPreprocessorContract:
     def test_process_returns_same_type(self, key: str) -> None:
         """process() returns a record of the same type it was given."""

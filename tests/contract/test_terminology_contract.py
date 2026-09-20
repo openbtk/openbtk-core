@@ -25,6 +25,8 @@ from openbtk.core.config import PolicyConfig
 from openbtk.core.registry import TERMINOLOGY_REGISTRY
 from openbtk.core.schemas import CodeSystem, Concept
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -67,7 +69,7 @@ def _skip_if_real_call_unavailable(key: str) -> None:
 _NONEXISTENT_CODE = "ZZZ-DOES-NOT-EXIST-99999"
 
 
-@pytest.mark.parametrize("key", TERMINOLOGY_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(TERMINOLOGY_REGISTRY))
 class TestTerminologyContract:
     def test_resolve_unknown_code_returns_none_not_raise(
         self, key: str, tmp_path: Path

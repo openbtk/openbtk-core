@@ -18,7 +18,7 @@ from openbtk.core.config import (
     ValidationIssue,
 )
 from openbtk.core.errors import ConfigError
-from openbtk.pipelines.executor import _Executor, _validate_linear_shape
+from openbtk.pipelines.executor import _Executor, _validate_shape
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -137,13 +137,14 @@ class Pipeline:
         """Everything that can be checked without instantiating a component or
         touching data: the config's registry, parameter and policy checks
         (:meth:`PipelineConfig.validate_registry`) plus the executor's own
-        shape rule (a single linear chain). An empty list means ``run()`` will
-        not be refused for any of these reasons -- not that it will succeed.
+        shape rules (no repeated predecessor, loaders are roots). An empty list means
+        ``run()`` will not be refused for any of these reasons -- not that it will
+        succeed.
         """
         config = self.to_config()
         issues = config.validate_registry()
         try:
-            _validate_linear_shape(config.steps)
+            _validate_shape(config.steps)
         except ConfigError as e:
             issues.append(ValidationIssue(severity="error", message=str(e)))
         return issues

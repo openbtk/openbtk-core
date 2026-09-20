@@ -203,7 +203,7 @@ class TestValidate:
         assert main(["validate", str(cfg)]) == 1
         assert "sends data offsite" in capsys.readouterr().out
 
-    def test_a_non_linear_pipeline_is_caught_before_running(
+    def test_a_repeated_predecessor_is_caught_before_running(
         self, tmp_path: Path, capsys: pytest.CaptureFixture[str]
     ) -> None:
         cfg = _config(
@@ -211,11 +211,22 @@ class TestValidate:
             _notes(tmp_path),
             extra_steps=(
                 "  - id: chunk\n    type: chunker.clinical_text.section_aware\n"
-                "    after: [load]\n"  # load now has two dependents
+                "    after: [load, load]\n"  # the same predecessor twice
             ),
         )
         assert main(["validate", str(cfg)]) == 1
-        assert "more than one dependent" in capsys.readouterr().out
+        assert "more than once" in capsys.readouterr().out
+
+    def test_a_fan_out_pipeline_is_valid(self, tmp_path: Path) -> None:
+        cfg = _config(
+            tmp_path,
+            _notes(tmp_path),
+            extra_steps=(
+                "  - id: chunk\n    type: chunker.clinical_text.section_aware\n"
+                "    after: [load]\n"  # load now feeds two steps
+            ),
+        )
+        assert main(["validate", str(cfg)]) == 0
 
     def test_json_output(self, tmp_path: Path) -> None:
         proc = _run("validate", str(_config(tmp_path, _notes(tmp_path))), "--json")

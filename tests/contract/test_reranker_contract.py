@@ -9,6 +9,8 @@ import pytest
 from openbtk.core.registry import RERANKER_REGISTRY
 from openbtk.core.schemas import SearchResult
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseReranker
 
@@ -30,7 +32,7 @@ def _sample_results() -> list[SearchResult]:
     return [SearchResult(id=str(i), score=float(i)) for i in range(5)]
 
 
-@pytest.mark.parametrize("key", RERANKER_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(RERANKER_REGISTRY))
 class TestRerankerContract:
     def test_rerank_returns_search_results(self, key: str) -> None:
         reranker = _new_instance(key)

@@ -40,7 +40,7 @@ from pydantic import BaseModel
 from openbtk.core.errors import LoaderError
 from openbtk.core.registry import LOADER_REGISTRY
 
-from .conftest import FixtureRecord, ReferenceLoader, make_exploding_source
+from .conftest import FixtureRecord, ReferenceLoader, enrolled, make_exploding_source
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -146,7 +146,7 @@ def _make_source(key: str, tmp_path: Path) -> Any:
     return iter(["a", "b"])
 
 
-@pytest.mark.parametrize("key", LOADER_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(LOADER_REGISTRY))
 class TestLoaderContract:
     def test_load_returns_iterator(self, key: str, tmp_path: Path) -> None:
         """load() returns a genuine Iterator, not a list (ADR-0004)."""

@@ -28,7 +28,7 @@ from openbtk.core.schemas import TextSpan
 from openbtk.deid.recognizers.base import RECOGNIZER_REGISTRY
 from openbtk.deid.schemas import Detection
 
-from .conftest import ReferenceRecognizer
+from .conftest import ReferenceRecognizer, enrolled
 
 if TYPE_CHECKING:
     from openbtk.deid.recognizers.base import BaseRecognizer
@@ -46,7 +46,7 @@ def _new_instance(key: str) -> BaseRecognizer:
 
 def _parametrized_keys() -> list[Any]:
     params: list[Any] = []
-    for key in RECOGNIZER_REGISTRY.list_keys():
+    for key in enrolled(RECOGNIZER_REGISTRY):
         cls = RECOGNIZER_REGISTRY.get(key)
         if cls.requires_model_download and not _SLOW_TESTS_ENABLED:
             params.append(

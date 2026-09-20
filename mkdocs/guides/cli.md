@@ -38,8 +38,8 @@ openbtk validate pipeline.yaml
 
 `validate` instantiates nothing and reads no data. It checks that every step's
 `type` is registered, that each parameter exists on the component's constructor
-and required ones are present, that the `after` graph is acyclic and a single
-linear chain, and that no step sends data off-site under a policy that forbids
+and required ones are present, that the `after` graph is acyclic (it may fan out and fan in), a step
+names each predecessor once and a loader is a root, and that no step sends data off-site under a policy that forbids
 it. It does not check that a chunker may follow the step before it (no such rule
 is specified yet), nor that your paths exist.
 
@@ -54,6 +54,46 @@ A config with validation errors is refused before anything runs (exit `2`). A ru
 that fails still writes its manifest, with the failure recorded. Manifests hold
 counts, component identity and input digests, never content, and API keys are
 redacted from the config they snapshot.
+
+## Fan-out and fan-in
+
+A pipeline is a DAG, not only a chain. A step with **several dependents** feeds each of
+them every record; a step with **several predecessors** reads their streams interleaved:
+
+```yaml
+name: two-views
+steps:
+  - id: load
+    type: loader.clinical_text.plain_text
+    params: {path: ./notes}
+  - id: deid
+    type: preprocessor.general.deidentify
+    after: [load]
+  - id: fixed
+    type: chunker.clinical_text.fixed_token
+    params: {max_tokens: 256}
+    after: [deid]        # deid feeds two chunkers...
+  - id: by_section
+    type: chunker.clinical_text.section_aware
+    params: {max_tokens: 256}
+    after: [deid]        # ...each of which sees every de-identified note
+```
+
+Things worth knowing:
+
+- **Fan-in is a merge, not a join.** `after: [a, b]` gives the step `a`'s and `b`'s records
+  one at a time in turn. It does not pair records across streams: to attach a patient's
+  structured events to a note, use `join_notes_to_events`. A step that cannot handle a
+  record's type fails, naming itself.
+- **A diamond delivers twice.** If `b` and `c` both read `a` and `d` reads `b` and `c`,
+  `d` receives every record of `a` once by each path.
+- **Memory stays bounded.** The run pulls one record from each end of the graph in turn,
+  so the buffer between branches holds only the lag between them (a chunker that turns one
+  note into many widens it by that many), never the corpus.
+- A guardrail attached to a step sees each of its records **once**, before the split.
+- Every step is in the manifest with its own counts; a failure names the branch it
+  happened in. A step may name each predecessor only once, a loader must be a root, and
+  cycles are still refused by `validate`.
 
 ## Replay a run
 

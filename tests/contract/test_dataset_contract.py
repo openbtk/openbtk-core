@@ -9,6 +9,8 @@ import pytest
 from openbtk.core.errors import DatasetError
 from openbtk.core.registry import DATASET_REGISTRY
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseDatasetAdapter
 
@@ -17,7 +19,7 @@ def _new_instance(key: str) -> BaseDatasetAdapter:
     return DATASET_REGISTRY.create(key)
 
 
-@pytest.mark.parametrize("key", DATASET_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(DATASET_REGISTRY))
 class TestDatasetAdapterContract:
     def test_name_is_a_nonempty_string(self, key: str) -> None:
         ds = _new_instance(key)

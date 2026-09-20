@@ -52,6 +52,13 @@ this repository and are not claimed.
   Identity comes from the component's provenance; every metric must come from an
   `EvalManifest` (there is no way to type a score in); sections that need judgement
   read "Not provided." unless you write them.
+- **Fan-out and fan-in in pipelines** (FR-L-04): a step may feed several steps (each gets
+  every record) or read several (their streams are interleaved); several independent
+  chains may run in one pipeline. **Behaviour change:** these shapes used to be refused
+  with a `ConfigError`; they now run. Fan-in is a merge, not a join, and a diamond delivers
+  each record twice. Memory stays bounded because the run pulls from every leaf in turn (a
+  test shows a lag of at most 3 records against 1999 for a sequential drain). `validate`
+  still refuses a repeated predecessor, a loader with an `after`, and cycles.
 - **Summarisation metrics** (FR-X-05): `openbtk.eval.summarisation` with ROUGE (wraps
   `rouge-score`, extra `eval`) and BERTScore. BERTScore is implemented here on
   `transformers` because the `bert-score` package cannot pin a model revision; the model,

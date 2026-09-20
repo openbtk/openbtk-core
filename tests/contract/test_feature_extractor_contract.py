@@ -8,7 +8,7 @@ import pytest
 
 from openbtk.core.registry import FEATURE_EXTRACTOR_REGISTRY
 
-from .conftest import FixtureChunk
+from .conftest import FixtureChunk, enrolled
 
 if TYPE_CHECKING:
     from openbtk.core.base import BaseFeatureExtractor
@@ -18,7 +18,7 @@ def _new_instance(key: str) -> BaseFeatureExtractor[Any]:
     return FEATURE_EXTRACTOR_REGISTRY.create(key)
 
 
-@pytest.mark.parametrize("key", FEATURE_EXTRACTOR_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(FEATURE_EXTRACTOR_REGISTRY))
 class TestFeatureExtractorContract:
     def test_extract_returns_dict_of_floats(self, key: str) -> None:
         extractor = _new_instance(key)
