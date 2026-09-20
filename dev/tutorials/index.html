@@ -1013,12 +1013,9 @@
 <p>Eight Jupyter notebooks, in order. Each one runs <strong>offline</strong>, downloads no model,
 uses only synthetic data, and is <strong>executed in CI on every change</strong> — a tutorial
 that stopped working would fail the build.</p>
-<p>The notebooks track <code>main</code>. Several use features and fixes newer than the 0.5.0
-release (the command line, QA and groundedness evaluation, <code>DATE_SHIFT</code> beside
-other identifiers, the terminology guardrail's warning-not-block behaviour), so
-install from source until the next release.</p>
+<p>The notebooks need OpenBTK 0.6.0 or later.</p>
 <p>To run them yourself:</p>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[text,ehr,langchain,langgraph,notebooks] @ git+https://github.com/openbtk/openbtk-core.git"</span><span class="w"> </span>faiss-cpu
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[text,ehr,langchain,langgraph,notebooks]"</span><span class="w"> </span>faiss-cpu
 jupyter<span class="w"> </span>lab<span class="w"> </span>notebooks/
 </code></pre></div>
 <table>
