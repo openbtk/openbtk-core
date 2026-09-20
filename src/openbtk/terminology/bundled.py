@@ -63,6 +63,19 @@ _ICD10CM_SUBSET: dict[str, str] = {
 }
 
 
+def bundled_icd10cm_concepts() -> list[Concept]:
+    """The bundled ICD-10-CM subset as concepts (for ``ConceptNormalizer``).
+
+    Example:
+        >>> {c.code for c in bundled_icd10cm_concepts()} >= {"I10", "E11.9"}
+        True
+    """
+    return [
+        Concept(code=code, system=CodeSystem.ICD10CM, display=display)
+        for code, display in _ICD10CM_SUBSET.items()
+    ]
+
+
 @TERMINOLOGY_REGISTRY.register("terminology.general.bundled_minimal")
 class BundledMinimalBackend(BaseTerminologyService):
     """Offline ICD-10-CM lookup over a small, bundled, verified subset.
