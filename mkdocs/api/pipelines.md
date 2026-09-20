@@ -21,3 +21,16 @@ manifest = pipeline.run()
 ::: openbtk.pipelines.pipeline.Pipeline
 
 ::: openbtk.pipelines.pipeline.Step
+
+## Cross-modal joins
+
+Attach a patient's structured events to their notes; see the
+[EHR guide](../guides/ehr.md#joining-notes-to-structured-data).
+
+::: openbtk.pipelines.join.join_notes_to_events
+
+::: openbtk.pipelines.join.index_patients
+
+::: openbtk.pipelines.join.NoteWithEvents
+
+::: openbtk.pipelines.join.MatchedEvent

@@ -167,6 +167,53 @@ What it reads and how, so you can judge whether it fits your feed:
 - The patient identifier (`PID-3`) is PHI. De-identify the records before they leave your
   environment, as for any other source.
 
+## Joining notes to structured data
+
+A note and a patient's codes and measurements often belong together: the discharge
+summary, plus the labs drawn the day before it. `join_notes_to_events` attaches a
+patient's events to each note, by shared encounter, by a time window, or either:
+
+```python
+import contextlib
+import io
+from datetime import UTC, datetime, timedelta
+
+with contextlib.redirect_stdout(io.StringIO()):
+    from openbtk.data.clinical_text.schemas import ClinicalTextRecord
+    from openbtk.data.ehr.schemas import Demographics, Measurement, PatientRecord
+    from openbtk.pipelines import index_patients, join_notes_to_events
+
+noon = datetime(2024, 3, 14, 12, tzinfo=UTC)
+patient = PatientRecord(
+    patient_id="pt-1",
+    demographics=Demographics(),
+    observations=[
+        Measurement(code="718-7", value=13.5, timestamp=noon - timedelta(hours=6)),
+        Measurement(code="718-7", value=12.0, timestamp=noon - timedelta(days=9)),
+    ],
+    source_system="fhir-r4",
+)
+note = ClinicalTextRecord(
+    record_id="n1",
+    source="synthetic",
+    text="Discharge summary.",
+    patient_ref="pt-1",
+    timestamp=noon,
+)
+
+(joined,) = join_notes_to_events(
+    [note], index_patients([patient]), before=timedelta(days=1)
+)
+assert [e.event.value for e in joined.events] == [13.5]  # the older result is outside
+```
+
+The join is on identifiers only: `patient_ref` on the note must equal the record's
+`patient_id`, and it never links by name or date of birth. A note with no `patient_ref`,
+or one that matches no patient, comes back with `patient_found=False` rather than being
+guessed at, so a join across sources that pseudonymise differently is visible as a run of
+`False`, not as silent emptiness. Notes stream; the patients are held as a lookup (one
+entry per patient) or fetched by a function you pass.
+
 ## From EHR to retrieval-ready text
 
 Because the timeline *is* a `ClinicalTextRecord`, de-identify it exactly like a

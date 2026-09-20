@@ -1458,6 +1458,32 @@
       "kind": "function",
       "signature": "() -> list[str]"
     },
+    "openbtk.pipelines.join.MatchedEvent": {
+      "fields": {
+        "event": true,
+        "kind": true,
+        "matched_by": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.pipelines.join.NoteWithEvents": {
+      "fields": {
+        "events": false,
+        "note": true,
+        "patient_found": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.pipelines.join.index_patients": {
+      "kind": "function",
+      "signature": "(patients: Iterable[PatientRecord]) -> dict[str, PatientRecord]"
+    },
+    "openbtk.pipelines.join.join_notes_to_events": {
+      "kind": "function",
+      "signature": "(notes: Iterable[ClinicalTextRecord], patients: Mapping[str, PatientRecord] | Callable[[str], PatientRecord | None], *, on: JoinOn = 'either', before: timedelta = <timedelta>, after: timedelta = <timedelta>) -> Iterator[NoteWithEvents]"
+    },
     "openbtk.pipelines.pipeline.Pipeline": {
       "init": "(name: str, *, version: int = 1, description: str | None = None, policy: PolicyConfig | None = None, provenance: ProvenanceConfig | None = None) -> None",
       "kind": "class",
