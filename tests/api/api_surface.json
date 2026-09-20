@@ -643,7 +643,7 @@
     },
     "openbtk.data.clinical_text.tokenization.count_tokens_exact": {
       "kind": "function",
-      "signature": "(text: str, *, model_name: str = 'microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext') -> int"
+      "signature": "(text: str, *, model_name: str = 'microsoft/BiomedNLP-BiomedBERT-base-uncased-abstract-fulltext', revision: str | None = None) -> int"
     },
     "openbtk.data.ehr.cohort.CohortBuilder": {
       "init": "(records: Iterable[PatientRecord]) -> None",

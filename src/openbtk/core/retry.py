@@ -81,7 +81,11 @@ def retry_with_backoff(
             if attempt == max_attempts - 1:
                 raise
             delay = min(base_delay * (2**attempt), max_delay)
-            delay = max(delay + random.uniform(-jitter * delay, jitter * delay), 0.0)
+            # Retry jitter, not a security value: a predictable PRNG is what we want.
+            delay = max(
+                delay + random.uniform(-jitter * delay, jitter * delay),  # nosec B311
+                0.0,
+            )
             log.warning(
                 "provider.rate_limited_retrying",
                 attempt=attempt + 1,

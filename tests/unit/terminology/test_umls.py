@@ -173,6 +173,53 @@ class TestMap:
             backend.map("E11.9", CodeSystem.ICD10CM, CodeSystem.RXNORM)
 
 
+class TestApiKeyNeverLeaks:
+    """Security review S-1: UMLS takes the key as a query parameter, and httpx
+    puts the full request URL in its error text, so chaining the original error
+    (`raise ... from e`) printed the key in every traceback."""
+
+    def _full_traceback(self, error: BaseException) -> str:
+        import traceback
+
+        return "".join(traceback.format_exception(error))
+
+    def test_a_failed_search_does_not_carry_the_key_in_its_traceback(self) -> None:
+        backend = _backend_with_transport(lambda req: httpx.Response(401, request=req))
+        with pytest.raises(TerminologyError) as exc:
+            backend.resolve("E11.9", CodeSystem.ICD10CM)
+        text = self._full_traceback(exc.value)
+        assert "secret-key" not in text and "apiKey" not in text
+        assert "HTTP 401" in text  # the useful part survives
+
+    def test_a_transport_failure_does_not_carry_the_key_either(self) -> None:
+        def boom(request: httpx.Request) -> httpx.Response:
+            raise httpx.ConnectError("no route", request=request)
+
+        backend = _backend_with_transport(boom)
+        with pytest.raises(TerminologyError) as exc:
+            backend.resolve("E11.9", CodeSystem.ICD10CM)
+        text = self._full_traceback(exc.value)
+        assert "secret-key" not in text
+        assert "ConnectError" in text
+
+    def test_a_failed_atoms_request_does_not_carry_the_key(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
+            if "/search/" in request.url.path:
+                return _search_response([{"ui": "C0011849", "name": "x"}])
+            return httpx.Response(500, request=request)
+
+        backend = _backend_with_transport(handler)
+        with pytest.raises(TerminologyError) as exc:
+            backend.map("E11.9", CodeSystem.ICD10CM, CodeSystem.SNOMED)
+        assert "secret-key" not in self._full_traceback(exc.value)
+
+    def test_the_error_context_never_holds_the_key(self) -> None:
+        backend = _backend_with_transport(lambda req: httpx.Response(401, request=req))
+        with pytest.raises(TerminologyError) as exc:
+            backend.resolve("E11.9", CodeSystem.ICD10CM)
+        assert "secret-key" not in str(exc.value.context)
+
+
 class TestDeclaredAttributes:
     def test_sends_data_offsite_is_true(self) -> None:
         assert UMLSRestBackend.sends_data_offsite is True

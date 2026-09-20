@@ -33,7 +33,19 @@ from openbtk.deid.schemas import Detection, PHICategory
 # to check independently of each other since their prefixes don't collide.
 _PATTERNS: dict[PHICategory, re.Pattern[str]] = {
     PHICategory.SSN: re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
-    PHICategory.EMAIL: re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}\b"),
+    # The local part may start only where a run of local-part characters starts
+    # (the lookbehind), never at every word boundary inside the run. With a
+    # leading ``\b`` the engine restarted the scan at each ``.``/``-`` of
+    # ``a.a.a.a...`` and rescanned the rest of the run: quadratic in the text
+    # length, so ~200 kB of dotted text stalled a document for over a minute
+    # (M11 security review, S-2). A length cap would fix the time but match only
+    # the tail of a long local part and leave its head un-redacted, so the start
+    # is what is anchored, and the whole local part is still matched. The domain
+    # takes any number of dot-separated labels, so ``sub.example.co.uk`` is
+    # redacted whole rather than stopping at ``sub.example`` (S-5).
+    PHICategory.EMAIL: re.compile(
+        r"(?<![A-Za-z0-9._%+-])[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b"
+    ),
     PHICategory.URL: re.compile(r"\bhttps?://[^\s,;]+"),
     PHICategory.IP_ADDRESS: re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b"),
     PHICategory.DATE: re.compile(r"\b\d{1,2}/\d{1,2}/\d{4}\b"),

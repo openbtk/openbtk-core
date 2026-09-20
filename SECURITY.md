@@ -23,7 +23,16 @@ somewhere it should not is handled as critical, specifically:
 
 ## Supported Versions
 
-Pre-1.0. Only the latest release receives fixes.
+Pre-1.0. Only the latest release receives fixes. From 1.0 the
+[stability policy](https://openbtk.org/openbtk-core/dev/stability/) applies; security
+fixes may change behaviour in a patch release.
+
+## What has been reviewed
+
+The [security review](https://openbtk.org/openbtk-core/dev/security-review/) lists the
+findings, what was checked and found clean, and, as plainly, what was not done: it is
+an internal review, not an independent audit. Static analysis, a secret scan and a
+dependency audit run in CI on every change, and the dependency audit weekly.
 
 ## Scope
 

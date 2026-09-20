@@ -114,6 +114,21 @@ _SENTENCE_BOUNDARY_RE = re.compile(r"[.!?]+(?=\s|$)")
 _WORD_RE = re.compile(r"\S+\s*")
 
 
+def _word_before(text: str, start: int, end: int) -> str:
+    """The run of word characters that ends at ``end`` (not before ``start``).
+
+    A backwards scan, not ``re.search(r"(\\w+)$", text[start:end])``: that copies
+    the slice and, on a long word followed by punctuation, retries from every
+    position -- quadratic, and ``start`` does not advance across a run of
+    abbreviations ("Dr. Dr. Dr. ...") so the slice kept growing (M11 security
+    review, S-4).
+    """
+    i = end
+    while i > start and (text[i - 1].isalnum() or text[i - 1] == "_"):
+        i -= 1
+    return text[i:end]
+
+
 def _split_sentences(text: str) -> list[tuple[int, int]]:
     """Split ``text`` into (start, end) spans that together cover the
     WHOLE input with no gap and no overlap -- concatenating
@@ -125,8 +140,7 @@ def _split_sentences(text: str) -> list[tuple[int, int]]:
     spans: list[tuple[int, int]] = []
     start = 0
     for m in _SENTENCE_BOUNDARY_RE.finditer(text):
-        word_before = re.search(r"(\w+)$", text[start : m.start()])
-        if word_before and word_before.group(1).lower() in _ABBREVIATIONS:
+        if _word_before(text, start, m.start()).lower() in _ABBREVIATIONS:
             continue
         end = m.end()
         while end < len(text) and text[end].isspace():

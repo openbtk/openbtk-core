@@ -1,0 +1,17 @@
+# Keeps the SHA-pinned GitHub Actions (supply-chain hardening, M11 review S-6) and the
+# dependency ranges current. Updates arrive as reviewed PRs, so a moved upstream tag
+# can never change what our release workflow runs without a diff to read.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
