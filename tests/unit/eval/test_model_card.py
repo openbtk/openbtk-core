@@ -132,11 +132,11 @@ class TestMarkdown:
         card = ModelCard.for_component(
             CrossEncoderReranker(),
             intended_use="Reranking passages.",
-            contact="team@example.org",
+            contact="the evaluation team",
         )
         text = card.to_markdown()
         assert "## Intended use\n\nReranking passages." in text
-        assert "team@example.org" in text
+        assert "the evaluation team" in text
 
     def test_the_identity_section_names_the_pinned_revision(self) -> None:
         text = _card().to_markdown()

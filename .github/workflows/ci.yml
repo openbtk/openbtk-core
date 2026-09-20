@@ -259,7 +259,16 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e ".[docs,langchain]"
-      - run: mkdocs build --strict
+      - name: Build the docs (strict)
+        shell: bash
+        run: |
+          mkdocs build --strict 2>&1 | tee mkdocs.out
+          status=${PIPESTATUS[0]}
+          if [ "$status" != "0" ]; then
+            echo "::error title=docs-build failed::$(grep -E 'WARNING|ERROR|Error' mkdocs.out | head -c 1500 | tr '
+' '|')"
+          fi
+          exit "$status"
 
   build:
     runs-on: ubuntu-latest
