@@ -13,6 +13,7 @@
   "feature_extractor": [],
   "guardrail": [
     "guardrail.ehr.code_validity",
+    "guardrail.ehr.k_anonymity",
     "guardrail.ehr.referential",
     "guardrail.ehr.units",
     "guardrail.general.dose_plausibility",

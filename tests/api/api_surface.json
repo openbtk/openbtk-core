@@ -669,6 +669,10 @@
       "kind": "function",
       "signature": "(code: str, *, system: CodeSystem | None = None) -> Predicate"
     },
+    "openbtk.data.ehr.cohort.quasi_identifiers": {
+      "kind": "function",
+      "signature": "(records: Iterable[PatientRecord], fields: Sequence[str] = ('birth_year', 'gender', 'race', 'ethnicity'), *, as_of: date | None = None, include_id: bool = False) -> Iterator[dict[str, object]]"
+    },
     "openbtk.data.ehr.fhir.FHIRLoader": {
       "init": "()",
       "kind": "class",
@@ -770,6 +774,64 @@
       "members": {
         "deidentify": "(text: str, *, patient_id: str, document_id: str | None = None) -> DeidResult"
       }
+    },
+    "openbtk.deid.kanonymity.AnonymisationResult": {
+      "fields": {
+        "levels": true,
+        "n_input": true,
+        "n_suppressed": true,
+        "report": true,
+        "rows": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.kanonymity.KAnonymityReport": {
+      "fields": {
+        "k": true,
+        "k_achieved": true,
+        "n_below_k": true,
+        "n_classes": true,
+        "n_records": true,
+        "n_unique": true,
+        "quasi_identifiers": true,
+        "satisfied": true,
+        "smallest_classes": false
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.deid.kanonymity.anonymise_to_k": {
+      "kind": "function",
+      "signature": "(rows: Iterable[Mapping[str, object]], quasi_identifiers: Sequence[str], *, k: int, ladders: Mapping[str, Sequence[Generaliser]] | None = None, max_suppression: float = 0.05, keep: Sequence[str] = ()) -> AnonymisationResult"
+    },
+    "openbtk.deid.kanonymity.band": {
+      "kind": "function",
+      "signature": "(width: int, *, top: int | None = None) -> Generaliser"
+    },
+    "openbtk.deid.kanonymity.identity": {
+      "kind": "function",
+      "signature": "(value: object) -> Hashable"
+    },
+    "openbtk.deid.kanonymity.k_anonymity_report": {
+      "kind": "function",
+      "signature": "(rows: Iterable[Mapping[str, object]], quasi_identifiers: Sequence[str], *, k: int) -> KAnonymityReport"
+    },
+    "openbtk.deid.kanonymity.prefix": {
+      "kind": "function",
+      "signature": "(digits: int) -> Generaliser"
+    },
+    "openbtk.deid.kanonymity.star": {
+      "kind": "function",
+      "signature": "(value: object) -> Hashable"
+    },
+    "openbtk.deid.kanonymity.top_code": {
+      "kind": "function",
+      "signature": "(limit: int) -> Generaliser"
+    },
+    "openbtk.deid.kanonymity.zip_ladder": {
+      "kind": "function",
+      "signature": "(length: int = 5) -> tuple[Generaliser, ...]"
     },
     "openbtk.deid.labelled.LabelledDocument": {
       "fields": {
@@ -1169,6 +1231,15 @@
         "check": "(payload: Any) -> GuardrailResult",
         "provenance": "() -> ComponentProvenance",
         "registry_key": "= 'guardrail.general.dose_plausibility'"
+      }
+    },
+    "openbtk.guardrails.ehr.CohortKAnonymityGuardrail": {
+      "init": "(*, k: int = 5, quasi_identifiers: Sequence[str] = ('birth_year', 'gender', 'race', 'ethnicity'), as_of: date | str | None = None) -> None",
+      "kind": "class",
+      "members": {
+        "check": "(payload: Any) -> GuardrailResult",
+        "provenance": "() -> ComponentProvenance",
+        "registry_key": "= 'guardrail.ehr.k_anonymity'"
       }
     },
     "openbtk.guardrails.ehr.EHRCodeValidityGuardrail": {

@@ -26,6 +26,8 @@ check. Whether a `BLOCK` halts a pipeline is the caller's policy. Import
 
 ::: openbtk.guardrails.ehr.UnitPlausibilityGuardrail
 
+::: openbtk.guardrails.ehr.CohortKAnonymityGuardrail
+
 ## Composing guardrails
 
 ::: openbtk.guardrails.pipeline.GuardrailPipeline

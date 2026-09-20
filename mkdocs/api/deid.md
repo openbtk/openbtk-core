@@ -27,6 +27,28 @@ result = engine.deidentify(text, patient_id="hashed-123")
 
 ::: openbtk.deid.schemas.RiskEstimate
 
+## Structured data: k-anonymity
+
+::: openbtk.deid.kanonymity.k_anonymity_report
+
+::: openbtk.deid.kanonymity.KAnonymityReport
+
+::: openbtk.deid.kanonymity.anonymise_to_k
+
+::: openbtk.deid.kanonymity.AnonymisationResult
+
+::: openbtk.deid.kanonymity.band
+
+::: openbtk.deid.kanonymity.top_code
+
+::: openbtk.deid.kanonymity.prefix
+
+::: openbtk.deid.kanonymity.zip_ladder
+
+::: openbtk.deid.kanonymity.identity
+
+::: openbtk.deid.kanonymity.star
+
 ## Extending: recognizers
 
 A recognizer finds candidate PHI spans; the engine merges them, filters by

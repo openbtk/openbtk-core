@@ -36,7 +36,7 @@ from typing import TYPE_CHECKING
 from openbtk.data.ehr.schemas import PatientRecord
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Iterator
+    from collections.abc import Iterable, Iterator, Sequence
 
     from openbtk.core.schemas import CodeSystem
     from openbtk.data.ehr.schemas import CodedEvent
@@ -162,3 +162,90 @@ class CohortBuilder:
                 p(record) for p in self._excludes
             ):
                 yield record
+
+
+QUASI_IDENTIFIER_FIELDS = (
+    "birth_year",
+    "age",
+    "gender",
+    "race",
+    "ethnicity",
+    "admission_year",
+    "admission_month",
+)
+"""The attributes :func:`quasi_identifiers` can read from a ``PatientRecord``."""
+
+
+def _age_on(born: date, as_of: date) -> int | None:
+    years = as_of.year - born.year - ((as_of.month, as_of.day) < (born.month, born.day))
+    return years if years >= 0 else None
+
+
+def quasi_identifiers(
+    records: Iterable[PatientRecord],
+    fields: Sequence[str] = ("birth_year", "gender", "race", "ethnicity"),
+    *,
+    as_of: date | None = None,
+    include_id: bool = False,
+) -> Iterator[dict[str, object]]:
+    """Yield one row per patient with the attributes a person could be linked on.
+
+    The bridge from a cohort to ``openbtk.deid.kanonymity.k_anonymity_report`` and
+    ``anonymise_to_k``. Streaming: one row is built per record and nothing is retained.
+
+    Args:
+        records: The cohort.
+        fields: Which attributes to read: ``birth_year``, ``age`` (whole years as of
+            ``as_of``), ``gender``, ``race``, ``ethnicity``, ``admission_year`` and
+            ``admission_month`` (``YYYY-MM``), the latter two from the earliest
+            encounter. An attribute a record does not have is ``None``.
+        as_of: The date ``age`` is computed on. Required when ``age`` is asked for,
+            because an age that depends on today's date would make results differ
+            between runs.
+        include_id: Also emit ``patient_id``. It is never a quasi-identifier; it is for
+            ``keep=`` when you need to join the exported table back.
+
+    Raises:
+        ValueError: On an unknown field, or ``age`` without ``as_of``.
+
+    Example:
+        >>> from openbtk.data.ehr.schemas import Demographics
+        >>> patient = PatientRecord(
+        ...     patient_id="pt-1",
+        ...     demographics=Demographics(birth_date=date(1980, 6, 1), gender="female"),
+        ...     source_system="fhir-r4",
+        ... )
+        >>> list(quasi_identifiers([patient], ["birth_year", "gender"]))
+        [{'birth_year': 1980, 'gender': 'female'}]
+    """
+    unknown = [f for f in fields if f not in QUASI_IDENTIFIER_FIELDS]
+    if unknown:
+        raise ValueError(
+            f"unknown quasi-identifier(s) {unknown}; choose from "
+            f"{list(QUASI_IDENTIFIER_FIELDS)}"
+        )
+    if "age" in fields and as_of is None:
+        raise ValueError("age needs as_of=, so the result does not depend on today")
+    for record in records:
+        demographics = record.demographics
+        starts = [e.start for e in record.encounters if e.start is not None]
+        first = min(starts) if starts else None
+        values: dict[str, object] = {
+            "birth_year": demographics.birth_date.year
+            if demographics.birth_date
+            else None,
+            "age": (
+                _age_on(demographics.birth_date, as_of)
+                if demographics.birth_date and as_of
+                else None
+            ),
+            "gender": demographics.gender,
+            "race": demographics.race,
+            "ethnicity": demographics.ethnicity,
+            "admission_year": first.year if first else None,
+            "admission_month": f"{first.year:04d}-{first.month:02d}" if first else None,
+        }
+        row = {name: values[name] for name in fields}
+        if include_id:
+            row["patient_id"] = record.patient_id
+        yield row

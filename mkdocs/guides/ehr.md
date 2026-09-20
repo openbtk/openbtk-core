@@ -143,8 +143,10 @@ assert clean.deid_status.value == "deidentified"
 `guardrail.ehr.code_validity` checks that coded events use codes their system
 recognises, `guardrail.ehr.referential` finds events that point at a missing
 encounter or fall outside its window, and `guardrail.ehr.units` flags
-implausible lab units and values. They return results rather than raising; see
-the [guardrails reference](../api/guardrails.md).
+implausible lab units and values. `guardrail.ehr.k_anonymity` checks that an exported
+cohort cannot be narrowed to fewer than `k` people by its quasi-identifiers (see
+[k-anonymity](deidentification.md#structured-data-k-anonymity)). They return results
+rather than raising; see the [guardrails reference](../api/guardrails.md).
 
 ## Limits worth knowing
 

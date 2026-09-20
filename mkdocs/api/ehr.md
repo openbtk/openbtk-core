@@ -40,3 +40,5 @@ See the [EHR guide](../guides/ehr.md) for a worked example.
 ::: openbtk.data.ehr.cohort.has_procedure
 
 ::: openbtk.data.ehr.cohort.age_between
+
+::: openbtk.data.ehr.cohort.quasi_identifiers

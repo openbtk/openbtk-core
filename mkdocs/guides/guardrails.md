@@ -22,6 +22,7 @@ print(result.passed, [r.severity.value for r in result.results])
 | `guardrail.general.groundedness` | claims are supported by the source | nothing (word overlap, see below) |
 | `guardrail.general.dose_plausibility` | drug doses, daily totals and routes against **your** limits | a reference table you supply |
 | `guardrail.ehr.code_validity` / `.referential` / `.units` | a `PatientRecord` | the `ehr` extra |
+| `guardrail.ehr.k_anonymity` | a cohort cannot be narrowed below `k` people | the `ehr` extra |
 
 ## Dose plausibility
 
