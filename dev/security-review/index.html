@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/quickstart/">
+        <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/security-review/">
       
       
-        <link rel="prev" href="..">
+        <link rel="prev" href="../stability/">
       
       
-        <link rel="next" href="../tutorials/">
+        <link rel="next" href="../api/core/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>Quick start - OpenBTK</title>
+        <title>Security review - OpenBTK</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#quick-start" class="md-skip">
+        <a href="#security-review" class="md-skip">
           Skip to content
         </a>
       
@@ -120,7 +120,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Quick start
+              Security review
             
           </span>
         </div>
@@ -290,37 +290,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Quick start
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
         
   
   
@@ -336,59 +309,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#installing" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Installing
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#a-real-pipeline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        A real pipeline
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#inspecting-the-run" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Inspecting the run
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -705,10 +625,37 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../security-review/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Security review
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -724,6 +671,142 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Findings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Findings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#s-1-the-umls-api-key-in-tracebacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-1: the UMLS API key in tracebacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-2-and-s-4-quadratic-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-2 and S-4: quadratic patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-3-an-unpinned-model-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-3: an unpinned model download
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-5-a-leak-the-timing-work-turned-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-5: a leak the timing work turned up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-6-build-and-release-supply-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-6: build and release supply chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checked-no-issue-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checked, no issue found
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kept-honest-by-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Kept honest by CI
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-this-review-did-not-do" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What this review did not do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeating-this-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repeating this review
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1122,10 +1205,82 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installing" class="md-nav__link">
+  <a href="#findings" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Installing
+        Findings
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Findings">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#s-1-the-umls-api-key-in-tracebacks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-1: the UMLS API key in tracebacks
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-2-and-s-4-quadratic-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-2 and S-4: quadratic patterns
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-3-an-unpinned-model-download" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-3: an unpinned model download
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-5-a-leak-the-timing-work-turned-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-5: a leak the timing work turned up
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s-6-build-and-release-supply-chain" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        S-6: build and release supply chain
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checked-no-issue-found" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checked, no issue found
       
     </span>
   </a>
@@ -1133,10 +1288,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#a-real-pipeline" class="md-nav__link">
+  <a href="#kept-honest-by-ci" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A real pipeline
+        Kept honest by CI
       
     </span>
   </a>
@@ -1144,10 +1299,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#inspecting-the-run" class="md-nav__link">
+  <a href="#what-this-review-did-not-do" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Inspecting the run
+        What this review did not do
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#repeating-this-review" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Repeating this review
       
     </span>
   </a>
@@ -1174,92 +1340,198 @@
   
 
 
-<h1 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h1>
-<h2 id="installing">Installing<a class="headerlink" href="#installing" title="Permanent link">&para;</a></h2>
+<h1 id="security-review">Security review<a class="headerlink" href="#security-review" title="Permanent link">&para;</a></h1>
+<p>An <strong>internal</strong> review of OpenBTK's own code and build, done for the 1.0 milestone
+(M11, task 11.2) by the maintainers' tooling and reading of the source. It is <strong>not</strong> an
+independent audit or a penetration test, and this page does not claim to be one; see
+<a href="#what-this-review-did-not-do">what this review did not do</a>. To report a
+vulnerability, use <a href="https://github.com/openbtk/openbtk-core/blob/main/SECURITY.md">SECURITY.md</a>.</p>
+<p>OpenBTK handles protected health information, so the questions asked were the ones
+that matter for it: can PHI or a credential reach a log, an error, a manifest or a
+cache; can untrusted input stall or crash a worker; and what does installing and
+releasing the package trust.</p>
+<h2 id="findings">Findings<a class="headerlink" href="#findings" title="Permanent link">&para;</a></h2>
+<p>Six findings, all fixed on the branch this page ships on. Each has a test that fails
+without the fix.</p>
 <table>
 <thead>
 <tr>
-<th>What you get</th>
-<th>Command</th>
+<th>ID</th>
+<th>Finding</th>
+<th>Impact</th>
+<th>Present in</th>
+<th>Fixed by</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Core + clinical text (loaders, de-id, chunking, pipelines)</td>
-<td><code>pip install "openbtk[text]"</code></td>
+<td>S-1</td>
+<td>The UMLS API key was printed in tracebacks</td>
+<td>Credential disclosure</td>
+<td>0.5.0</td>
+<td>Chained error is now the exception type and HTTP status only</td>
 </tr>
 <tr>
-<td>Everything</td>
-<td><code>pip install "openbtk[text,ehr,retrieval,llms,langchain]"</code></td>
+<td>S-2</td>
+<td>Email pattern was quadratic in the input length</td>
+<td>Availability</td>
+<td>every release since 0.1.0rc1</td>
+<td>Match may only start where a run of local-part characters starts</td>
 </tr>
 <tr>
-<td>Core only (registry, config, provenance — no modality)</td>
-<td><code>pip install openbtk</code></td>
+<td>S-3</td>
+<td>The exact tokenizer was downloaded from a moving Hub branch</td>
+<td>Supply chain</td>
+<td>every release since 0.1.0rc1</td>
+<td>Default model pinned to a commit; other models warn until pinned</td>
 </tr>
 <tr>
-<td>Latest <code>main</code> from source</td>
-<td><code>pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"</code></td>
+<td>S-4</td>
+<td>Two more quadratic patterns: the QA answer parser and the sentence splitter</td>
+<td>Availability</td>
+<td>splitter: every release since 0.1.0rc1; QA parser: 0.6.0</td>
+<td>Unambiguous pattern; backwards scan</td>
+</tr>
+<tr>
+<td>S-5</td>
+<td>Emails on multi-label domains were only partly redacted</td>
+<td>PHI left in output</td>
+<td>every release since 0.1.0rc1</td>
+<td>Domain accepts dot-separated labels</td>
+</tr>
+<tr>
+<td>S-6</td>
+<td>CI and release actions were pinned by mutable tag</td>
+<td>Supply chain</td>
+<td>all</td>
+<td>Pinned to commit SHAs, updated by Dependabot</td>
 </tr>
 </tbody>
 </table>
-<p>Optional extras: <code>text</code>, <code>ehr</code>, <code>retrieval</code>, <code>llms</code>, <code>langchain</code>, <code>langgraph</code>.
-A component that needs one says which, by name, when you construct it.</p>
-<p>The optional NER recognizer additionally needs a downloaded spaCy model:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>-m<span class="w"> </span>spacy<span class="w"> </span>download<span class="w"> </span>en_core_web_sm
+<h3 id="s-1-the-umls-api-key-in-tracebacks">S-1: the UMLS API key in tracebacks<a class="headerlink" href="#s-1-the-umls-api-key-in-tracebacks" title="Permanent link">&para;</a></h3>
+<p>UMLS takes its key as a <strong>query parameter</strong>. <code>httpx</code> puts the full request URL in the
+text of its errors, and the backend chained the original error (<code>raise ... from e</code>),
+so any traceback that reached a log, a CI console or a crash reporter contained
+<code>apiKey=...</code>. The raised <code>TerminologyError</code> itself never carried it, which is why the
+existing "no PHI in errors" tests did not catch it.</p>
+<p>The chained cause is now a fresh exception naming only the error type and HTTP
+status. <strong>If you used <code>terminology.general.umls</code> with 0.5.0 and its tracebacks were
+logged anywhere shared, rotate the key.</strong> The OpenAI-compatible provider sends its key
+in a header and its errors carry the URL only; that path was checked and needs no
+change.</p>
+<h3 id="s-2-and-s-4-quadratic-patterns">S-2 and S-4: quadratic patterns<a class="headerlink" href="#s-2-and-s-4-quadratic-patterns" title="Permanent link">&para;</a></h3>
+<p>A regular expression whose running time grows with the <em>square</em> of the input turns one
+crafted document into a stalled worker. Found by timing every pattern that reads
+document or model text against adversarial input (long runs of <code>a.</code>, <code>a-</code>, digits,
+spaces, <code>@</code>, and so on) at doubling sizes.</p>
+<ul>
+<li>The <strong>email</strong> pattern started a fresh scan at every word boundary, so <code>a.a.a.a...</code>
+  rescanned the rest of the run each time, so each doubling of the input roughly
+  quadrupled the time (reproduce it by running the old pattern,
+  <code>\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+\.[A-Za-z]{2,}\b</code>, on <code>"a." * n</code>). Every
+  rule-based de-identification call was exposed to it. The <code>SN-</code> and <code>MRN-</code> shapes
+  triggered it too.</li>
+<li>The QA <strong>answer parser</strong> (<code>\s*(?:is|:)?\s*</code>) had two adjacent whitespace groups that
+  a run of spaces could be split between in quadratic ways; it parses <em>model output</em>.</li>
+<li>The <strong>sentence splitter</strong> re-ran a search over a slice that kept growing across a
+  run of abbreviations (<code>Dr. Dr. Dr. ...</code>), and rescanned a long word from every
+  position.</li>
+</ul>
+<p>A length cap would have fixed the email time but matched only the <em>tail</em> of a long
+address and left its head un-redacted, which is worse than being slow. The fix
+instead anchors where a match may start, so every address is still matched whole
+(pinned by a test). <code>tests/security/test_redos.py</code> feeds each pattern adversarial
+input at 100 kB and requires a result within 3 seconds, which linear code beats by two
+orders of magnitude and the old code missed by a wide margin.</p>
+<h3 id="s-3-an-unpinned-model-download">S-3: an unpinned model download<a class="headerlink" href="#s-3-an-unpinned-model-download" title="Permanent link">&para;</a></h3>
+<p><code>count_tokens_exact</code> loaded a Hugging Face tokenizer by name, which follows the
+repository's default branch: whoever controls that repository could change what code
+and files are loaded. The default model is now pinned to a specific commit (the
+current <code>main</code>, recorded in the source), and a model you name yourself is loaded
+unpinned only with a warning until you pass <code>revision=</code>.</p>
+<h3 id="s-5-a-leak-the-timing-work-turned-up">S-5: a leak the timing work turned up<a class="headerlink" href="#s-5-a-leak-the-timing-work-turned-up" title="Permanent link">&para;</a></h3>
+<p>While fixing S-2 a test for <code>user@sub.example.co.uk</code> showed the old pattern matched
+only <code>user@sub.example</code>, leaving <code>.co.uk</code> in the de-identified text. A domain suffix
+is a weak identifier, but it is what a de-identifier is for.</p>
+<h3 id="s-6-build-and-release-supply-chain">S-6: build and release supply chain<a class="headerlink" href="#s-6-build-and-release-supply-chain" title="Permanent link">&para;</a></h3>
+<p>Every third-party GitHub Action, including the one that publishes to PyPI, was
+referenced by a tag an upstream owner can move. They are now pinned to commit SHAs
+(the tag is kept in a comment), and Dependabot proposes updates as reviewable pull
+requests. PyPI publishing already used a protected environment with manual approval
+and trusted publishing (no long-lived token).</p>
+<h2 id="checked-no-issue-found">Checked, no issue found<a class="headerlink" href="#checked-no-issue-found" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>No PHI or credentials in logs, errors, manifests or reports.</strong> Covered by the
+  existing adversarial <code>tests/security/</code> suite; the review additionally read every
+  place an error context is built. <code>RunManifest</code> and <code>EvalManifest</code> hold identifiers
+  and counts only, and the executor redacts parameters whose names look secret.</li>
+<li><strong>Static analysis.</strong> Bandit 1.9.4 over <code>src/</code> reported five things, and none is
+  left unexplained: the unpinned download (S-3, fixed); the stdlib XML parser (B405,
+  B314: the n2c2 reader refuses any <code>DOCTYPE</code> or <code>ENTITY</code> first, the input that makes it
+  unsafe, so <code>defusedxml</code> would add a seventh dependency for nothing); the retry
+  back-off's use of <code>random</code> (B311: jitter, not a secret); and a false positive on the
+  word "token" in a constant's name (B105). Each suppression carries its reason on
+  the line, and CI fails on any new medium-or-higher finding.</li>
+<li><strong>No dynamic code execution.</strong> No <code>eval</code>, <code>exec</code>, <code>pickle</code>, <code>subprocess</code>, <code>os.system</code>
+  or <code>shell=True</code> in the library; configuration is read with <code>yaml.safe_load</code>.</li>
+<li><strong>Known vulnerabilities in dependencies.</strong> <code>pip-audit</code> over the zero-extras install
+  (the six core dependencies) and the light extras (<code>ehr</code>, <code>langchain</code>, <code>langgraph</code>)
+  found none at the time of review. Auditing a full development environment, with the
+  heavy extras, did report advisories in two third-party packages, neither of which
+  has a fixed release, and neither of which OpenBTK's use reaches:<ul>
+<li><strong><code>chromadb</code></strong> (five advisories, all about the Chroma <em>server</em>: authorisation
+  between tenants, and remote code through a server API that loads a model
+  repository). OpenBTK uses only the in-process client (<code>Client</code> and
+  <code>PersistentClient</code>), never <code>HttpClient</code>, never runs a Chroma server, and never
+  passes <code>trust_remote_code</code>. If you run a Chroma server yourself, that exposure is
+  yours; keep it off untrusted networks.</li>
+<li><strong><code>nltk</code></strong> (a model-path validation advisory). OpenBTK does not depend on it; it
+  arrives through <code>medspacy_quickumls</code> when that optional package is installed.</li>
+</ul>
+</li>
+<li><strong>No secrets in the repository.</strong> <code>detect-secrets</code> over every tracked file.</li>
+<li><strong>Off-site policy.</strong> A component that would send text off the machine is refused
+  by config validation unless the policy allows it; this is tested.</li>
+<li><strong>Constructors do no I/O</strong>, so <code>openbtk validate</code> and config checks cannot trigger a
+  download or a network call.</li>
+</ul>
+<h2 id="kept-honest-by-ci">Kept honest by CI<a class="headerlink" href="#kept-honest-by-ci" title="Permanent link">&para;</a></h2>
+<p>These checks now run on every pull request (the <code>security</code> job) and, for dependencies,
+weekly against <code>main</code>, because a vulnerability can be published without any commit
+here:</p>
+<ul>
+<li><code>bandit -ll</code> over <code>src/</code></li>
+<li><code>detect-secrets</code> over tracked files</li>
+<li><code>pip-audit</code> on the core install and the light extras</li>
+<li>the ReDoS timing tests, in the normal test run</li>
+</ul>
+<h2 id="what-this-review-did-not-do">What this review did not do<a class="headerlink" href="#what-this-review-did-not-do" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>It was not independent.</strong> The people who wrote the code reviewed it, with
+  tooling. For a v1.0 that hospitals rely on, an external review is still worth having;
+  this page is the material to hand to one, not a substitute.</li>
+<li><strong>No fuzzing campaign and no penetration test.</strong> The timing probes were targeted, at
+  the patterns that read text; other parsers (FHIR, HL7 v2, OMOP, JSON Lines) rely on
+  their parsing libraries and standard-library readers, and were read but not fuzzed.</li>
+<li><strong>Third-party models and services are outside its scope.</strong> Model weights (spaCy,
+  Hugging Face), LLM providers and the UMLS service are the operator's trust
+  decisions. OpenBTK's controls are the off-site policy, pinning where it loads a model
+  itself, and never logging content.</li>
+<li><strong>The heavy extras are not audited in CI</strong> (torch, transformers, spaCy, FAISS,
+  Chroma and similar): their advisories change often, and the ones found in the
+  review are listed above. Track them with Dependabot or <code>pip-audit</code> on your own lock
+  file.</li>
+<li><strong>De-identification is not perfect.</strong> A recognizer that misses an identifier is a
+  privacy failure of a kind no scanner finds. Measured recall is on the
+  <a href="../benchmarks/">benchmarks page</a>, and the i2b2/n2c2 number is still to be published.</li>
+</ul>
+<h2 id="repeating-this-review">Repeating this review<a class="headerlink" href="#repeating-this-review" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>bandit<span class="w"> </span>-r<span class="w"> </span>src<span class="w"> </span>-ll<span class="w">                       </span><span class="c1"># static analysis</span>
+pip-audit<span class="w">                               </span><span class="c1"># in an environment with the extras you use</span>
+pytest<span class="w"> </span>tests/security<span class="w">                   </span><span class="c1"># PHI-leak and timing tests</span>
 </code></pre></div>
-<h2 id="a-real-pipeline">A real pipeline<a class="headerlink" href="#a-real-pipeline" title="Permanent link">&para;</a></h2>
-<p>This example is extracted from the project README and executed in CI on
-every change (<code>tests/unit/test_readme.py</code>), so it cannot silently go stale.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">clinical_text</span>  <span class="c1"># noqa: F401 -- registers loaders/preprocessors/chunkers</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.pipelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">Step</span>
-
-<span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">notes_dir</span><span class="p">:</span>
-    <span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">notes_dir</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"note1.txt"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
-        <span class="s2">"Chief Complaint:</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"Patient SSN: 123-45-6789 reports chest pain.</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"Plan:</span><span class="se">\n</span><span class="s2">"</span>
-        <span class="s2">"Admit for observation.</span><span class="se">\n</span><span class="s2">"</span>
-    <span class="p">)</span>
-
-    <span class="n">pipeline</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">Pipeline</span><span class="p">(</span><span class="s2">"clinical-rag"</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Step</span><span class="p">(</span><span class="s2">"load"</span><span class="p">,</span> <span class="s2">"loader.clinical_text.plain_text"</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">notes_dir</span><span class="p">))</span>
-        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Step</span><span class="p">(</span><span class="s2">"deid"</span><span class="p">,</span> <span class="s2">"preprocessor.general.deidentify"</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"surrogate"</span><span class="p">))</span>
-        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Step</span><span class="p">(</span><span class="s2">"segment"</span><span class="p">,</span> <span class="s2">"preprocessor.clinical_text.section_segment"</span><span class="p">))</span>
-        <span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">Step</span><span class="p">(</span><span class="s2">"chunk"</span><span class="p">,</span> <span class="s2">"chunker.clinical_text.section_aware"</span><span class="p">,</span> <span class="n">max_tokens</span><span class="o">=</span><span class="mi">200</span><span class="p">))</span>
-    <span class="p">)</span>
-    <span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>  <span class="c1"># structured JSON logs, not errors</span>
-        <span class="n">manifest</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
-
-<span class="k">assert</span> <span class="n">manifest</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"success"</span>
-<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">manifest</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">step_id</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">step</span><span class="o">.</span><span class="n">records_out</span><span class="si">}</span><span class="s2"> record(s)"</span><span class="p">)</span>
-<span class="c1"># load: 1 record(s)</span>
-<span class="c1"># deid: 1 record(s)</span>
-<span class="c1"># segment: 1 record(s)</span>
-<span class="c1"># chunk: 2 record(s)</span>
-</code></pre></div>
-<p>Every submodule you use (here, <code>openbtk.data.clinical_text</code>) must be
-imported explicitly — <code>import openbtk</code> alone stays deliberately light (no
-modality module, no heavy dependency, under 500&nbsp;ms) so <code>pip install
-openbtk</code> with zero extras still works.</p>
-<h2 id="inspecting-the-run">Inspecting the run<a class="headerlink" href="#inspecting-the-run" title="Permanent link">&para;</a></h2>
-<p><code>pipeline.run()</code> returns a <a class="autorefs autorefs-internal" title="openbtk.core.provenance.RunManifest" href="../api/core/#openbtk.core.provenance.RunManifest"><code>RunManifest</code></a>
-— never the processed records themselves. It carries per-step throughput,
-component identity, and (when a guardrail is attached) aggregated
-pass/warn/block counts, all with no document content anywhere in it:</p>
-<div class="highlight"><pre><span></span><code><span class="nb">print</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">status</span><span class="p">)</span>  <span class="c1"># "success" or "failed"</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">manifest</span><span class="o">.</span><span class="n">run_id</span><span class="p">)</span>  <span class="c1"># a fresh id per run</span>
-<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="n">manifest</span><span class="o">.</span><span class="n">steps</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">step</span><span class="o">.</span><span class="n">step_id</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">component</span><span class="o">.</span><span class="n">class_name</span><span class="p">,</span> <span class="n">step</span><span class="o">.</span><span class="n">records_out</span><span class="p">)</span>
-</code></pre></div>
-<p>See the <a href="../api/pipelines/">API reference</a> for the full shape of
-<code>RunManifest</code>, <code>StepProvenance</code>, and the <code>Pipeline</code>/<code>Step</code> builder.</p>
+<p>When you add a regular expression that reads document text, add its adversarial input
+to <code>tests/security/test_redos.py</code>.</p>
 
 
 
