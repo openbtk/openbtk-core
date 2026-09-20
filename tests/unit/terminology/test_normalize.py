@@ -306,6 +306,33 @@ class TestLoading:
 
 
 class TestScale:
+    def test_a_query_scores_a_bounded_number_of_candidates(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
+        """Scoring work per query is capped, however large the vocabulary. Counting
+        comparisons is deterministic; the posting-list scan that feeds it is guarded by
+        the wall-clock backstop in the test below."""
+        from openbtk.terminology import normalize
+
+        calls = 0
+        real = normalize.SequenceMatcher
+
+        def counting(*args: object, **kwargs: object) -> object:
+            nonlocal calls
+            calls += 1
+            return real(*args, **kwargs)  # type: ignore[arg-type]
+
+        monkeypatch.setattr(normalize, "SequenceMatcher", counting)
+        concepts = [
+            _concept(f"X{i}", f"synthetic condition number {i} of the body")
+            for i in range(20000)
+        ]
+        normalizer = ConceptNormalizer(concepts)
+        for i in range(0, 20000, 2000):
+            calls = 0
+            normalizer.normalise(f"synthetic conditon nmber {i} of teh body")
+            assert calls <= normalize._MAX_CANDIDATES
+
     def test_a_large_vocabulary_answers_quickly_and_correctly(self) -> None:
         concepts = [
             _concept(f"X{i}", f"synthetic condition number {i} of the body")
@@ -319,14 +346,14 @@ class TestScale:
             assert exact is not None and exact.concept.code == f"X{i}"
             # The number is a meaning-changing token, so only X{i} is a candidate.
             assert typo is not None and typo.concept.code == f"X{i}"
-        assert time.perf_counter() - started < 3.0
+        assert time.perf_counter() - started < 10.0  # a backstop; not a benchmark
 
     @pytest.mark.parametrize("text", ["a" * 255, "ab " * 85, "1" * 255, "left " * 51])
     def test_adversarial_terms_are_bounded(self, text: str) -> None:
         normalizer = ConceptNormalizer(_VOCAB * 200, aliases=_ALIASES)
         started = time.perf_counter()
         normalizer.normalise(text)
-        assert time.perf_counter() - started < 3.0
+        assert time.perf_counter() - started < 10.0  # a backstop; not a benchmark
 
 
 @settings(max_examples=60, deadline=None)

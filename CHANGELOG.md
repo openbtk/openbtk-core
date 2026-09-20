@@ -10,8 +10,38 @@ recorded here.
 ## [Unreleased]
 
 **M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism and
-the security review are done; the adopter and independent-evaluation items need
-people outside this repository and are not claimed.
+the security review are done. The PRD's v1.0 gate also asks for "all P2 requirements";
+an audit found twelve of them unbuilt, and they are being added below. The adopter
+(three named production users) and independent-evaluation items need people outside
+this repository and are not claimed.
+
+### Added — P2 requirements (PRD section 7, "v1.0 — Adoption")
+- **`DosePlausibilityGuardrail`** (`guardrail.general.dose_plausibility`, FR-G-05).
+  Finds drug, dose, frequency and route statements in generated text and checks them
+  against limits **you supply**; OpenBTK ships no dose limits, and every limit must name
+  its source. Blocks a dose or computed daily total over a limit. Says plainly when
+  nothing was checked. A pass never means a dose is safe.
+- **k-anonymity** (FR-D-11): `openbtk.deid.kanonymity` measures it (counts-only report)
+  and reaches it by generalising along inspectable ladders, then suppressing the rare
+  remainder; `guardrail.ehr.k_anonymity` checks an EHR cohort;
+  `data.ehr.cohort.quasi_identifiers` builds the table. It covers only the columns you
+  name and says nothing about what a group shares.
+- **`HL7v2Loader`** (`loader.ehr.hl7v2`, FR-E-03): folds HL7 v2 messages (PID, PV1, DG1,
+  OBX, RXE/RXA, PR1) into `PatientRecord`s. Names, addresses and phone numbers are never
+  read. Codes map only through HL7 table 0396 names checked against HL7's table; plain
+  `I10` is WHO ICD-10 and is not treated as ICD-10-CM.
+- **Cross-modal joins** (FR-E-08): `openbtk.pipelines.join_notes_to_events` attaches a
+  patient's events to their notes by encounter, by a configurable time window, or
+  either. Identifier joins only; an unmatched note is reported, never guessed.
+- **`ConceptNormalizer`** (FR-M-06): fuzzy free-text term to concept matching over a
+  vocabulary you supply ("CBC" reaches its LOINC code through your alias). It refuses a
+  candidate that differs in a number, laterality, acuity or negation word, so a shorter
+  name never resolves to a more specific code.
+- **`CrossEncoderReranker`** (`reranker.general.cross_encoder`, FR-R-04): MedCPT's
+  cross-encoder pinned to its verified commit; local, lazy, keeps unscorable results.
+- **Hybrid retrieval** (FR-R-05): `BM25Index` and `reciprocal_rank_fusion`;
+  `RAGPipeline(bm25=...)` fuses exact-term hits with the vector store's before reranking.
+- New guides: guardrails, terminology, retrieval.
 
 ### Security
 Found by an internal review ([`mkdocs/security-review.md`](mkdocs/security-review.md)).

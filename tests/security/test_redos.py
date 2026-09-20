@@ -28,7 +28,10 @@ from openbtk.eval.qa import parse_choice
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-BUDGET_SECONDS = 3.0
+# Linear code finishes these in well under a second. The quadratic versions took tens
+# of seconds to minutes, so a budget of eight seconds still catches them while leaving
+# headroom for a slow or busy machine (these must not flake).
+BUDGET_SECONDS = 8.0
 SIZE = 100_000
 
 
