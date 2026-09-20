@@ -52,6 +52,7 @@ from openbtk.core.base import (
     BaseVectorStore,
     Component,
 )
+from openbtk.core.deprecation import warn_deprecated
 from openbtk.core.errors import PolicyError, RegistryError
 from openbtk.core.logging import get_logger
 from openbtk.core.plugins import load_plugins
@@ -198,6 +199,7 @@ class Registry(Generic[T]):
         self._category = category
         self._base_type = base_type
         self._items: dict[str, type[T]] = {}
+        self._deprecated_aliases: dict[str, tuple[str, str, str]] = {}
 
     def register(self, key: str) -> Callable[[type[T]], type[T]]:
         """Return a decorator that registers a class under ``key``.
@@ -239,17 +241,31 @@ class Registry(Generic[T]):
 
         return decorator
 
-    def register_alias(self, alias: str, existing_key: str) -> None:
+    def register_alias(
+        self,
+        alias: str,
+        existing_key: str,
+        *,
+        since: str | None = None,
+        removal: str | None = None,
+    ) -> None:
         """Register ``alias`` as a second name for an already-registered key.
 
-        The primary use is a deprecation transition: a key is renamed by
-        registering the new key normally, then aliasing the old key to it,
-        so existing configs keep working for at least one minor version.
+        The primary use is a deprecation transition (``mkdocs/stability.md``): a
+        key is renamed by registering the new key normally, then aliasing the
+        old key to it, so existing configs keep working. Pass ``since`` and
+        ``removal`` (release numbers, e.g. ``"1.2.0"`` / ``"2.0.0"``) to make
+        every lookup through the old key emit an
+        :class:`~openbtk.core.deprecation.OpenBTKDeprecationWarning`. A key is
+        never removed within a major version, only deprecated.
 
         Raises:
             RegistryError: If ``alias`` is malformed, or ``existing_key`` is
                 not already registered.
+            ValueError: If only one of ``since`` / ``removal`` is given.
         """
+        if (since is None) != (removal is None):
+            raise ValueError("give both since= and removal=, or neither")
         _validate_key(alias, expected_category=self._category)
         if existing_key not in self._items:
             raise RegistryError(
@@ -258,6 +274,8 @@ class Registry(Generic[T]):
                 context={"registry": self._category, "existing_key": existing_key},
             )
         self._items[alias] = self._items[existing_key]
+        if since is not None and removal is not None:
+            self._deprecated_aliases[alias] = (existing_key, since, removal)
         log.debug(
             "registry.alias",
             registry=self._category,
@@ -282,6 +300,16 @@ class Registry(Generic[T]):
                 f"Registry {self._category!r}: key {key!r} not found. "
                 f"Available: {self.list_keys()}",
                 context={"registry": self._category, "key": key},
+            )
+        deprecated = self._deprecated_aliases.get(key)
+        if deprecated is not None:
+            new_key, since, removal = deprecated
+            warn_deprecated(
+                f"registry key {key!r}",
+                since=since,
+                removal=removal,
+                use=repr(new_key),
+                stacklevel=3,
             )
         return self._items[key]
 

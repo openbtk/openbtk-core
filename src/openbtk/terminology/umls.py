@@ -110,7 +110,7 @@ class UMLSRestBackend(BaseTerminologyService):
         except httpx.HTTPError as e:
             raise TerminologyError(
                 "UMLS search request failed.", context={"params": _redact(params)}
-            ) from e
+            ) from _sanitised(e)
         result: list[dict[str, Any]] = (
             response.json().get("result", {}).get("results", [])
         )
@@ -160,7 +160,7 @@ class UMLSRestBackend(BaseTerminologyService):
         except httpx.HTTPError as e:
             raise TerminologyError(
                 "UMLS atoms request failed.", context={"cui": cui, "sab": sab}
-            ) from e
+            ) from _sanitised(e)
         atoms = response.json().get("result", [])
         concepts: list[Concept] = []
         for atom in atoms:
@@ -173,6 +173,20 @@ class UMLSRestBackend(BaseTerminologyService):
             if bare_code and name:
                 concepts.append(Concept(code=bare_code, system=system, display=name))
         return concepts
+
+
+def _sanitised(error: httpx.HTTPError) -> Exception:
+    """A replacement for ``error`` that cannot carry the API key.
+
+    UMLS takes the key as an ``apiKey`` query parameter, and httpx puts the full
+    request URL -- key included -- in its error text ("Client error '401' for url
+    '...?apiKey=SECRET'"). Chaining the original exception (``raise ... from e``)
+    would print that URL in every traceback, and so in CI logs and crash reports.
+    Only the exception type and HTTP status are kept.
+    """
+    response = getattr(error, "response", None)
+    status = f" (HTTP {response.status_code})" if response is not None else ""
+    return RuntimeError(f"{type(error).__name__}{status}")
 
 
 def _redact(params: dict[str, Any]) -> dict[str, Any]:

@@ -34,7 +34,11 @@ category and are unscored. Everything else maps as in ``_TAG_TO_CATEGORY``.
 
 from __future__ import annotations
 
-import xml.etree.ElementTree as ET
+# Bandit B405/B314 (stdlib XML on untrusted input) are suppressed here and at the
+# parse call: _parse_document refuses any DOCTYPE/ENTITY first, which is the input
+# stdlib ElementTree is unsafe on (entity expansion), so defusedxml -- a seventh
+# core dependency -- would add nothing.
+import xml.etree.ElementTree as ET  # nosec B405
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -162,7 +166,7 @@ def _parse_document(file: Path) -> LabelledDocument:
             context=ctx,
         )
     try:
-        root = ET.fromstring(raw)
+        root = ET.fromstring(raw)  # nosec B314
     except ET.ParseError as e:
         raise DatasetError(f"{file.name} is not well-formed XML.", context=ctx) from e
     text_el = root.find("TEXT")

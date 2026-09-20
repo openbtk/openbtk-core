@@ -9,6 +9,52 @@ recorded here.
 
 ## [Unreleased]
 
+**M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism and
+the security review are done; the adopter and independent-evaluation items need
+people outside this repository and are not claimed.
+
+### Security
+Found by an internal review ([`mkdocs/security-review.md`](mkdocs/security-review.md)).
+An internal review is not an independent audit, and the page says so.
+- **S-1: the UMLS API key appeared in tracebacks** (0.5.0). UMLS takes the key as a
+  query parameter and `httpx` puts the URL in its error text; the chained error now
+  carries only the exception type and HTTP status. *If you used
+  `terminology.general.umls` with 0.5.0 and its tracebacks were logged somewhere
+  shared, rotate the key.*
+- **S-2: the email pattern was quadratic** in the input length (each doubling of a
+  run like `a.a.a.a...` roughly quadrupled the time), so a crafted document could
+  stall a worker. It is now linear and still matches a whole long address; every
+  release since 0.1.0rc1 was affected.
+- **S-3: the exact tokenizer was fetched from a moving Hub branch.** The default is
+  pinned to a commit; a model of your own loads unpinned only with a
+  `tokenizer.unpinned` warning until you pass `revision=`.
+- **S-4:** two more quadratic patterns, in `parse_choice` (model output) and the
+  sentence splitter.
+- **S-6:** every GitHub Action, including the PyPI publisher, is pinned to a commit
+  SHA; Dependabot keeps them current.
+
+### Fixed
+- **Emails on multi-label domains were only partly redacted** (S-5):
+  `user@sub.example.co.uk` left `.co.uk` in the output. **Behaviour change:** more
+  of such an address is now redacted, never less.
+
+### Added — M11
+- **The public API is frozen and enforced.** Public API is what the API reference
+  documents. `tests/api/` snapshots its signatures, pydantic fields, the top-level
+  `__all__`, the CLI, the manifest schema versions and every registry key, so a
+  removed or changed name fails CI. (CLAUDE.md rule 6 already claimed a key
+  snapshot; none existed until now.) Added: `mkdocs/stability.md` (what is public,
+  what is breaking, the deprecation rules), and the API reference now covers the
+  registry, all 13 base classes, shared schemas, configuration, provenance, logging,
+  retry, deprecation and every error.
+- **Deprecation mechanism**: `openbtk.core.deprecation` (`deprecated`,
+  `warn_deprecated`, `OpenBTKDeprecationWarning`) and
+  `Registry.register_alias(old, new, since=, removal=)`. OpenBTK's own tests turn the
+  warning into an error, so nothing inside the library may call a deprecated API.
+- `count_tokens_exact(..., revision=)` (additive).
+- **CI `security` job** (bandit medium+, detect-secrets, pip-audit on the core install
+  and the light extras) and a weekly `audit.yml`; `tests/security/test_redos.py`.
+
 ## [0.6.0] — 2026-09-20
 
 ### Read this first

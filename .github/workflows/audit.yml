@@ -1,0 +1,34 @@
+name: Dependency audit
+
+# A vulnerability can be published against a dependency without any commit here, so
+# CI's `security` job (which only runs on changes) is not enough on its own. This runs
+# the same audit weekly against main and fails, and so notifies, when one appears.
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+      - run: pip install pip-audit==2.10.1
+      - name: Core install (zero extras)
+        run: |
+          python -m venv "$RUNNER_TEMP/core"
+          "$RUNNER_TEMP/core/bin/pip" install --quiet --upgrade pip .
+          pip-audit --progress-spinner off --path "$("$RUNNER_TEMP/core/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
+      - name: Light extras
+        run: |
+          python -m venv "$RUNNER_TEMP/extras"
+          "$RUNNER_TEMP/extras/bin/pip" install --quiet --upgrade pip ".[ehr,langchain,langgraph]"
+          pip-audit --progress-spinner off --path "$("$RUNNER_TEMP/extras/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"

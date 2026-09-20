@@ -284,7 +284,15 @@ markers = [
     "benchmark: performance test, nightly only (skipped unless OPENBTK_RUN_BENCHMARKS=1)",
     "credentialed: needs user-supplied restricted data (i2b2/MIMIC); always skipped in CI",
 ]
-filterwarnings = ["error", "ignore::DeprecationWarning"]
+# Later entries win: third-party DeprecationWarnings are ignored, but OpenBTK's own
+# deprecation warning is an ERROR here, so nothing inside OpenBTK (or its tests) may
+# call a deprecated OpenBTK API -- a deprecation is only ever exercised on purpose,
+# under pytest.warns.
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "error::openbtk.core.deprecation.OpenBTKDeprecationWarning",
+]
 
 [tool.coverage.run]
 source = ["openbtk"]

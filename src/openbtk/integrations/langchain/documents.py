@@ -34,7 +34,8 @@ if TYPE_CHECKING:
 _CHUNK_ID = "chunk_id"
 _RECORD_ID = "record_id"
 _SECTION = "section"
-_TOKEN_COUNT = "token_count"
+# A metadata key name, not a credential (bandit B105 matches "token" in the name).
+_TOKEN_COUNT = "token_count"  # nosec B105
 _SPAN_START = "span_start"
 _SPAN_END = "span_end"
 _ENTITIES = "entities"

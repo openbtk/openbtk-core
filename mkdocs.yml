@@ -40,6 +40,8 @@ nav:
       - Command line: guides/cli.md
       - LangChain & LangGraph: langchain.md
   - Benchmarks: benchmarks.md
+  - Stability policy: stability.md
+  - Security review: security-review.md
   - API reference:
       - Core: api/core.md
       - De-identification: api/deid.md

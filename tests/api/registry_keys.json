@@ -1,0 +1,54 @@
+{
+  "chunker": [
+    "chunker.clinical_text.fixed_token",
+    "chunker.clinical_text.section_aware"
+  ],
+  "dataset": [
+    "dataset.clinical_text.n2c2_deid"
+  ],
+  "embedding": [
+    "embedding.general.huggingface",
+    "embedding.general.openai"
+  ],
+  "feature_extractor": [],
+  "guardrail": [
+    "guardrail.ehr.code_validity",
+    "guardrail.ehr.referential",
+    "guardrail.ehr.units",
+    "guardrail.general.groundedness",
+    "guardrail.general.phi_leakage",
+    "guardrail.general.terminology"
+  ],
+  "llm": [
+    "llm.general.anthropic",
+    "llm.general.huggingface_local",
+    "llm.general.openai",
+    "llm.general.openai_compatible"
+  ],
+  "loader": [
+    "loader.clinical_text.jsonl",
+    "loader.clinical_text.mimic_notes",
+    "loader.clinical_text.plain_text",
+    "loader.ehr.fhir",
+    "loader.ehr.omop"
+  ],
+  "preprocessor": [
+    "preprocessor.clinical_text.section_segment",
+    "preprocessor.ehr.temporal",
+    "preprocessor.general.deidentify"
+  ],
+  "reranker": [
+    "reranker.general.concept_overlap"
+  ],
+  "segmenter": [],
+  "terminology": [
+    "terminology.general.bundled_minimal",
+    "terminology.general.local",
+    "terminology.general.umls"
+  ],
+  "vectorstore": [
+    "vectorstore.general.chroma",
+    "vectorstore.general.faiss",
+    "vectorstore.general.qdrant"
+  ]
+}

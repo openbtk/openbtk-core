@@ -221,7 +221,10 @@ def format_prompt(item: MCQItem) -> str:
 
 # "answer is B" / "Answer: B" (bare letter must be UPPER case, so "the answer is a
 # bit unclear" is not read as option A) or "answer: (b)" (parenthesised, any case).
-_ANSWER_IS = re.compile(r"(?i:\banswer)\s*(?:is|:)?\s*(?:\(([A-Ja-j])\)|([A-J])\b)")
+# (``\s*(?:is|:)?\s*`` would let two adjacent ``\s*`` split one run of spaces in
+# quadratic ways; the second is nested under the optional so each space has one
+# reading -- M11 security review, S-4.)
+_ANSWER_IS = re.compile(r"(?i:\banswer)\s*(?:(?:is|:)\s*)?(?:\(([A-Ja-j])\)|([A-J])\b)")
 # A reply that STARTS with the letter: "B", "(b)", "B.", "B) text", "b. text".
 _LEADING = re.compile(r"^\W*\(?([A-J])\s*(?:[).:]\s|[).:]?$)", re.IGNORECASE)
 
