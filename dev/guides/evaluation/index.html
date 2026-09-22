@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://openbtk.org/openbtk-core/dev/guides/evaluation/">
       
       
-        <link rel="prev" href="../ehr/">
+        <link rel="prev" href="../terminology/">
       
       
         <link rel="next" href="../cli/">
@@ -482,6 +482,90 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -571,6 +655,28 @@
     <span class="md-ellipsis">
       
         Groundedness
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model cards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summaries-rouge-and-bertscore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summaries: ROUGE and BERTScore
       
     </span>
   </a>
@@ -1156,6 +1262,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#model-cards" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model cards
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#summaries-rouge-and-bertscore" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Summaries: ROUGE and BERTScore
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1326,6 +1454,106 @@ clinically faithful answer. Build a <code>GroundednessGuardrail</code> with your
 run <code>evaluate_detector</code> on your own labelled examples before trusting any
 faithfulness number.</p>
 </div>
+<h2 id="model-cards">Model cards<a class="headerlink" href="#model-cards" title="Permanent link">&para;</a></h2>
+<p>A model card is the short document that travels with a model: what it is, what it is for,
+how well it does, where it fails. OpenBTK already records the facts a card needs, so it
+assembles them: the exact model and pinned revision a component used, and the scores an
+evaluation produced.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">datetime</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.eval.manifest</span><span class="w"> </span><span class="kn">import</span> <span class="n">EvalManifest</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.eval.model_card</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelCard</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.retrieval.cross_encoder</span><span class="w"> </span><span class="kn">import</span> <span class="n">CrossEncoderReranker</span>
+
+<span class="n">card</span> <span class="o">=</span> <span class="n">ModelCard</span><span class="o">.</span><span class="n">for_component</span><span class="p">(</span>
+    <span class="n">CrossEncoderReranker</span><span class="p">(),</span>
+    <span class="n">intended_use</span><span class="o">=</span><span class="s2">"Reordering retrieved passages for clinical question answering."</span><span class="p">,</span>
+    <span class="n">limitations</span><span class="o">=</span><span class="s2">"Not evaluated on non-English text or on notes over 512 tokens."</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># A score reaches a card only from an evaluation run's manifest.</span>
+<span class="n">run</span> <span class="o">=</span> <span class="n">EvalManifest</span><span class="p">(</span>
+    <span class="n">eval_id</span><span class="o">=</span><span class="s2">"retrieval-2026-09"</span><span class="p">,</span>
+    <span class="n">kind</span><span class="o">=</span><span class="s2">"retrieval"</span><span class="p">,</span>
+    <span class="n">started_at</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2026</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">),</span>
+    <span class="n">ended_at</span><span class="o">=</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2026</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">),</span>
+    <span class="n">report</span><span class="o">=</span><span class="p">{</span><span class="s2">"recall_at_5"</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+<span class="p">)</span>
+<span class="n">card</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">with_evaluation</span><span class="p">(</span><span class="n">run</span><span class="p">,</span> <span class="s2">"recall_at_5"</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"Recall@5"</span><span class="p">)</span>
+
+<span class="n">text</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">to_markdown</span><span class="p">()</span>
+<span class="k">assert</span> <span class="s2">"ncbi/MedCPT-Cross-Encoder"</span> <span class="ow">in</span> <span class="n">text</span>
+<span class="k">assert</span> <span class="s2">"| Recall@5 | 0.5 | `retrieval-2026-09` (retrieval) |"</span> <span class="ow">in</span> <span class="n">text</span>
+<span class="k">assert</span> <span class="s2">"## Training data</span><span class="se">\n\n</span><span class="s2">Not provided."</span> <span class="ow">in</span> <span class="n">text</span>  <span class="c1"># nothing invented</span>
+</code></pre></div>
+<p>What is written for you, and what is not:</p>
+<ul>
+<li>The <strong>identity</strong> (model, pinned revision, source, the OpenBTK component and its
+  settings) comes from the component's provenance, and the <strong>evaluation table</strong> from
+  <code>EvalManifest</code>s you attach, each with its id and input digests.</li>
+<li>Everything that needs judgement (intended use, out-of-scope use, training data,
+  limitations, ethical considerations) is text <em>you</em> provide. A section you leave out
+  reads "Not provided." A card never describes a model's training data, invents
+  limitations or praises it.</li>
+<li><strong>There is no way to type a score into a card.</strong> <code>with_evaluation</code> reads a number from a
+  manifest's report and refuses one that is not there, so no figure appears without the
+  run that produced it. A card with no evaluation says so.</li>
+<li>For a whole run, <code>cards_from_run(manifest)</code> writes one card per distinct model the run
+  used. For a model you fine-tuned, build a <code>ModelCard</code> from its <code>ModelIdentity</code> and say
+  what you trained it on.</li>
+</ul>
+<h2 id="summaries-rouge-and-bertscore">Summaries: ROUGE and BERTScore<a class="headerlink" href="#summaries-rouge-and-bertscore" title="Permanent link">&para;</a></h2>
+<p>For a discharge summary or similar, <code>evaluate_summaries</code> compares each candidate with a
+reference on ROUGE (word, word-pair and longest-common-subsequence overlap) and, if you
+give it a scorer, BERTScore (similarity in a language model's embedding space, which credits
+a paraphrase that ROUGE misses).</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.eval.summarisation</span><span class="w"> </span><span class="kn">import</span> <span class="n">SummaryPair</span><span class="p">,</span> <span class="n">evaluate_summaries</span>
+
+<span class="n">pairs</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">SummaryPair</span><span class="p">(</span>
+        <span class="n">example_id</span><span class="o">=</span><span class="s2">"d1"</span><span class="p">,</span>
+        <span class="n">reference</span><span class="o">=</span><span class="s2">"the patient is stable today"</span><span class="p">,</span>
+        <span class="n">candidate</span><span class="o">=</span><span class="s2">"the patient is stable"</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">]</span>
+<span class="n">report</span> <span class="o">=</span> <span class="n">evaluate_summaries</span><span class="p">(</span><span class="n">pairs</span><span class="p">,</span> <span class="n">use_stemmer</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="c1"># The candidate has 4 of the reference's 5 words and nothing extra:</span>
+<span class="k">assert</span> <span class="n">report</span><span class="o">.</span><span class="n">rouge</span><span class="p">[</span><span class="s2">"rouge1"</span><span class="p">]</span><span class="o">.</span><span class="n">precision</span> <span class="o">==</span> <span class="mf">1.0</span>
+<span class="k">assert</span> <span class="n">report</span><span class="o">.</span><span class="n">rouge</span><span class="p">[</span><span class="s2">"rouge1"</span><span class="p">]</span><span class="o">.</span><span class="n">recall</span> <span class="o">==</span> <span class="mf">0.8</span>
+<span class="k">assert</span> <span class="n">report</span><span class="o">.</span><span class="n">as_dict</span><span class="p">()[</span><span class="s2">"n"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>
+</code></pre></div>
+<p>Read these numbers for what they are:</p>
+<ul>
+<li>They measure <strong>similarity to a reference, not correctness.</strong> A fluent summary that
+  leaves out the one abnormal result can score well, and a faithful paraphrase can score
+  badly. Compare systems on your own data with them, next to the groundedness check above;
+  do not use them as a safety measure.</li>
+<li>ROUGE wraps Google's <code>rouge-score</code> (the <code>eval</code> extra). Its tokenizer keeps only <code>a-z</code>
+  and <code>0-9</code>, so accented letters and symbols such as <code>%</code> or <code>&gt;</code> are dropped before
+  scoring, a real limit for clinical text.</li>
+<li><strong>BERTScore needs choices OpenBTK will not make for you.</strong> You give the model, its
+  pinned commit <em>and</em> the layer, and it downloads nothing until first use:</li>
+</ul>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.eval.summarisation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BertScorer</span>
+
+<span class="n">scorer</span> <span class="o">=</span> <span class="n">BertScorer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="s2">"distilbert-base-uncased"</span><span class="p">,</span>
+    <span class="n">revision</span><span class="o">=</span><span class="s2">"12040accade4e8a0f71eabdb258fecc2e7e948be"</span><span class="p">,</span>  <span class="c1"># pragma: allowlist secret</span>
+    <span class="n">layer</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="n">scorer</span><span class="o">.</span><span class="n">provenance</span><span class="p">()</span><span class="o">.</span><span class="n">model_identity</span><span class="o">.</span><span class="n">revision</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"12040acc"</span><span class="p">)</span>
+<span class="c1"># evaluate_summaries(pairs, bertscorer=scorer)  # downloads the model, needs torch</span>
+</code></pre></div>
+<p>OpenBTK implements BERTScore itself rather than wrapping the <code>bert-score</code> package,
+  because that package fetches its model by name with no way to pin a revision. The
+  implementation reproduces the reference package's raw scores (five sentence pairs agree
+  to within 1e-7; the test that checks this carries the recorded values), but supports
+  neither idf weighting nor baseline rescaling, so its numbers are comparable only with
+  other <em>raw</em> scores from the same model and layer.
+- The report holds scores and counts, never text. <code>summarisation_manifest(report,
+  bertscorer=scorer)</code> records when it ran, the scores, and the BERTScore model, so a score
+  can go on a <a href="#model-cards">model card</a> through its manifest.</p>
 
 
 

@@ -522,6 +522,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#structured-data-k-anonymity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structured data: k-anonymity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-the-command-line" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -556,6 +567,90 @@
     
   
     EHR
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
   
 
     
@@ -1168,6 +1263,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#structured-data-k-anonymity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Structured data: k-anonymity
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-the-command-line" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1325,6 +1431,63 @@ scoring, so do not compare its numbers with papers that use a stricter one.</p>
 <code>python -m openbtk.eval.deid_benchmark --dataset n2c2 --path &lt;dir&gt;</code> runs the
 same scorer over it. That harness is tested on hand-built files in the corpus's
 format and has not been run against the real corpus.</p>
+<h2 id="structured-data-k-anonymity">Structured data: k-anonymity<a class="headerlink" href="#structured-data-k-anonymity" title="Permanent link">&para;</a></h2>
+<p>Removing names does not make a table of patients anonymous: a birth year, a sex and a
+ZIP prefix together can single someone out. A table is <strong>k-anonymous</strong> over the columns
+you name when every combination of their values is shared by at least <code>k</code> records.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.deid.kanonymity</span><span class="w"> </span><span class="kn">import</span> <span class="n">anonymise_to_k</span><span class="p">,</span> <span class="n">k_anonymity_report</span>
+
+<span class="n">table</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">{</span><span class="s2">"patient"</span><span class="p">:</span> <span class="sa">f</span><span class="s2">"p</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span> <span class="s2">"birth_year"</span><span class="p">:</span> <span class="mi">1960</span> <span class="o">+</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">30</span><span class="p">,</span> <span class="s2">"gender"</span><span class="p">:</span> <span class="s2">"f"</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="s2">"m"</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">120</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s2">"birth_year"</span><span class="p">,</span> <span class="s2">"gender"</span><span class="p">]</span>
+
+<span class="n">before</span> <span class="o">=</span> <span class="n">k_anonymity_report</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">before</span><span class="o">.</span><span class="n">k_achieved</span><span class="p">,</span> <span class="n">before</span><span class="o">.</span><span class="n">n_unique</span><span class="p">,</span> <span class="n">before</span><span class="o">.</span><span class="n">satisfied</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">anonymise_to_k</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">columns</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="p">[</span><span class="s2">"patient"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">report</span><span class="o">.</span><span class="n">satisfied</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">levels</span><span class="p">,</span> <span class="n">result</span><span class="o">.</span><span class="n">n_suppressed</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div>
+<p>The report holds <strong>counts only</strong>, never a value, so it is safe to log. <code>anonymise_to_k</code>
+generalises the column with the most distinct values one step at a time (a year becomes a
+5-year band, then a 10-year band, then <code>*</code>) and, only if a few records are still too rare,
+suppresses them (<code>max_suppression</code>, default 5%). It returns exactly which steps it took.
+Only the columns you name, plus any in <code>keep</code>, are exported; an unlisted column cannot
+leak through. Ages are top-coded at 90, as Safe Harbor requires, and
+<code>zip_ladder()</code> shortens a ZIP code.</p>
+<p>For an EHR cohort, <code>quasi_identifiers</code> builds the table from <code>PatientRecord</code>s and
+<code>guardrail.ehr.k_anonymity</code> checks a cohort directly:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.ehr.cohort</span><span class="w"> </span><span class="kn">import</span> <span class="n">quasi_identifiers</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.ehr.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Demographics</span><span class="p">,</span> <span class="n">PatientRecord</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.guardrails.ehr</span><span class="w"> </span><span class="kn">import</span> <span class="n">CohortKAnonymityGuardrail</span>
+
+<span class="n">cohort</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">PatientRecord</span><span class="p">(</span>
+        <span class="n">patient_id</span><span class="o">=</span><span class="sa">f</span><span class="s2">"pt-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">"</span><span class="p">,</span>
+        <span class="n">demographics</span><span class="o">=</span><span class="n">Demographics</span><span class="p">(</span><span class="n">gender</span><span class="o">=</span><span class="s2">"female"</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="k">else</span> <span class="s2">"male"</span><span class="p">),</span>
+        <span class="n">source_system</span><span class="o">=</span><span class="s2">"fhir-r4"</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
+<span class="p">]</span>
+<span class="n">rows</span> <span class="o">=</span> <span class="n">quasi_identifiers</span><span class="p">(</span><span class="n">cohort</span><span class="p">,</span> <span class="p">[</span><span class="s2">"gender"</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">k_anonymity_report</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="p">[</span><span class="s2">"gender"</span><span class="p">],</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">satisfied</span><span class="p">)</span>
+
+<span class="n">check</span> <span class="o">=</span> <span class="n">CohortKAnonymityGuardrail</span><span class="p">(</span><span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">quasi_identifiers</span><span class="o">=</span><span class="p">[</span><span class="s2">"gender"</span><span class="p">])</span><span class="o">.</span><span class="n">check</span><span class="p">(</span><span class="n">cohort</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">check</span><span class="o">.</span><span class="n">passed</span><span class="p">,</span> <span class="n">check</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
+</code></pre></div>
+<p>What this does <strong>not</strong> give you, and you should not claim it does:</p>
+<ul>
+<li>It protects only against linking on the columns you named. A rare diagnosis or a
+  free-text note that you did not list is not protected.</li>
+<li>It says nothing about what a group <em>shares</em>: if every patient in a group has the same
+  diagnosis, the diagnosis is disclosed.</li>
+<li>It does not choose <code>k</code>. Five is a common floor; the right value is a policy decision.</li>
+<li>The ZIP ladder does not know which three-digit prefixes are too small to publish (Safe
+  Harbor lists them); apply that rule yourself.</li>
+</ul>
+<p>It is evidence for an expert to weigh, not a de-identification determination.</p>
 <h2 id="from-the-command-line">From the command line<a class="headerlink" href="#from-the-command-line" title="Permanent link">&para;</a></h2>
 <p><code>openbtk deid notes/ --out clean/</code> de-identifies a directory of notes without a
 config; see the <a href="../cli/">CLI guide</a>.</p>

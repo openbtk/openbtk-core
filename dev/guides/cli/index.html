@@ -485,6 +485,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../evaluation/" class="md-nav__link">
         
   
@@ -599,6 +683,28 @@
     <span class="md-ellipsis">
       
         Run and audit
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checkpoint-and-resume-long-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checkpoint and resume long runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fan-out-and-fan-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fan-out and fan-in
       
     </span>
   </a>
@@ -1190,6 +1296,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#checkpoint-and-resume-long-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checkpoint and resume long runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fan-out-and-fan-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Fan-out and fan-in
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#replay-a-run" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1297,8 +1425,8 @@ openbtk<span class="w"> </span>list<span class="w"> </span>llm<span class="w"> <
 </code></pre></div>
 <p><code>validate</code> instantiates nothing and reads no data. It checks that every step's
 <code>type</code> is registered, that each parameter exists on the component's constructor
-and required ones are present, that the <code>after</code> graph is acyclic and a single
-linear chain, and that no step sends data off-site under a policy that forbids
+and required ones are present, that the <code>after</code> graph is acyclic (it may fan out and fan in), a step
+names each predecessor once and a loader is a root, and that no step sends data off-site under a policy that forbids
 it. It does not check that a chunker may follow the step before it (no such rule
 is specified yet), nor that your paths exist.</p>
 <h2 id="run-and-audit">Run and audit<a class="headerlink" href="#run-and-audit" title="Permanent link">&para;</a></h2>
@@ -1309,6 +1437,110 @@ openbtk<span class="w"> </span>run<span class="w"> </span>pipeline.yaml<span cla
 that fails still writes its manifest, with the failure recorded. Manifests hold
 counts, component identity and input digests, never content, and API keys are
 redacted from the config they snapshot.</p>
+<h2 id="checkpoint-and-resume-long-runs">Checkpoint and resume long runs<a class="headerlink" href="#checkpoint-and-resume-long-runs" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>openbtk<span class="w"> </span>run<span class="w"> </span>pipeline.yaml<span class="w"> </span>--checkpoint<span class="w"> </span>state.json
+openbtk<span class="w"> </span>run<span class="w"> </span>pipeline.yaml<span class="w"> </span>--checkpoint<span class="w"> </span>state.json<span class="w"> </span>--checkpoint-interval<span class="w"> </span><span class="m">5000</span>
+</code></pre></div>
+<p>With <code>--checkpoint</code>, a run periodically records how far each root loader has read; a
+rerun with the same file resumes from there instead of the beginning. A completed run
+deletes the file, since there is nothing left to resume:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>  <span class="c1"># registry logs, not errors</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.core.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseLoader</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.core.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">PipelineConfig</span><span class="p">,</span> <span class="n">StepConfig</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.core.errors</span><span class="w"> </span><span class="kn">import</span> <span class="n">LoaderError</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.core.registry</span><span class="w"> </span><span class="kn">import</span> <span class="n">LOADER_REGISTRY</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.pipelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span><span class="p">,</span> <span class="n">load_checkpoint</span>
+
+    <span class="nd">@LOADER_REGISTRY</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">"loader.general.cli_guide_flaky_source"</span><span class="p">)</span>
+    <span class="k">class</span><span class="w"> </span><span class="nc">FlakySource</span><span class="p">(</span><span class="n">BaseLoader</span><span class="p">):</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">source</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">7</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">FlakySource</span><span class="o">.</span><span class="n">fixed</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">LoaderError</span><span class="p">(</span><span class="s2">"a transient failure"</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"at"</span><span class="p">:</span> <span class="n">i</span><span class="p">})</span>
+                <span class="k">yield</span> <span class="p">{</span><span class="s2">"i"</span><span class="p">:</span> <span class="n">i</span><span class="p">}</span>
+
+    <span class="n">FlakySource</span><span class="o">.</span><span class="n">fixed</span> <span class="o">=</span> <span class="kc">False</span>
+
+<span class="n">folder</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="n">state</span> <span class="o">=</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"state.json"</span>
+<span class="n">config</span> <span class="o">=</span> <span class="n">PipelineConfig</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">"ingest"</span><span class="p">,</span>
+    <span class="n">steps</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">StepConfig</span><span class="p">(</span>
+            <span class="nb">id</span><span class="o">=</span><span class="s2">"load"</span><span class="p">,</span>
+            <span class="nb">type</span><span class="o">=</span><span class="s2">"loader.general.cli_guide_flaky_source"</span><span class="p">,</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">"source"</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+        <span class="p">),</span>
+    <span class="p">],</span>
+<span class="p">)</span>
+<span class="n">first</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">first</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"failed"</span>
+<span class="k">assert</span> <span class="n">load_checkpoint</span><span class="p">(</span><span class="n">state</span><span class="p">)</span><span class="o">.</span><span class="n">loader_counts</span><span class="p">[</span><span class="s2">"load"</span><span class="p">]</span> <span class="o">==</span> <span class="mi">7</span>  <span class="c1"># records 0-6 were read</span>
+
+<span class="n">FlakySource</span><span class="o">.</span><span class="n">fixed</span> <span class="o">=</span> <span class="kc">True</span>  <span class="c1"># whatever broke is fixed; retry</span>
+<span class="n">second</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="o">=</span><span class="n">state</span><span class="p">,</span> <span class="n">checkpoint_interval</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">second</span><span class="o">.</span><span class="n">status</span> <span class="o">==</span> <span class="s2">"success"</span>
+<span class="k">assert</span> <span class="n">second</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">resumed_from</span> <span class="o">==</span> <span class="mi">7</span>
+<span class="k">assert</span> <span class="n">second</span><span class="o">.</span><span class="n">steps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">records_out</span> <span class="o">==</span> <span class="mi">13</span>  <span class="c1"># 20 - 7: the 7 already read are never redone</span>
+<span class="k">assert</span> <span class="ow">not</span> <span class="n">state</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>  <span class="c1"># a completed run leaves nothing to resume</span>
+<span class="n">folder</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</code></pre></div>
+<p>What this does and does not guarantee:</p>
+<ul>
+<li><strong>Only root loader steps are tracked</strong> -- "record 4,512,003 of this source has been
+  read" -- not whether every downstream step finished with it. Resuming re-loads from
+  that position and runs it through the <em>whole</em> pipeline again. That is safe because
+  every step here is a pure function of its input, never because the executor remembers
+  partial downstream progress -- it does not.</li>
+<li><strong>At-least-once, not exactly-once.</strong> A checkpoint is saved every <code>--checkpoint-interval</code>
+  records (default 1000, shown here as 3 to make the example concrete), so a crash
+  between saves reprocesses up to that many records again; it never skips one that was
+  not genuinely already read.</li>
+<li><strong>Resuming re-reads and discards the skipped records; it does not seek.</strong> This is
+  correct only when the source yields the same items in the same order across attempts
+  -- a stable file, not a query against data that changes between runs.</li>
+</ul>
+<h2 id="fan-out-and-fan-in">Fan-out and fan-in<a class="headerlink" href="#fan-out-and-fan-in" title="Permanent link">&para;</a></h2>
+<p>A pipeline is a DAG, not only a chain. A step with <strong>several dependents</strong> feeds each of
+them every record; a step with <strong>several predecessors</strong> reads their streams interleaved:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">two-views</span>
+<span class="nt">steps</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">load</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">loader.clinical_text.plain_text</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="nv">./notes</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">deid</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">preprocessor.general.deidentify</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">load</span><span class="p p-Indicator">]</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">fixed</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chunker.clinical_text.fixed_token</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">deid</span><span class="p p-Indicator">]</span><span class="w">        </span><span class="c1"># deid feeds two chunkers...</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">id</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">by_section</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">chunker.clinical_text.section_aware</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">max_tokens</span><span class="p">:</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">after</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">deid</span><span class="p p-Indicator">]</span><span class="w">        </span><span class="c1"># ...each of which sees every de-identified note</span>
+</code></pre></div>
+<p>Things worth knowing:</p>
+<ul>
+<li><strong>Fan-in is a merge, not a join.</strong> <code>after: [a, b]</code> gives the step <code>a</code>'s and <code>b</code>'s records
+  one at a time in turn. It does not pair records across streams: to attach a patient's
+  structured events to a note, use <code>join_notes_to_events</code>. A step that cannot handle a
+  record's type fails, naming itself.</li>
+<li><strong>A diamond delivers twice.</strong> If <code>b</code> and <code>c</code> both read <code>a</code> and <code>d</code> reads <code>b</code> and <code>c</code>,
+  <code>d</code> receives every record of <code>a</code> once by each path.</li>
+<li><strong>Memory stays bounded.</strong> The run pulls one record from each end of the graph in turn,
+  so the buffer between branches holds only the lag between them (a chunker that turns one
+  note into many widens it by that many), never the corpus.</li>
+<li>A guardrail attached to a step sees each of its records <strong>once</strong>, before the split.</li>
+<li>Every step is in the manifest with its own counts; a failure names the branch it
+  happened in. A step may name each predecessor only once, a loader must be a root, and
+  cycles are still refused by <code>validate</code>.</li>
+</ul>
 <h2 id="replay-a-run">Replay a run<a class="headerlink" href="#replay-a-run" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code>openbtk<span class="w"> </span>replay<span class="w"> </span>run.json
 </code></pre></div>

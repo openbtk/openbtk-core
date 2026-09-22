@@ -483,6 +483,90 @@
   
   
     <li class="md-nav__item">
+      <a href="../../guides/guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guides/terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../../guides/evaluation/" class="md-nav__link">
         
   
@@ -1092,6 +1176,89 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#matching-free-text-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matching free-text terms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConceptNormalizer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConceptNormalizer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.from_bundled_icd10cm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_bundled_icd10cm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.from_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.normalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.resolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptMatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConceptMatch
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1290,6 +1457,89 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#matching-free-text-terms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Matching free-text terms
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConceptNormalizer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ConceptNormalizer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.from_bundled_icd10cm" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_bundled_icd10cm
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.from_csv" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_csv
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.normalise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        normalise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptNormalizer.resolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        resolve
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#openbtk.terminology.normalize.ConceptMatch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConceptMatch
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1388,10 +1638,10 @@ system it does not cover at all) is merely unconfirmed, not invalid.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/openbtk/terminology/bundled.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">89</span>
-<span class="normal">90</span>
-<span class="normal">91</span>
-<span class="normal">92</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_authoritative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">102</span>
+<span class="normal">103</span>
+<span class="normal">104</span>
+<span class="normal">105</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">is_authoritative</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>  <span class="c1"># noqa: ARG002</span>
 <span class="w">    </span><span class="sd">"""Never: this is a small subset, so a code missing from it (or from a</span>
 <span class="sd">    system it does not cover at all) is merely unconfirmed, not invalid."""</span>
     <span class="k">return</span> <span class="kc">False</span>
@@ -1421,16 +1671,16 @@ a silent no-op standing in for unimplemented behaviour.</p>
 
             <details class="mkdocstrings-source">
               <summary>Source code in <code>src/openbtk/terminology/bundled.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 94</span>
-<span class="normal"> 95</span>
-<span class="normal"> 96</span>
-<span class="normal"> 97</span>
-<span class="normal"> 98</span>
-<span class="normal"> 99</span>
-<span class="normal">100</span>
-<span class="normal">101</span>
-<span class="normal">102</span>
-<span class="normal">103</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">107</span>
+<span class="normal">108</span>
+<span class="normal">109</span>
+<span class="normal">110</span>
+<span class="normal">111</span>
+<span class="normal">112</span>
+<span class="normal">113</span>
+<span class="normal">114</span>
+<span class="normal">115</span>
+<span class="normal">116</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">map</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># noqa: ARG002 -- BaseTerminologyService interface, unused by design</span>
     <span class="n">from_system</span><span class="p">:</span> <span class="n">CodeSystem</span><span class="p">,</span>  <span class="c1"># noqa: ARG002</span>
@@ -1891,6 +2141,710 @@ True</p>
     <span class="bp">self</span><span class="o">.</span><span class="n">_ttl_seconds</span> <span class="o">=</span> <span class="n">ttl_seconds</span>
 </code></pre></div></td></tr></table></div>
                   </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="matching-free-text-terms">Matching free-text terms<a class="headerlink" href="#matching-free-text-terms" title="Permanent link">&para;</a></h2>
+<p>See the <a href="../../guides/terminology/">terminology guide</a> for what the matcher will and will
+not do.</p>
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openbtk.terminology.normalize.ConceptNormalizer" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">openbtk.terminology.normalize.ConceptNormalizer</span>
+
+
+<a href="#openbtk.terminology.normalize.ConceptNormalizer" class="headerlink" title="Permanent link">&para;</a></h2>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ConceptNormalizer</span><span class="p">(</span><span class="n">concepts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Concept</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">aliases</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+
+
+        <p>Map free-text terms to the concepts of a vocabulary you supply.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>concepts</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Iterable">Iterable</span>[<a class="autorefs autorefs-internal" title="openbtk.core.schemas.Concept" href="../core/#openbtk.core.schemas.Concept">Concept</a>]</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The vocabulary.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>aliases</code>
+            </td>
+            <td>
+                  <code><span title="collections.abc.Mapping">Mapping</span>[<span title="str">str</span>, <span title="collections.abc.Sequence">Sequence</span>[<span title="str">str</span>]] | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Extra names per concept, keyed by <code>code</code> (a code in more than one
+system takes the aliases in each). This is how "CBC" reaches its code.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>threshold</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The lowest score returned, in <code>[0, 1]</code>. <code>1.0</code> allows only
+exact and alias matches.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.85</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>ambiguity_margin</code>
+            </td>
+            <td>
+                  <code><span title="float">float</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>:meth:<code>resolve</code> gives no answer when the two best distinct
+codes are this close.</p>
+              </div>
+            </td>
+            <td>
+                  <code>0.05</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+<details class="example" open>
+  <summary>Example</summary>
+  <blockquote>
+<blockquote>
+<blockquote>
+<p>concepts = [
+...     Concept(code="I10", system=CodeSystem.ICD10CM,
+...             display="Essential (primary) hypertension"),
+...     Concept(code="E11.9", system=CodeSystem.ICD10CM,
+...             display="Type 2 diabetes mellitus without complications"),
+... ]
+normalizer = ConceptNormalizer(concepts, aliases={"I10": ["HTN"]})
+normalizer.resolve("htn").concept.code
+'I10'
+normalizer.resolve("Type 1 diabetes mellitus") is None
+True</p>
+</blockquote>
+</blockquote>
+</blockquote>
+</details>
+
+
+
+
+
+
+
+                  <details class="mkdocstrings-source">
+                    <summary>Source code in <code>src/openbtk/terminology/normalize.py</code></summary>
+                    <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">137</span>
+<span class="normal">138</span>
+<span class="normal">139</span>
+<span class="normal">140</span>
+<span class="normal">141</span>
+<span class="normal">142</span>
+<span class="normal">143</span>
+<span class="normal">144</span>
+<span class="normal">145</span>
+<span class="normal">146</span>
+<span class="normal">147</span>
+<span class="normal">148</span>
+<span class="normal">149</span>
+<span class="normal">150</span>
+<span class="normal">151</span>
+<span class="normal">152</span>
+<span class="normal">153</span>
+<span class="normal">154</span>
+<span class="normal">155</span>
+<span class="normal">156</span>
+<span class="normal">157</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span>
+    <span class="n">concepts</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Concept</span><span class="p">],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">aliases</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span>
+    <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">threshold</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"threshold must be between 0 and 1"</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">ambiguity_margin</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"ambiguity_margin must be between 0 and 1"</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_threshold</span> <span class="o">=</span> <span class="n">threshold</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span> <span class="o">=</span> <span class="n">ambiguity_margin</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">_Entry</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_by_normal</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_by_trigram</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">concept</span> <span class="ow">in</span> <span class="n">concepts</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_add</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">concept</span><span class="o">.</span><span class="n">display</span><span class="p">,</span> <span class="n">is_alias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">alias</span> <span class="ow">in</span> <span class="p">(</span><span class="n">aliases</span> <span class="ow">or</span> <span class="p">{})</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">concept</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="p">()):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_add</span><span class="p">(</span><span class="n">concept</span><span class="p">,</span> <span class="n">alias</span><span class="p">,</span> <span class="n">is_alias</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+                  </details>
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.terminology.normalize.ConceptNormalizer.from_bundled_icd10cm" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_bundled_icd10cm</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#openbtk.terminology.normalize.ConceptNormalizer.from_bundled_icd10cm" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_bundled_icd10cm</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptNormalizer</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A normaliser over the small ICD-10-CM subset that ships with OpenBTK.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/terminology/normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">226</span>
+<span class="normal">227</span>
+<span class="normal">228</span>
+<span class="normal">229</span>
+<span class="normal">230</span>
+<span class="normal">231</span>
+<span class="normal">232</span>
+<span class="normal">233</span>
+<span class="normal">234</span>
+<span class="normal">235</span>
+<span class="normal">236</span>
+<span class="normal">237</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_bundled_icd10cm</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptNormalizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""A normaliser over the small ICD-10-CM subset that ships with OpenBTK."""</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.terminology.bundled</span><span class="w"> </span><span class="kn">import</span> <span class="n">bundled_icd10cm_concepts</span>
+
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">bundled_icd10cm_concepts</span><span class="p">(),</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+        <span class="n">ambiguity_margin</span><span class="o">=</span><span class="n">ambiguity_margin</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.terminology.normalize.ConceptNormalizer.from_csv" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_csv</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#openbtk.terminology.normalize.ConceptNormalizer.from_csv" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptNormalizer</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Read <code>code,system,display</code> rows and an optional <code>aliases</code> column.</p>
+<p>Aliases are separated by <code>|</code>. <code>system</code> must be a
+:class:<code>~openbtk.core.schemas.CodeSystem</code> value. Read now, not lazily: this is
+an explicit load, not a constructor.</p>
+
+
+<p><span class="doc-section-title">Raises:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="openbtk.core.errors.TerminologyError" href="../core/#openbtk.core.errors.TerminologyError">TerminologyError</a></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>If the file is missing, lacks a required column or has a
+row with an unknown system. The message names the line, never a value.</p>
+              </div>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/terminology/normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">171</span>
+<span class="normal">172</span>
+<span class="normal">173</span>
+<span class="normal">174</span>
+<span class="normal">175</span>
+<span class="normal">176</span>
+<span class="normal">177</span>
+<span class="normal">178</span>
+<span class="normal">179</span>
+<span class="normal">180</span>
+<span class="normal">181</span>
+<span class="normal">182</span>
+<span class="normal">183</span>
+<span class="normal">184</span>
+<span class="normal">185</span>
+<span class="normal">186</span>
+<span class="normal">187</span>
+<span class="normal">188</span>
+<span class="normal">189</span>
+<span class="normal">190</span>
+<span class="normal">191</span>
+<span class="normal">192</span>
+<span class="normal">193</span>
+<span class="normal">194</span>
+<span class="normal">195</span>
+<span class="normal">196</span>
+<span class="normal">197</span>
+<span class="normal">198</span>
+<span class="normal">199</span>
+<span class="normal">200</span>
+<span class="normal">201</span>
+<span class="normal">202</span>
+<span class="normal">203</span>
+<span class="normal">204</span>
+<span class="normal">205</span>
+<span class="normal">206</span>
+<span class="normal">207</span>
+<span class="normal">208</span>
+<span class="normal">209</span>
+<span class="normal">210</span>
+<span class="normal">211</span>
+<span class="normal">212</span>
+<span class="normal">213</span>
+<span class="normal">214</span>
+<span class="normal">215</span>
+<span class="normal">216</span>
+<span class="normal">217</span>
+<span class="normal">218</span>
+<span class="normal">219</span>
+<span class="normal">220</span>
+<span class="normal">221</span>
+<span class="normal">222</span>
+<span class="normal">223</span>
+<span class="normal">224</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="nd">@classmethod</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">from_csv</span><span class="p">(</span>
+    <span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.85</span><span class="p">,</span> <span class="n">ambiguity_margin</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptNormalizer</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Read ``code,system,display`` rows and an optional ``aliases`` column.</span>
+
+<span class="sd">    Aliases are separated by ``|``. ``system`` must be a</span>
+<span class="sd">    :class:`~openbtk.core.schemas.CodeSystem` value. Read now, not lazily: this is</span>
+<span class="sd">    an explicit load, not a constructor.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        TerminologyError: If the file is missing, lacks a required column or has a</span>
+<span class="sd">            row with an unknown system. The message names the line, never a value.</span>
+<span class="sd">    """</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">handle</span> <span class="o">=</span> <span class="n">source</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">""</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">TerminologyError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Could not open the vocabulary file </span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">)},</span>
+        <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+    <span class="n">concepts</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Concept</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">aliases</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">with</span> <span class="n">handle</span><span class="p">:</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"code"</span><span class="p">,</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"display"</span><span class="p">}</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">reader</span><span class="o">.</span><span class="n">fieldnames</span> <span class="ow">or</span> <span class="p">())</span>
+        <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TerminologyError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> lacks required column(s) </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">missing</span><span class="p">)</span><span class="si">}</span><span class="s2">."</span><span class="p">,</span>
+                <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">)},</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">number</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reader</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">system</span> <span class="o">=</span> <span class="n">CodeSystem</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">"system"</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                <span class="n">concept</span> <span class="o">=</span> <span class="n">Concept</span><span class="p">(</span>
+                    <span class="n">code</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">"code"</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                    <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">,</span>
+                    <span class="n">display</span><span class="o">=</span><span class="n">row</span><span class="p">[</span><span class="s2">"display"</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
+                <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">TerminologyError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">source</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> line </span><span class="si">{</span><span class="n">number</span><span class="si">}</span><span class="s2"> is not a valid concept."</span><span class="p">,</span>
+                    <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s2">"path"</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">source</span><span class="p">),</span> <span class="s2">"line"</span><span class="p">:</span> <span class="n">number</span><span class="p">},</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+            <span class="n">concepts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">concept</span><span class="p">)</span>
+            <span class="n">extra</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"aliases"</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">""</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">"|"</span><span class="p">)]</span>
+            <span class="n">aliases</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="n">concept</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="p">[])</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">extra</span> <span class="k">if</span> <span class="n">a</span><span class="p">)</span>
+    <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+        <span class="n">concepts</span><span class="p">,</span>
+        <span class="n">aliases</span><span class="o">=</span><span class="n">aliases</span><span class="p">,</span>
+        <span class="n">threshold</span><span class="o">=</span><span class="n">threshold</span><span class="p">,</span>
+        <span class="n">ambiguity_margin</span><span class="o">=</span><span class="n">ambiguity_margin</span><span class="p">,</span>
+    <span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.terminology.normalize.ConceptNormalizer.normalise" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">normalise</span>
+
+
+<a href="#openbtk.terminology.normalize.ConceptNormalizer.normalise" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">normalise</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConceptMatch</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The best-scoring concepts for <code>text</code>, best first, at or above threshold.</p>
+<p>One match per code (its best-scoring name). Ties break on code, so the order is
+deterministic. Returns <code>[]</code> for an empty term, one over
+256 characters (a sentence, not a term), or no candidate above the threshold.</p>
+
+
+<p><span class="doc-section-title">Parameters:</span></p>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Description</th>
+          <th>Default</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr class="doc-section-item">
+            <td>
+                <code>text</code>
+            </td>
+            <td>
+                  <code><span title="str">str</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The term.</p>
+              </div>
+            </td>
+            <td>
+                <em>required</em>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>limit</code>
+            </td>
+            <td>
+                  <code><span title="int">int</span></code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>The most matches to return.</p>
+              </div>
+            </td>
+            <td>
+                  <code>3</code>
+            </td>
+          </tr>
+          <tr class="doc-section-item">
+            <td>
+                <code>system</code>
+            </td>
+            <td>
+                  <code><a class="autorefs autorefs-internal" title="openbtk.core.schemas.CodeSystem" href="../core/#openbtk.core.schemas.CodeSystem">CodeSystem</a> | None</code>
+            </td>
+            <td>
+              <div class="doc-md-description">
+                <p>Only consider concepts of this code system.</p>
+              </div>
+            </td>
+            <td>
+                  <code>None</code>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/terminology/normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">241</span>
+<span class="normal">242</span>
+<span class="normal">243</span>
+<span class="normal">244</span>
+<span class="normal">245</span>
+<span class="normal">246</span>
+<span class="normal">247</span>
+<span class="normal">248</span>
+<span class="normal">249</span>
+<span class="normal">250</span>
+<span class="normal">251</span>
+<span class="normal">252</span>
+<span class="normal">253</span>
+<span class="normal">254</span>
+<span class="normal">255</span>
+<span class="normal">256</span>
+<span class="normal">257</span>
+<span class="normal">258</span>
+<span class="normal">259</span>
+<span class="normal">260</span>
+<span class="normal">261</span>
+<span class="normal">262</span>
+<span class="normal">263</span>
+<span class="normal">264</span>
+<span class="normal">265</span>
+<span class="normal">266</span>
+<span class="normal">267</span>
+<span class="normal">268</span>
+<span class="normal">269</span>
+<span class="normal">270</span>
+<span class="normal">271</span>
+<span class="normal">272</span>
+<span class="normal">273</span>
+<span class="normal">274</span>
+<span class="normal">275</span>
+<span class="normal">276</span>
+<span class="normal">277</span>
+<span class="normal">278</span>
+<span class="normal">279</span>
+<span class="normal">280</span>
+<span class="normal">281</span>
+<span class="normal">282</span>
+<span class="normal">283</span>
+<span class="normal">284</span>
+<span class="normal">285</span>
+<span class="normal">286</span>
+<span class="normal">287</span>
+<span class="normal">288</span>
+<span class="normal">289</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">normalise</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">ConceptMatch</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""The best-scoring concepts for ``text``, best first, at or above threshold.</span>
+
+<span class="sd">    One match per code (its best-scoring name). Ties break on code, so the order is</span>
+<span class="sd">    deterministic. Returns ``[]`` for an empty term, one over</span>
+<span class="sd">    256 characters (a sentence, not a term), or no candidate above the threshold.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        text: The term.</span>
+<span class="sd">        limit: The most matches to return.</span>
+<span class="sd">        system: Only consider concepts of this code system.</span>
+<span class="sd">    """</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">_MAX_QUERY_CHARS</span> <span class="ow">or</span> <span class="n">limit</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">_normal</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">query</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[]</span>
+    <span class="n">best</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">CodeSystem</span><span class="p">],</span> <span class="n">ConceptMatch</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_candidates</span><span class="p">(</span><span class="n">query</span><span class="p">):</span>
+        <span class="n">entry</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_entries</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">system</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">entry</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">system</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">system</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_score</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_threshold</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="n">entry</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">entry</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">system</span><span class="p">)</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="n">best</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">found</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">score</span> <span class="o">&gt;</span> <span class="n">found</span><span class="o">.</span><span class="n">score</span><span class="p">:</span>
+            <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"exact"</span><span class="p">,</span> <span class="s2">"alias"</span><span class="p">,</span> <span class="s2">"fuzzy"</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">"fuzzy"</span> <span class="k">if</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="mf">1.0</span> <span class="k">else</span> <span class="p">(</span><span class="s2">"alias"</span> <span class="k">if</span> <span class="n">entry</span><span class="o">.</span><span class="n">is_alias</span> <span class="k">else</span> <span class="s2">"exact"</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">shown</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">method</span> <span class="o">!=</span> <span class="s2">"fuzzy"</span>
+                <span class="k">else</span> <span class="nb">min</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="mf">0.9999</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">best</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ConceptMatch</span><span class="p">(</span>
+                <span class="n">concept</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">concept</span><span class="p">,</span>
+                <span class="n">score</span><span class="o">=</span><span class="n">shown</span><span class="p">,</span>
+                <span class="n">matched_text</span><span class="o">=</span><span class="n">entry</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+                <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
+            <span class="p">)</span>
+    <span class="n">ranked</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+        <span class="n">best</span><span class="o">.</span><span class="n">values</span><span class="p">(),</span>
+        <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">m</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">m</span><span class="o">.</span><span class="n">score</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">code</span><span class="p">,</span> <span class="n">m</span><span class="o">.</span><span class="n">concept</span><span class="o">.</span><span class="n">system</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">ranked</span><span class="p">[:</span><span class="n">limit</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="openbtk.terminology.normalize.ConceptNormalizer.resolve" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">resolve</span>
+
+
+<a href="#openbtk.terminology.normalize.ConceptNormalizer.resolve" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">resolve</span><span class="p">(</span><span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptMatch</span> <span class="o">|</span> <span class="kc">None</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>The single best match, or <code>None</code> when there is none or it is not clear.</p>
+<p><code>None</code> means: nothing reached the threshold, or the two best answers are
+different concepts scoring within <code>ambiguity_margin</code> of each other. In that
+case call :meth:<code>normalise</code> and decide with a person or more context.</p>
+
+
+            <details class="mkdocstrings-source">
+              <summary>Source code in <code>src/openbtk/terminology/normalize.py</code></summary>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">291</span>
+<span class="normal">292</span>
+<span class="normal">293</span>
+<span class="normal">294</span>
+<span class="normal">295</span>
+<span class="normal">296</span>
+<span class="normal">297</span>
+<span class="normal">298</span>
+<span class="normal">299</span>
+<span class="normal">300</span>
+<span class="normal">301</span>
+<span class="normal">302</span>
+<span class="normal">303</span>
+<span class="normal">304</span>
+<span class="normal">305</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">resolve</span><span class="p">(</span>
+    <span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">system</span><span class="p">:</span> <span class="n">CodeSystem</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ConceptMatch</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""The single best match, or ``None`` when there is none or it is not clear.</span>
+
+<span class="sd">    ``None`` means: nothing reached the threshold, or the two best answers are</span>
+<span class="sd">    different concepts scoring within ``ambiguity_margin`` of each other. In that</span>
+<span class="sd">    case call :meth:`normalise` and decide with a person or more context.</span>
+<span class="sd">    """</span>
+    <span class="n">matches</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">normalise</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">system</span><span class="o">=</span><span class="n">system</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">matches</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">score</span> <span class="o">-</span> <span class="n">matches</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">score</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_margin</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">matches</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</code></pre></div></td></tr></table></div>
+            </details>
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h2 id="openbtk.terminology.normalize.ConceptMatch" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">openbtk.terminology.normalize.ConceptMatch</span>
+
+
+<a href="#openbtk.terminology.normalize.ConceptMatch" class="headerlink" title="Permanent link">&para;</a></h2>
+
+
+    <div class="doc doc-contents first">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>A candidate concept for a term, with how it matched.</p>
+<p><code>method</code> is <code>exact</code> (the term is the concept's display), <code>alias</code> (it is one of
+the aliases you listed) or <code>fuzzy</code> (a close, but not identical, string).</p>
+
+
+
+
+
+
+
+
 
 
 

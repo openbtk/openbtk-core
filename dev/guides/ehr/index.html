@@ -16,7 +16,7 @@
         <link rel="prev" href="../deidentification/">
       
       
-        <link rel="next" href="../evaluation/">
+        <link rel="next" href="../guardrails/">
       
       
         
@@ -528,6 +528,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hl7-v2-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HL7 v2 messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#joining-notes-to-structured-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joining notes to structured data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-ehr-to-retrieval-ready-text" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -564,6 +586,90 @@
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../guardrails/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guardrails
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../retrieval/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Retrieval
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../terminology/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Terminology
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1146,6 +1252,28 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#hl7-v2-messages" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HL7 v2 messages
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#joining-notes-to-structured-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Joining notes to structured data
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-ehr-to-retrieval-ready-text" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1199,7 +1327,7 @@
 
 
 <h1 id="ehr">EHR<a class="headerlink" href="#ehr" title="Permanent link">&para;</a></h1>
-<p>The EHR modality loads FHIR R4 and OMOP into a single <code>PatientRecord</code> schema, so
+<p>The EHR modality loads FHIR R4, OMOP and HL7 v2 into a single <code>PatientRecord</code> schema, so
 everything downstream (timelines, cohorts, guardrails) is source-agnostic.</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[ehr]"</span><span class="w">        </span><span class="c1"># fhir.resources, pyarrow, pandas, hl7apy</span>
 </code></pre></div>
@@ -1313,6 +1441,91 @@ text.</p>
   <code>ClinicalTextRecord</code>. That is the seam between the two modalities: the output
   goes through the same de-identification, segmentation and chunking as any note.</li>
 </ul>
+<h2 id="hl7-v2-messages">HL7 v2 messages<a class="headerlink" href="#hl7-v2-messages" title="Permanent link">&para;</a></h2>
+<p>Many hospitals still send admissions and results as HL7 v2 messages. <code>HL7v2Loader</code>
+reads a directory of <code>*.hl7</code> files (each may hold many messages) and folds the messages
+about one patient into one <code>PatientRecord</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pathlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.ehr.hl7v2</span><span class="w"> </span><span class="kn">import</span> <span class="n">HL7v2Loader</span>
+
+<span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="sa">r</span><span class="s2">"MSH|^~\&amp;|APP|FAC|RCV|FAC|20240314101500+0000||ADT^A01|M1|P|2.5"</span><span class="p">,</span>
+    <span class="s2">"PID|1||PT0001^^^HOSP^MR||DOE^JANE||19800601|F"</span><span class="p">,</span>
+    <span class="s2">"DG1|1||I10^Essential hypertension^I10C||20240314"</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">folder</span> <span class="o">=</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span>
+<span class="p">(</span><span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">/</span> <span class="s2">"adt.hl7"</span><span class="p">)</span><span class="o">.</span><span class="n">write_text</span><span class="p">(</span>
+    <span class="s2">"</span><span class="se">\r</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">messages</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">"utf-8"</span>
+<span class="p">)</span>
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+    <span class="p">(</span><span class="n">record</span><span class="p">,)</span> <span class="o">=</span> <span class="n">HL7v2Loader</span><span class="p">()</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">folder</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">record</span><span class="o">.</span><span class="n">patient_id</span> <span class="o">==</span> <span class="s2">"PT0001"</span> <span class="ow">and</span> <span class="n">record</span><span class="o">.</span><span class="n">demographics</span><span class="o">.</span><span class="n">gender</span> <span class="o">==</span> <span class="s2">"female"</span>
+<span class="k">assert</span> <span class="n">record</span><span class="o">.</span><span class="n">conditions</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">display</span> <span class="o">==</span> <span class="s2">"Essential hypertension"</span>
+<span class="n">folder</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+</code></pre></div>
+<p>What it reads and how, so you can judge whether it fits your feed:</p>
+<ul>
+<li>It reads <code>PID</code> (identifier, birth date, sex, race, ethnic group, death), <code>PV1</code> (visit
+  number, class, admit and discharge times), <code>DG1</code>, <code>OBX</code>, <code>RXE</code>/<code>RXA</code> and <code>PR1</code>.
+  Everything else is ignored, and <strong>names, addresses and phone numbers are never read</strong>.</li>
+<li>A code is mapped only through coding-system names HL7 defines for the code sets
+  OpenBTK models: <code>SCT</code> (SNOMED CT), <code>LN</code> (LOINC), <code>I10C</code> (ICD-10-CM), <code>RXNORM</code>, <code>C4</code>
+  (CPT-4). Plain <code>I10</code> is the WHO ICD-10, a different code set, and is <em>not</em> treated as
+  ICD-10-CM. An event with no mappable code is skipped and counted in a log line, not
+  raised.</li>
+<li>A timestamp with no UTC offset is assumed to be UTC. HL7 v2 does not label local time,
+  so if your interface engine emits it, pass <code>default_utc_offset_hours=</code>.</li>
+<li>The patient identifier (<code>PID-3</code>) is PHI. De-identify the records before they leave your
+  environment, as for any other source.</li>
+</ul>
+<h2 id="joining-notes-to-structured-data">Joining notes to structured data<a class="headerlink" href="#joining-notes-to-structured-data" title="Permanent link">&para;</a></h2>
+<p>A note and a patient's codes and measurements often belong together: the discharge
+summary, plus the labs drawn the day before it. <code>join_notes_to_events</code> attaches a
+patient's events to each note, by shared encounter, by a time window, or either:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">contextlib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">io</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+
+<span class="k">with</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">redirect_stdout</span><span class="p">(</span><span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()):</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.clinical_text.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClinicalTextRecord</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.data.ehr.schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">Demographics</span><span class="p">,</span> <span class="n">Measurement</span><span class="p">,</span> <span class="n">PatientRecord</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.pipelines</span><span class="w"> </span><span class="kn">import</span> <span class="n">index_patients</span><span class="p">,</span> <span class="n">join_notes_to_events</span>
+
+<span class="n">noon</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2024</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="n">tzinfo</span><span class="o">=</span><span class="n">UTC</span><span class="p">)</span>
+<span class="n">patient</span> <span class="o">=</span> <span class="n">PatientRecord</span><span class="p">(</span>
+    <span class="n">patient_id</span><span class="o">=</span><span class="s2">"pt-1"</span><span class="p">,</span>
+    <span class="n">demographics</span><span class="o">=</span><span class="n">Demographics</span><span class="p">(),</span>
+    <span class="n">observations</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">Measurement</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">"718-7"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">13.5</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">noon</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">6</span><span class="p">)),</span>
+        <span class="n">Measurement</span><span class="p">(</span><span class="n">code</span><span class="o">=</span><span class="s2">"718-7"</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="mf">12.0</span><span class="p">,</span> <span class="n">timestamp</span><span class="o">=</span><span class="n">noon</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">9</span><span class="p">)),</span>
+    <span class="p">],</span>
+    <span class="n">source_system</span><span class="o">=</span><span class="s2">"fhir-r4"</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">note</span> <span class="o">=</span> <span class="n">ClinicalTextRecord</span><span class="p">(</span>
+    <span class="n">record_id</span><span class="o">=</span><span class="s2">"n1"</span><span class="p">,</span>
+    <span class="n">source</span><span class="o">=</span><span class="s2">"synthetic"</span><span class="p">,</span>
+    <span class="n">text</span><span class="o">=</span><span class="s2">"Discharge summary."</span><span class="p">,</span>
+    <span class="n">patient_ref</span><span class="o">=</span><span class="s2">"pt-1"</span><span class="p">,</span>
+    <span class="n">timestamp</span><span class="o">=</span><span class="n">noon</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="p">(</span><span class="n">joined</span><span class="p">,)</span> <span class="o">=</span> <span class="n">join_notes_to_events</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">note</span><span class="p">],</span> <span class="n">index_patients</span><span class="p">([</span><span class="n">patient</span><span class="p">]),</span> <span class="n">before</span><span class="o">=</span><span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="k">assert</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">event</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">joined</span><span class="o">.</span><span class="n">events</span><span class="p">]</span> <span class="o">==</span> <span class="p">[</span><span class="mf">13.5</span><span class="p">]</span>  <span class="c1"># the older result is outside</span>
+</code></pre></div>
+<p>The join is on identifiers only: <code>patient_ref</code> on the note must equal the record's
+<code>patient_id</code>, and it never links by name or date of birth. A note with no <code>patient_ref</code>,
+or one that matches no patient, comes back with <code>patient_found=False</code> rather than being
+guessed at, so a join across sources that pseudonymise differently is visible as a run of
+<code>False</code>, not as silent emptiness. Notes stream; the patients are held as a lookup (one
+entry per patient) or fetched by a function you pass.</p>
 <h2 id="from-ehr-to-retrieval-ready-text">From EHR to retrieval-ready text<a class="headerlink" href="#from-ehr-to-retrieval-ready-text" title="Permanent link">&para;</a></h2>
 <p>Because the timeline <em>is</em> a <code>ClinicalTextRecord</code>, de-identify it exactly like a
 note before it goes anywhere else:</p>
@@ -1331,8 +1544,10 @@ note before it goes anywhere else:</p>
 <p><code>guardrail.ehr.code_validity</code> checks that coded events use codes their system
 recognises, <code>guardrail.ehr.referential</code> finds events that point at a missing
 encounter or fall outside its window, and <code>guardrail.ehr.units</code> flags
-implausible lab units and values. They return results rather than raising; see
-the <a href="../../api/guardrails/">guardrails reference</a>.</p>
+implausible lab units and values. <code>guardrail.ehr.k_anonymity</code> checks that an exported
+cohort cannot be narrowed to fewer than <code>k</code> people by its quasi-identifiers (see
+<a href="../deidentification/#structured-data-k-anonymity">k-anonymity</a>). They return results
+rather than raising; see the <a href="../../api/guardrails/">guardrails reference</a>.</p>
 <h2 id="limits-worth-knowing">Limits worth knowing<a class="headerlink" href="#limits-worth-knowing" title="Permanent link">&para;</a></h2>
 <ul>
 <li>The FHIR loader is exercised on Synthea-<em>shaped</em> bundles and resource-by-resource
