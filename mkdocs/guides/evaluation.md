@@ -235,7 +235,7 @@ from openbtk.eval.summarisation import BertScorer
 
 scorer = BertScorer(
     model="distilbert-base-uncased",
-    revision="12040accade4e8a0f71eabdb258fecc2e7e948be",
+    revision="12040accade4e8a0f71eabdb258fecc2e7e948be",  # pragma: allowlist secret
     layer=5,
 )
 assert scorer.provenance().model_identity.revision.startswith("12040acc")

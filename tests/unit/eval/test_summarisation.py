@@ -511,7 +511,7 @@ def test_matches_the_reference_bert_score_package_on_a_real_model() -> None:
     pytest.importorskip("torch")
     scorer = BertScorer(
         model="distilbert-base-uncased",
-        revision="12040accade4e8a0f71eabdb258fecc2e7e948be",
+        revision="12040accade4e8a0f71eabdb258fecc2e7e948be",  # pragma: allowlist secret
         layer=5,
     )
     for reference, candidate, (p, r, f) in _REFERENCE_PAIRS:
