@@ -1,6 +1,19 @@
 # OpenBTK — Open Toolkit for Biomedical AI
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/openbtk)](https://pypi.org/project/openbtk/)
+[![PyPI downloads](https://img.shields.io/pypi/dm/openbtk)](https://pypistats.org/packages/openbtk)
+[![Repo views](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fviews.json)](https://github.com/openbtk/openbtk-core/pulse)
+[![Repo clones](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fclones.json)](https://github.com/openbtk/openbtk-core/pulse)
+
+<sub>PyPI badges are live from PyPI/pypistats.org. GitHub only shows clone and
+view counts to maintainers and only for a rolling 14 days, so the repo badges
+above are a running total accumulated daily by
+[`traffic-stats.yml`](.github/workflows/traffic-stats.yml) and
+[`scripts/update_traffic_stats.py`](scripts/update_traffic_stats.py) onto the
+[`metrics-data`](https://github.com/openbtk/openbtk-core/tree/metrics-data)
+branch — not a GitHub-native figure, and "visits" undercounts real reach
+because the same visitor across different days is counted once per day.</sub>
 
 **The open-source layer between biomedical data and modern AI.**
 
@@ -14,11 +27,15 @@ than memory.
 
 > ## Status: v0.5 — pre-1.0, real, and honestly scoped
 >
-> Milestones **M1–M10** are built, tested and released: the core framework,
-> de-identification, clinical text, EHR loading, providers and retrieval,
-> guardrails and terminology, benchmarks, and LangChain interop.
-> `pip install openbtk` gives you `0.6.0`, including the `openbtk` command line,
-> clinical-QA and groundedness evaluation, guides and eight tutorial notebooks.
+> `pip install openbtk` gives you the latest PyPI release, **`0.5.0`**: the core
+> framework, de-identification, clinical text, EHR loading, providers and
+> retrieval, guardrails and terminology, benchmarks, and LangChain interop.
+>
+> **M10 and most of M11 are built, tested and merged to `main`, but not yet
+> released** — the `openbtk` command line, clinical-QA and groundedness
+> evaluation, guides, eight tutorial notebooks, a security review and twelve
+> further requirements from the v1.0 gate. They will ship in the next PyPI
+> release, which needs an explicit maintainer go-ahead.
 >
 > **The i2b2/n2c2 de-identification benchmark has not been run.** The harness
 > exists and is tested, but that corpus is released only under a Data Use

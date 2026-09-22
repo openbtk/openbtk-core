@@ -15,6 +15,21 @@ an audit found twelve of them unbuilt, and all twelve are below. The remaining M
 items -- three named production users, and an independent evaluation of the de-id
 stack -- need people outside this repository and are not claimed.
 
+### Added — repo metrics on the README
+- **PyPI version and download-count badges** (live from PyPI/pypistats.org, no
+  infrastructure of ours involved).
+- **GitHub repo views and clones badges.** GitHub's traffic API only shows this to
+  maintainers and only for a rolling 14 days, so `traffic-stats.yml` fetches it daily
+  with a dedicated token and `scripts/update_traffic_stats.py` folds it into a running
+  history on the `metrics-data` branch, which shields.io endpoint badges read from.
+
+### Added — repository ruleset on `main`
+- Force-pushes and branch deletion on `main` are now rejected outright.
+- Merging into `main` requires a pull request, one approving review, and all 20 CI
+  checks green on a branch that is up to date with `main` -- with no bypass for
+  anyone, including repo admins. Direct pushes to `main` (including by a maintainer)
+  are no longer possible; this is the first change merged under the new rule.
+
 ### Added — P2 requirements (PRD section 7, "v1.0 — Adoption")
 - **`DosePlausibilityGuardrail`** (`guardrail.general.dose_plausibility`, FR-G-05).
   Finds drug, dose, frequency and route statements in generated text and checks them

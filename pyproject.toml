@@ -204,6 +204,7 @@ ignore = [
 "tests/**" = ["ANN", "ARG"]
 "notebooks/**" = ["ANN", "ARG", "T20", "E501"]   # tutorials print and read top-to-bottom
 "src/openbtk/cli/**" = ["T20"]     # the CLI prints legitimately
+"scripts/**" = ["T20"]             # repo maintenance scripts, not the package; print legitimately
 
 [tool.ruff.lint.isort]
 known-first-party = ["openbtk"]
