@@ -424,3 +424,15 @@ class ReferenceRecognizer(BaseRecognizer):
 @pytest.fixture
 def fixture_record() -> FixtureRecord:
     return FixtureRecord(record_id="rec-1", text="hello world from a fixture")
+
+
+def enrolled(registry: Any) -> list[str]:
+    """The keys a contract suite parametrizes over.
+
+    Every registered component is enrolled, with no opt-out, *except test doubles*: the
+    components unit tests register to drive one test. Their key has a ``_test_`` segment
+    (``loader.general.pipeline_test_lines``). A double is not a component, and whether
+    one happened to be registered when the contract suite was collected used to depend
+    on the order tests were collected in.
+    """
+    return [key for key in registry.list_keys() if "_test_" not in key]

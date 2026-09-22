@@ -279,6 +279,16 @@ class StepProvenance(BaseModel):
     error: str | None = Field(
         None, description="PHI-free failure summary, if status == 'failed'."
     )
+    resumed_from: int = Field(
+        0,
+        ge=0,
+        description=(
+            "For a root loader step run with a checkpoint (FR-L-05): how many of "
+            "its source's records were already read in an earlier run and were "
+            "skipped, not reloaded, this time. 0 for every other step, and for a "
+            "loader run without a checkpoint."
+        ),
+    )
 
 
 class RunManifest(BaseModel):

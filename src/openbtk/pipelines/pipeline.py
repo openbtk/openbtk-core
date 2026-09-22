@@ -18,7 +18,7 @@ from openbtk.core.config import (
     ValidationIssue,
 )
 from openbtk.core.errors import ConfigError
-from openbtk.pipelines.executor import _Executor, _validate_linear_shape
+from openbtk.pipelines.executor import _Executor, _validate_shape
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -137,18 +137,24 @@ class Pipeline:
         """Everything that can be checked without instantiating a component or
         touching data: the config's registry, parameter and policy checks
         (:meth:`PipelineConfig.validate_registry`) plus the executor's own
-        shape rule (a single linear chain). An empty list means ``run()`` will
-        not be refused for any of these reasons -- not that it will succeed.
+        shape rules (no repeated predecessor, loaders are roots). An empty list means
+        ``run()`` will not be refused for any of these reasons -- not that it will
+        succeed.
         """
         config = self.to_config()
         issues = config.validate_registry()
         try:
-            _validate_linear_shape(config.steps)
+            _validate_shape(config.steps)
         except ConfigError as e:
             issues.append(ValidationIssue(severity="error", message=str(e)))
         return issues
 
-    def run(self) -> RunManifest:
+    def run(
+        self,
+        *,
+        checkpoint_path: str | Path | None = None,
+        checkpoint_interval: int = 1000,
+    ) -> RunManifest:
         """Execute this pipeline, streaming records through every step.
 
         Always returns a ``RunManifest`` -- success or failure (ADR-0005:
@@ -157,5 +163,18 @@ class Pipeline:
         or execution is caught and reported as
         ``RunManifest.status == "failed"`` with a PHI-free
         ``RunManifest.error`` instead.
+
+        Args:
+            checkpoint_path: When given (FR-L-05), resume from this file if it
+                already holds a checkpoint for this pipeline, and periodically
+                write how far each root loader has read. A successful run
+                deletes the file; a failed one leaves it for the next attempt.
+                See ``openbtk.pipelines.checkpoint`` for exactly what this
+                guarantees -- at-least-once, not exactly-once or a real seek.
+            checkpoint_interval: Records between checkpoint saves.
         """
-        return _Executor(self.to_config()).run()
+        return _Executor(
+            self.to_config(),
+            checkpoint_path=checkpoint_path,
+            checkpoint_interval=checkpoint_interval,
+        ).run()

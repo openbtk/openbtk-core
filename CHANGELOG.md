@@ -10,8 +10,75 @@ recorded here.
 ## [Unreleased]
 
 **M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism and
-the security review are done; the adopter and independent-evaluation items need
-people outside this repository and are not claimed.
+the security review are done. The PRD's v1.0 gate also asks for "all P2 requirements";
+an audit found twelve of them unbuilt, and all twelve are below. The remaining M11
+items -- three named production users, and an independent evaluation of the de-id
+stack -- need people outside this repository and are not claimed.
+
+### Added — P2 requirements (PRD section 7, "v1.0 — Adoption")
+- **`DosePlausibilityGuardrail`** (`guardrail.general.dose_plausibility`, FR-G-05).
+  Finds drug, dose, frequency and route statements in generated text and checks them
+  against limits **you supply**; OpenBTK ships no dose limits, and every limit must name
+  its source. Blocks a dose or computed daily total over a limit. Says plainly when
+  nothing was checked. A pass never means a dose is safe.
+- **k-anonymity** (FR-D-11): `openbtk.deid.kanonymity` measures it (counts-only report)
+  and reaches it by generalising along inspectable ladders, then suppressing the rare
+  remainder; `guardrail.ehr.k_anonymity` checks an EHR cohort;
+  `data.ehr.cohort.quasi_identifiers` builds the table. It covers only the columns you
+  name and says nothing about what a group shares.
+- **`HL7v2Loader`** (`loader.ehr.hl7v2`, FR-E-03): folds HL7 v2 messages (PID, PV1, DG1,
+  OBX, RXE/RXA, PR1) into `PatientRecord`s. Names, addresses and phone numbers are never
+  read. Codes map only through HL7 table 0396 names checked against HL7's table; plain
+  `I10` is WHO ICD-10 and is not treated as ICD-10-CM.
+- **Cross-modal joins** (FR-E-08): `openbtk.pipelines.join_notes_to_events` attaches a
+  patient's events to their notes by encounter, by a configurable time window, or
+  either. Identifier joins only; an unmatched note is reported, never guessed.
+- **`ConceptNormalizer`** (FR-M-06): fuzzy free-text term to concept matching over a
+  vocabulary you supply ("CBC" reaches its LOINC code through your alias). It refuses a
+  candidate that differs in a number, laterality, acuity or negation word, so a shorter
+  name never resolves to a more specific code.
+- **`CrossEncoderReranker`** (`reranker.general.cross_encoder`, FR-R-04): MedCPT's
+  cross-encoder pinned to its verified commit; local, lazy, keeps unscorable results.
+- **Hybrid retrieval** (FR-R-05): `BM25Index` and `reciprocal_rank_fusion`;
+  `RAGPipeline(bm25=...)` fuses exact-term hits with the vector store's before reranking.
+- **Cloud LLM providers** (FR-V-01): `llm.general.azure_openai`, `llm.general.bedrock`
+  (Converse API) and `llm.general.vertex` (`google-genai`); extras `bedrock` and
+  `vertex`. Each is tested against fake SDKs **and** against the real SDK libraries
+  offline (Bedrock's request passes botocore's own validator; the Vertex request is
+  built from real `google.genai` types; real error objects are translated), with a CI
+  job that fails on a skip. **None has been run against a live AWS, Google Cloud or
+  Azure account.** An argument a provider cannot express is refused, not dropped.
+- **Model cards** (FR-P-06): `openbtk.eval.model_card.ModelCard` and `cards_from_run`.
+  Identity comes from the component's provenance; every metric must come from an
+  `EvalManifest` (there is no way to type a score in); sections that need judgement
+  read "Not provided." unless you write them.
+- **Fan-out and fan-in in pipelines** (FR-L-04): a step may feed several steps (each gets
+  every record) or read several (their streams are interleaved); several independent
+  chains may run in one pipeline. **Behaviour change:** these shapes used to be refused
+  with a `ConfigError`; they now run. Fan-in is a merge, not a join, and a diamond delivers
+  each record twice. Memory stays bounded because the run pulls from every leaf in turn (a
+  test shows a lag of at most 3 records against 1999 for a sequential drain). `validate`
+  still refuses a repeated predecessor, a loader with an `after`, and cycles.
+- **Checkpoint and resume for long pipeline runs** (FR-L-05): `Pipeline.run(checkpoint_path=...)`
+  and `openbtk run --checkpoint PATH [--checkpoint-interval N]`. Periodically records how
+  far each root loader has read; a rerun with the same file resumes instead of
+  restarting, and a successful run deletes the file. At-least-once, not exactly-once
+  (a crash between saves, every 1000 records by default, redoes up to that many); resume
+  is "read and discard the skipped records," not a real seek, so it needs a source that
+  yields the same items in the same order across attempts. `StepProvenance.resumed_from`
+  records how many of a loader's records were skipped this way (0 otherwise). Verified
+  with a real crash-and-retry, including a chunker step downstream that never reprocesses
+  the already-consumed records.
+- **Summarisation metrics** (FR-X-05): `openbtk.eval.summarisation` with ROUGE (wraps
+  `rouge-score`, extra `eval`) and BERTScore. BERTScore is implemented here on
+  `transformers` because the `bert-score` package cannot pin a model revision; the model,
+  its commit and the layer are all required. Checked against the reference package: the
+  first version disagreed on recall (the reference lets `[CLS]`/`[SEP]` take part in
+  matching, with zero weight in the average), which the check caught and the
+  implementation now reproduces to within 1e-7. No idf weighting or baseline rescaling.
+  Reports hold scores, never text; `summarisation_manifest` feeds model cards.
+- New guides: guardrails, terminology, retrieval; the evaluation guide gains summaries
+  and model cards.
 
 ### Security
 Found by an internal review ([`mkdocs/security-review.md`](mkdocs/security-review.md)).

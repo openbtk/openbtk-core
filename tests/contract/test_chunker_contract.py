@@ -23,7 +23,7 @@ from pydantic import BaseModel
 
 from openbtk.core.registry import CHUNKER_REGISTRY
 
-from .conftest import FixtureChunk, FixtureRecord
+from .conftest import FixtureChunk, FixtureRecord, enrolled
 
 if TYPE_CHECKING:
     from openbtk.core.base import BaseChunker
@@ -44,7 +44,7 @@ def _make_record(key: str, text: str) -> Any:
     return FixtureRecord(record_id="r1", text=text)
 
 
-@pytest.mark.parametrize("key", CHUNKER_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(CHUNKER_REGISTRY))
 class TestChunkerContract:
     def test_chunk_returns_iterator(self, key: str) -> None:
         """chunk() returns a genuine Iterator, not a list (ADR-0004)."""

@@ -14,6 +14,10 @@ check. Whether a `BLOCK` halts a pipeline is the caller's policy. Import
 
 ::: openbtk.guardrails.groundedness.GroundednessCheckInput
 
+::: openbtk.guardrails.dose.DosePlausibilityGuardrail
+
+::: openbtk.guardrails.dose.DoseLimit
+
 ## EHR
 
 ::: openbtk.guardrails.ehr.EHRCodeValidityGuardrail
@@ -21,6 +25,8 @@ check. Whether a `BLOCK` halts a pipeline is the caller's policy. Import
 ::: openbtk.guardrails.ehr.ReferentialIntegrityGuardrail
 
 ::: openbtk.guardrails.ehr.UnitPlausibilityGuardrail
+
+::: openbtk.guardrails.ehr.CohortKAnonymityGuardrail
 
 ## Composing guardrails
 

@@ -16,7 +16,7 @@ from pydantic import BaseModel
 
 from openbtk.core.registry import SEGMENTER_REGISTRY
 
-from .conftest import FixtureRecord
+from .conftest import FixtureRecord, enrolled
 
 if TYPE_CHECKING:
     from openbtk.core.base import BaseSegmenter
@@ -26,7 +26,7 @@ def _new_instance(key: str) -> BaseSegmenter[Any, Any]:
     return SEGMENTER_REGISTRY.create(key)
 
 
-@pytest.mark.parametrize("key", SEGMENTER_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(SEGMENTER_REGISTRY))
 class TestSegmenterContract:
     def test_segment_returns_iterator(self, key: str) -> None:
         """segment() returns a genuine Iterator, not a list (ADR-0004)."""

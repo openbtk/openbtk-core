@@ -31,6 +31,8 @@ import pytest
 from openbtk.core.config import PolicyConfig
 from openbtk.core.registry import EMBEDDING_REGISTRY
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseEmbeddingProvider
 
@@ -86,7 +88,7 @@ def _new_instance(key: str) -> BaseEmbeddingProvider:
     )
 
 
-@pytest.mark.parametrize("key", EMBEDDING_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(EMBEDDING_REGISTRY))
 class TestEmbeddingContract:
     def test_declares_sends_data_offsite(self, key: str) -> None:
         """Every provider must declare this -- it is what FR-V-07's policy

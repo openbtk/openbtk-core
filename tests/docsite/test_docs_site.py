@@ -30,7 +30,8 @@ _GUIDES = sorted((_DOCS / "guides").glob("*.md"))
 
 # Guides that need an optional extra to execute their code.
 _REQUIRES: dict[str, tuple[str, ...]] = {
-    "ehr.md": ("fhir.resources", "pyarrow"),
+    "ehr.md": ("fhir.resources", "pyarrow", "hl7apy"),
+    "evaluation.md": ("rouge_score",),
 }
 
 

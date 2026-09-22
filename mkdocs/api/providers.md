@@ -15,6 +15,20 @@ or models.
 
 ::: openbtk.llms.openai_compatible.OpenAICompatibleProvider
 
+### Cloud providers
+
+Azure OpenAI, AWS Bedrock and Google Vertex AI. Each is tested against a mocked SDK
+*and* against the real SDK libraries offline (request shapes validated by the
+libraries themselves); **none has been run against a live account**. They need the
+`llms` (Azure), `bedrock` or `vertex` extra, and read credentials from the SDK's own
+environment lookup, never from OpenBTK.
+
+::: openbtk.llms.azure_openai.AzureOpenAIProvider
+
+::: openbtk.llms.bedrock.BedrockProvider
+
+::: openbtk.llms.vertex.VertexAIProvider
+
 ### Biomedical presets
 
 Presets are configuration over the classes above, not new classes.

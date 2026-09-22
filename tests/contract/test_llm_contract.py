@@ -44,6 +44,8 @@ from openbtk.core.config import PolicyConfig
 from openbtk.core.registry import LLM_REGISTRY
 from openbtk.core.schemas import LLMResponse, Message
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseLLMProvider
 
@@ -67,6 +69,9 @@ _ALLOW_OFFSITE = PolicyConfig(allow_offsite_providers=True)
 _TINY_GPT2_SHA = "5f91d94bd9cd7190a9f3216ff93cd1dd95f2c7be"  # pragma: allowlist secret
 _OPENAI_COMPATIBLE_BASE_URL_ENV_VAR = "OPENBTK_TEST_OPENAI_COMPATIBLE_BASE_URL"
 _CONSTRUCTOR_KWARGS_BY_KEY: dict[str, dict[str, Any]] = {
+    "llm.general.azure_openai": {"model": "a-deployment"},
+    "llm.general.bedrock": {"model": "vendor.model-v1:0"},
+    "llm.general.vertex": {"model": "model-001"},
     "llm.general.huggingface_local": {
         "model": "sshleifer/tiny-gpt2",
         "revision": _TINY_GPT2_SHA,
@@ -86,6 +91,9 @@ _CONSTRUCTOR_KWARGS_BY_KEY: dict[str, dict[str, Any]] = {
 _REAL_CALL_ENV_VAR_BY_KEY: dict[str, str | None] = {
     "llm.general.openai": "OPENAI_API_KEY",
     "llm.general.anthropic": "ANTHROPIC_API_KEY",
+    "llm.general.azure_openai": "AZURE_OPENAI_API_KEY",
+    "llm.general.bedrock": "AWS_ACCESS_KEY_ID",
+    "llm.general.vertex": "GOOGLE_APPLICATION_CREDENTIALS",
     "llm.general.openai_compatible": _OPENAI_COMPATIBLE_BASE_URL_ENV_VAR,
     "llm.general.huggingface_local": None,
 }
@@ -130,7 +138,7 @@ class _Answer(BaseModel):
     value: str
 
 
-@pytest.mark.parametrize("key", LLM_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(LLM_REGISTRY))
 class TestLLMContract:
     def test_declares_sends_data_offsite(self, key: str) -> None:
         provider = _new_instance(key)

@@ -3,7 +3,10 @@ ReferentialIntegrityGuardrail, UnitPlausibilityGuardrail."""
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
+from typing import TYPE_CHECKING
+
+import pytest
 
 from openbtk.core.schemas import CodeSystem, GuardrailSeverity
 from openbtk.data.ehr.schemas import (
@@ -14,11 +17,15 @@ from openbtk.data.ehr.schemas import (
     PatientRecord,
 )
 from openbtk.guardrails.ehr import (
+    CohortKAnonymityGuardrail,
     EHRCodeValidityGuardrail,
     ReferentialIntegrityGuardrail,
     UnitPlausibilityGuardrail,
 )
 from openbtk.guardrails.terminology_validity import TerminologyValidityGuardrail
+
+if TYPE_CHECKING:
+    from collections.abc import Iterator
 
 _T1 = datetime(2024, 3, 14, tzinfo=UTC)
 _T2 = datetime(2024, 3, 15, tzinfo=UTC)
@@ -192,3 +199,102 @@ class TestUnitPlausibilityGuardrail:
         assert isinstance(
             UnitPlausibilityGuardrail().provenance().model_dump_json(), str
         )
+
+
+def _cohort(gender_counts: dict[str, int], **extra: object) -> list[PatientRecord]:
+    patients: list[PatientRecord] = []
+    for gender, count in gender_counts.items():
+        for _ in range(count):
+            patients.append(
+                _patient(
+                    patient_id=f"pt-{len(patients)}",
+                    demographics=Demographics(gender=gender, **extra),  # type: ignore[arg-type]
+                )
+            )
+    return patients
+
+
+class TestCohortKAnonymityGuardrail:
+    def _guardrail(self, **kwargs: object) -> CohortKAnonymityGuardrail:
+        kwargs.setdefault("quasi_identifiers", ["gender"])
+        return CohortKAnonymityGuardrail(**kwargs)  # type: ignore[arg-type]
+
+    def test_is_registered_under_the_spec_key(self) -> None:
+        from openbtk.core.registry import GUARDRAIL_REGISTRY
+
+        assert "guardrail.ehr.k_anonymity" in GUARDRAIL_REGISTRY.list_keys()
+
+    def test_a_k_anonymous_cohort_passes(self) -> None:
+        result = self._guardrail(k=5).check(_cohort({"female": 6, "male": 5}))
+        assert result.passed and result.severity is GuardrailSeverity.INFO
+        assert result.details["k_achieved"] == 5
+
+    def test_a_small_group_warns_with_counts(self) -> None:
+        result = self._guardrail(k=5).check(
+            _cohort({"female": 8, "male": 1, "other": 3})
+        )
+        assert not result.passed and result.severity is GuardrailSeverity.WARNING
+        assert result.details["k_achieved"] == 1
+        assert result.details["n_unique"] == 1 and result.details["n_below_k"] == 4
+        assert "under k=5" in result.message
+
+    def test_the_result_carries_no_patient_values(self) -> None:
+        cohort = _cohort({"female": 1}, race="Sentinel-Race-Value")
+        dumped = (
+            CohortKAnonymityGuardrail(k=5, quasi_identifiers=["gender", "race"])
+            .check(cohort)
+            .model_dump_json()
+        )
+        assert "Sentinel-Race-Value" not in dumped and "pt-0" not in dumped
+
+    def test_the_cohort_may_be_a_generator_consumed_once(self) -> None:
+        def stream() -> Iterator[PatientRecord]:
+            yield from _cohort({"female": 6})
+
+        assert self._guardrail(k=5).check(stream()).passed
+
+    def test_an_empty_cohort_is_not_a_finding(self) -> None:
+        result = self._guardrail().check([])
+        assert result.passed and "empty" in result.message
+
+    @pytest.mark.parametrize(
+        "payload", ["", "text", None, 12, {"a": 1}, ["not", "patients"], b"x"]
+    )
+    def test_things_that_are_not_cohorts_are_not_applicable(
+        self, payload: object
+    ) -> None:
+        result = self._guardrail().check(payload)
+        assert result.passed and result.severity is GuardrailSeverity.INFO
+
+    def test_age_without_as_of_is_a_warning_not_a_crash(self) -> None:
+        result = CohortKAnonymityGuardrail(quasi_identifiers=["age"]).check(
+            _cohort({"female": 6})
+        )
+        assert not result.passed and "as_of" in result.message
+
+    def test_age_works_with_as_of_given_as_a_string(self) -> None:
+        patients = [
+            _patient(
+                patient_id=f"pt-{i}",
+                demographics=Demographics(birth_date=date(1980, 1, 1)),
+            )
+            for i in range(5)
+        ]
+        guardrail = CohortKAnonymityGuardrail(
+            k=5, quasi_identifiers=["age"], as_of="2024-06-01"
+        )
+        assert guardrail.check(patients).passed
+
+    def test_an_unknown_attribute_is_a_warning_listing_the_choices(self) -> None:
+        result = self._guardrail(quasi_identifiers=["zodiac"]).check(
+            _cohort({"female": 6})
+        )
+        assert not result.passed and "zodiac" in result.message
+        assert "gender" in result.details["available"]  # type: ignore[operator]
+
+    def test_a_bad_k_is_a_warning(self) -> None:
+        assert not self._guardrail(k=0).check(_cohort({"female": 6})).passed
+
+    def test_provenance_records_the_settings(self) -> None:
+        config = self._guardrail(k=7).provenance().config
+        assert config == {"k": 7, "quasi_identifiers": ["gender"], "as_of": None}

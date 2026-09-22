@@ -193,7 +193,7 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: pip install -e ".[dev,ehr,langchain,langgraph]"
+      - run: pip install -e ".[dev,ehr,eval,langchain,langgraph]"
       - name: Docs examples, none skipped (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
@@ -259,7 +259,27 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -e ".[docs,langchain]"
-      - run: mkdocs build --strict
+      - name: Build the docs (strict)
+        shell: bash
+        run: |
+          # GitHub's default `bash` invocation already runs with `-eo pipefail`, so
+          # without `set +e` here a failing `mkdocs` aborts the script at the pipe
+          # itself -- before `status=` or the annotation below ever runs. This is
+          # exactly why earlier docs-build failures reported no detail at all.
+          set +e
+          mkdocs build --strict 2>&1 | tee mkdocs.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" != "0" ]; then
+            echo "::error title=docs-build failed::$(tail -c 1500 mkdocs.out | tr '\n%' '||')"
+          fi
+          exit "$status"
+      - name: Upload the full build log on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: mkdocs-build-log
+          path: mkdocs.out
 
   build:
     runs-on: ubuntu-latest
@@ -329,3 +349,48 @@ jobs:
           python -m venv "$RUNNER_TEMP/extras"
           "$RUNNER_TEMP/extras/bin/pip" install --quiet --upgrade pip ".[ehr,langchain,langgraph]"
           pip-audit --progress-spinner off --path "$("$RUNNER_TEMP/extras/bin/python" -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')"
+
+  test-cloud-sdks:
+    # The cloud LLM providers (Bedrock, Vertex, Azure) are unit-tested against fake SDK
+    # modules. This job checks the shapes they build against the REAL libraries, offline:
+    # botocore's own request validator, real google-genai types, real error objects. It
+    # fails on a skip, so the checks cannot quietly stop running. It cannot show a live
+    # service accepts a request; none of these providers has been run against one.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -e ".[dev,bedrock,vertex,eval]" openai
+      - name: Providers against the real SDKs (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          set +e
+          pytest "${{ github.workspace }}/tests/unit/llms/test_cloud_sdk_shapes.py" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" != "0" ]; then
+            echo "::error title=test-cloud-sdks::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
+          if grep -Eq "skipped" pytest.out; then
+            echo "::error title=test-cloud-sdks::a check was skipped, so an SDK is not installed"
+            exit 1
+          fi
+      - name: Summarisation metrics against the real rouge-score (from outside the repository)
+        working-directory: ${{ runner.temp }}
+        run: |
+          set +e
+          pytest "${{ github.workspace }}/tests/unit/eval/test_summarisation.py" -m "not slow" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" != "0" ]; then
+            echo "::error title=test-cloud-sdks::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
+          if grep -Eq "skipped" pytest.out; then
+            echo "::error title=test-cloud-sdks::a summarisation check was skipped, so rouge-score is not installed"
+            exit 1
+          fi

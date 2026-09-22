@@ -18,6 +18,8 @@ import pytest
 from openbtk.core.registry import GUARDRAIL_REGISTRY
 from openbtk.core.schemas import GuardrailResult, GuardrailSeverity
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from openbtk.core.base import BaseGuardrail
 
@@ -49,7 +51,7 @@ _AWKWARD_PAYLOADS: list[Any] = [
 ]
 
 
-@pytest.mark.parametrize("key", GUARDRAIL_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(GUARDRAIL_REGISTRY))
 class TestGuardrailContract:
     @pytest.mark.parametrize("payload", _AWKWARD_PAYLOADS)
     def test_check_never_raises(self, key: str, payload: Any) -> None:

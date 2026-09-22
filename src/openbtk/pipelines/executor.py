@@ -5,16 +5,23 @@ anything more complex than a data pipeline (ADR-0001).
 
 **Scope, disclosed rather than silently assumed:**
 
-  * Every non-root step has **exactly one** entry in ``after``, and no step
-    is any other step's sole predecessor more than once -- this executor
-    runs a single linear chain, not an arbitrary DAG. The base classes each
-    step wraps (``BaseLoader.load``, ``BasePreprocessor.process``,
-    ``BaseChunker.chunk``, ``BaseSegmenter.segment``) each take exactly one
-    input item, so fan-in has no defined merge semantics, and fan-out would
-    need a real broadcast (``itertools.tee``, with its own memory
-    trade-offs) that nothing here implements. Both shapes are rejected with
-    ``ConfigError`` rather than silently draining only one branch, or
-    guessing at a merge.
+  * The steps form a DAG (FR-L-04), with two rules. A step with **several dependents**
+    (fan-out) feeds each of them every record, through ``itertools.tee``; a step with
+    **several predecessors** (fan-in) receives their streams *interleaved*, one record
+    at a time in turn. Interleaving is a merge, not a join: the step sees each record
+    on its own and a step that cannot handle a record's type fails, naming itself. It
+    does not pair records across streams (see ``openbtk.pipelines.join`` for joining
+    notes to structured data). Memory stays bounded because the run pulls from every
+    leaf in turn, so the buffer between branches holds only the lag between them (a
+    chunker that emits many records per input widens it by that many).
+  * A diamond (``a -> b``, ``a -> c``, ``b, c -> d``) gives ``d`` every record of ``a``
+    twice, once by each path; that is the topology asked for, not a bug.
+  * A step's outputs are still discarded at the leaves: the run's product is its
+    manifest, and the steps' own side effects.
+  * ``run(checkpoint_path=...)`` (FR-L-05) periodically records how far each root
+    loader has read, so a rerun with the same path resumes instead of restarting.
+    See ``openbtk.pipelines.checkpoint`` for exactly what that does and does not
+    guarantee -- in short, at-least-once, by re-reading and discarding, not a seek.
   * Only ``loader``, ``preprocessor``, ``chunker`` and ``segmenter`` steps
     are executable. No real ``embedding``/``vectorstore`` component exists
     in this repository yet to validate an execution path against --
@@ -43,6 +50,7 @@ anything more complex than a data pipeline (ADR-0001).
 from __future__ import annotations
 
 import hashlib
+import itertools
 import re
 import uuid
 from datetime import UTC, datetime
@@ -65,6 +73,7 @@ from openbtk.core.provenance import (
 )
 from openbtk.core.registry import get_registry
 from openbtk.core.schemas import GuardrailSeverity
+from openbtk.pipelines.checkpoint import CheckpointState
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -124,7 +133,14 @@ class _Counts:
 
 
 class _StepRecord:
-    __slots__ = ("component", "counts", "digest_sha", "digest_uri", "step_id")
+    __slots__ = (
+        "component",
+        "counts",
+        "digest_sha",
+        "digest_uri",
+        "resumed_from",
+        "step_id",
+    )
 
     def __init__(self, step_id: str, component: Component, counts: _Counts) -> None:
         self.step_id = step_id
@@ -132,6 +148,7 @@ class _StepRecord:
         self.counts = counts
         self.digest_uri: str | None = None
         self.digest_sha: str | None = None
+        self.resumed_from = 0
 
 
 class _GuardrailTally:
@@ -155,43 +172,48 @@ class _GuardrailTally:
             self.samples.append(message)
 
 
-def _validate_linear_shape(steps: list[StepConfig]) -> None:
-    """This executor drains exactly one leaf stream at the end (see
-    ``_Executor.run``) -- correct only for a single linear chain. A step
-    with two or more dependents (fan-out) or a config with more than one
-    independent chain (multiple leaves) would need each branch drained
-    separately, and a shared upstream generator split across branches
-    needs real broadcast semantics (``itertools.tee``, with its own memory
-    trade-offs) that nothing here implements yet. Rejected loudly rather
-    than silently draining only one branch and reporting its counts as if
-    they were the whole run's.
-    """
-    multi_predecessor = sorted(s.id for s in steps if len(s.after) > 1)
-    if multi_predecessor:
-        raise ConfigError(
-            f"Step(s) {multi_predecessor!r} have more than one predecessor; "
-            "this executor supports at most one (see this module's docstring).",
-            context={"steps": multi_predecessor},
-        )
-    children_count: dict[str, int] = {}
+def _validate_shape(steps: list[StepConfig]) -> None:
+    """The shape rules that hold whatever the topology: a step names each predecessor
+    at most once, and a loader is a root. (Cycles and unknown ``after`` ids are
+    ``PipelineConfig.validate_registry``'s.)"""
     for step in steps:
-        if step.after:
-            children_count[step.after[0]] = children_count.get(step.after[0], 0) + 1
-    branching = sorted(step_id for step_id, n in children_count.items() if n > 1)
-    if branching:
-        raise ConfigError(
-            f"Step(s) {branching!r} have more than one dependent step; this "
-            "executor supports only a single linear chain (see this "
-            "module's docstring).",
-            context={"steps": branching},
-        )
-    leaves = [s.id for s in steps if s.id not in children_count]
-    if len(leaves) > 1:
-        raise ConfigError(
-            f"Pipeline has {len(leaves)} independent branches {leaves!r}; "
-            "this executor supports only a single linear chain.",
-            context={"leaves": leaves},
-        )
+        if len(set(step.after)) != len(step.after):
+            raise ConfigError(
+                f"Step {step.id!r} lists the same predecessor more than once.",
+                context={"step_id": step.id},
+            )
+        if step.type.split(".", 1)[0] == "loader" and step.after:
+            raise ConfigError(
+                f"Step {step.id!r}: a loader step must be a root step (no 'after').",
+                context={"step_id": step.id},
+            )
+
+
+def _interleave(streams: list[Iterator[Any]]) -> Iterator[Any]:
+    """Merge streams fairly: one item from each live stream in turn, until all end. An
+    exception from any stream propagates as it is."""
+    live = [iter(stream) for stream in streams]
+    while live:
+        for iterator in list(live):
+            try:
+                item = next(iterator)
+            except StopIteration:
+                live.remove(iterator)
+                continue
+            yield item
+
+
+def _drain(leaves: list[Iterator[Any]]) -> None:
+    """Pull every leaf to the end, one item from each in turn. Alternating, rather than
+    finishing one leaf before the next, is what keeps a fan-out's buffer small: the
+    branches advance together, so no branch waits far ahead of another."""
+    live = list(leaves)
+    while live:
+        for iterator in list(live):
+            try:
+                next(iterator)
+            except StopIteration:
+                live.remove(iterator)
 
 
 def _topological_order(steps: list[StepConfig]) -> list[str]:
@@ -255,6 +277,26 @@ def _run_source(
         ) from e
 
 
+def _checkpointed(
+    step_id: str,
+    produce: Callable[[], Iterator[Any]],
+    start: int,
+    state: CheckpointState,
+) -> Callable[[], Iterator[Any]]:
+    """Wrap a loader's ``produce`` so its first ``start`` items are read and
+    discarded (FR-L-05: resume is "skip and re-read", not a real seek), and the
+    checkpoint advances -- and periodically saves -- as each item is yielded."""
+
+    def wrapped() -> Iterator[Any]:
+        position = start
+        for item in itertools.islice(produce(), start, None):
+            position += 1
+            yield item
+            state.advance(step_id, position)
+
+    return wrapped
+
+
 def _run_per_record(
     step_id: str,
     upstream: Iterator[Any],
@@ -288,8 +330,17 @@ def _run_per_record(
 
 
 class _Executor:
-    def __init__(self, config: PipelineConfig) -> None:
+    def __init__(
+        self,
+        config: PipelineConfig,
+        *,
+        checkpoint_path: str | Path | None = None,
+        checkpoint_interval: int = 1000,
+    ) -> None:
         self._config = config
+        self._checkpoint_path = checkpoint_path
+        self._checkpoint_interval = checkpoint_interval
+        self._checkpoint: CheckpointState | None = None
 
     def run(self) -> RunManifest:
         run_id = uuid.uuid4().hex
@@ -310,12 +361,26 @@ class _Executor:
                     + "; ".join(i.message for i in issues),
                     context={"pipeline": self._config.name},
                 )
-            _validate_linear_shape(self._config.steps)
+            if self._checkpoint_path is not None:
+                self._checkpoint = CheckpointState.load_or_start(
+                    self._checkpoint_path,
+                    pipeline_name=self._config.name,
+                    run_id=run_id,
+                    interval=self._checkpoint_interval,
+                )
+            _validate_shape(self._config.steps)
             order = _topological_order(self._config.steps)
             by_id = {s.id: s for s in self._config.steps}
             guardrails_by_point = self._index_guardrails()
 
-            step_streams: dict[str, Iterator[Any]] = {}
+            dependents: dict[str, int] = {}
+            for step in self._config.steps:
+                for predecessor_id in step.after:
+                    dependents[predecessor_id] = dependents.get(predecessor_id, 0) + 1
+
+            # Each step's output, as one iterator per dependent (a fan-out step gets a
+            # tee of its stream, one branch for each step that reads it).
+            outputs: dict[str, list[Iterator[Any]]] = {}
             for step_id in order:
                 step = by_id[step_id]
                 # Looked up by the step's OWN declared `after`, never "whatever
@@ -324,7 +389,14 @@ class _Executor:
                 # more than one root (e.g. two independent loaders), and
                 # conflating the two was a real bug caught by a test with two
                 # root steps sharing this executor's own step-wiring loop.
-                predecessor = step_streams[step.after[0]] if step.after else None
+                upstreams = [outputs[dep].pop() for dep in step.after]
+                predecessor = (
+                    None
+                    if not upstreams
+                    else upstreams[0]
+                    if len(upstreams) == 1
+                    else _interleave(upstreams)
+                )
                 stream, record = self._wire_step(step, predecessor, failed)
                 step_records.append(record)
                 point = f"after:{step_id}"
@@ -332,10 +404,17 @@ class _Executor:
                     stream = self._apply_guardrails(
                         point, guardrails_by_point[point], stream, guardrail_tallies
                     )
-                step_streams[step_id] = stream
-            if order:
-                for _ in step_streams[order[-1]]:
-                    pass
+                branches = dependents.get(step_id, 0)
+                outputs[step_id] = (
+                    list(itertools.tee(stream, branches)) if branches > 1 else [stream]
+                )
+            _drain(
+                [
+                    outputs[step_id][0]
+                    for step_id in order
+                    if not dependents.get(step_id)
+                ]
+            )
         except GuardrailViolation as e:
             status, error_message = "failed", str(e)
         except OpenBTKError as e:
@@ -344,6 +423,16 @@ class _Executor:
             # ADR-0005's "no manifest-off switch" must hold even for a bug this
             # executor didn't anticipate, not just the documented error types above.
             status, error_message = "failed", f"Unexpected error: {e}"
+
+        if self._checkpoint is not None:
+            if status == "success":
+                # Nothing is left to resume; a stale file would only risk a future
+                # run skipping records that a fresh source no longer starts with.
+                self._checkpoint.clear()
+            else:
+                # Capture progress since the last periodic save, so a retry redoes
+                # at most checkpoint_interval records, not everything since start.
+                self._checkpoint.save()
 
         ended = datetime.now(UTC)
         steps = [
@@ -354,6 +443,7 @@ class _Executor:
                 records_out=r.counts.output_count,
                 status="failed" if r.step_id == failed[0] else "success",
                 error=error_message if r.step_id == failed[0] else None,
+                resumed_from=r.resumed_from,
             )
             for r in step_records
         ]
@@ -412,8 +502,6 @@ class _Executor:
         predecessor: Iterator[Any] | None,
         failed: list[str | None],
     ) -> tuple[Iterator[Any], _StepRecord]:
-        # len(step.after) <= 1 is already guaranteed by _validate_linear_shape,
-        # called before this is ever reached -- not re-checked here.
         category = step.type.split(".", 1)[0]
         registry = get_registry(category)
         counts = _Counts()
@@ -443,9 +531,13 @@ class _Executor:
             digest = _digest_source(source)
             if digest is not None:
                 record.digest_uri, record.digest_sha = digest
-            stream = _run_source(
-                step.id, lambda: component.load(source), counts, failed
-            )
+            load_fn: Callable[[], Iterator[Any]] = lambda: component.load(source)  # noqa: E731
+            if self._checkpoint is not None:
+                record.resumed_from = self._checkpoint.start_position(step.id)
+                load_fn = _checkpointed(
+                    step.id, load_fn, record.resumed_from, self._checkpoint
+                )
+            stream = _run_source(step.id, load_fn, counts, failed)
             return stream, record
 
         component = registry.create(
@@ -456,8 +548,7 @@ class _Executor:
         if isinstance(component, BasePreprocessor):
             if predecessor is None:
                 raise ConfigError(
-                    f"Step {step.id!r}: a preprocessor step needs exactly "
-                    "one predecessor.",
+                    f"Step {step.id!r}: a preprocessor step needs a predecessor.",
                     context={"step_id": step.id},
                 )
             stream = _run_per_record(
@@ -470,8 +561,7 @@ class _Executor:
         elif isinstance(component, (BaseChunker, BaseSegmenter)):
             if predecessor is None:
                 raise ConfigError(
-                    f"Step {step.id!r}: a chunker/segmenter step needs "
-                    "exactly one predecessor.",
+                    f"Step {step.id!r}: a chunker/segmenter step needs a predecessor.",
                     context={"step_id": step.id},
                 )
             method = (

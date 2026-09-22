@@ -2,12 +2,10 @@
 code validity, referential integrity, unit plausibility.
 
 **Cohort de-identification (k-anonymity)**, the fourth guardrail section
-2.5 names, is deliberately not built here: k-anonymity over quasi-
-identifiers on export is a real, separate feature (choosing and
-generalising quasi-identifier fields, a suppression/generalisation
-strategy) that this task's own roadmap entry ("code validity, referential
-integrity, units") does not list -- building it unasked would be exactly
-the unscoped, unverified extra work CLAUDE.md's discipline warns against.
+2.5 names, is ``guardrail.ehr.k_anonymity`` (FR-D-11). It was left out of the
+first three because choosing quasi-identifiers and a generalisation strategy
+is a feature of its own; that machinery now lives in
+``openbtk.deid.kanonymity`` and this guardrail is its check over a cohort.
 
 **Guardrails live at L3** (docs/03_ARCHITECTURE.md section 8.3) and may
 import ``openbtk.data.ehr`` (L2) downward -- these are the first
@@ -19,15 +17,23 @@ module, not that it may never know a modality's shape at all.
 
 from __future__ import annotations
 
-from typing import Any
+import itertools
+from collections.abc import Iterable, Mapping, Sequence
+from datetime import date
+from typing import TYPE_CHECKING, Any
 
 from openbtk.core.base import BaseGuardrail
 from openbtk.core.registry import GUARDRAIL_REGISTRY
 from openbtk.core.schemas import GuardrailResult, GuardrailSeverity
+from openbtk.data.ehr.cohort import QUASI_IDENTIFIER_FIELDS, quasi_identifiers
+from openbtk.deid.kanonymity import k_anonymity_report
 from openbtk.guardrails.terminology_validity import (
     TerminologyValidityGuardrail,
     _looks_like_patient_record,
 )
+
+if TYPE_CHECKING:
+    from openbtk.core.provenance import ComponentProvenance
 
 _EVENT_FIELDS = ("conditions", "medications", "procedures")
 _MEASUREMENT_FIELD = "observations"
@@ -254,3 +260,141 @@ def _all_events(payload: Any) -> list[Any]:
         events.extend(getattr(payload, field))
     events.extend(getattr(payload, _MEASUREMENT_FIELD))
     return events
+
+
+@GUARDRAIL_REGISTRY.register("guardrail.ehr.k_anonymity")
+class CohortKAnonymityGuardrail(BaseGuardrail):
+    """A cohort is k-anonymous over its quasi-identifiers, or the check warns.
+
+    Give it the cohort (any iterable of ``PatientRecord``, consumed once) and it counts
+    how many patients share each combination of the chosen attributes. If the smallest
+    group is under ``k`` the result is a ``WARNING`` (per docs/06_SECURITY_COMPLIANCE.md
+    section 3.10) saying how many patients are in a too-small group and how many are
+    unique. The result carries **counts only**, never a value.
+
+    Args:
+        k: The smallest acceptable group. ``5`` is a common floor, not a rule; the right
+            value is a policy decision for your data.
+        quasi_identifiers: Attributes to combine; see
+            ``openbtk.data.ehr.cohort.QUASI_IDENTIFIER_FIELDS``.
+        as_of: The date ``age`` is computed on (required only when ``age`` is used).
+
+    It reaches "satisfied" only over the attributes you name, and says nothing about
+    what a group has in common. See ``openbtk.deid.kanonymity`` for what k-anonymity
+    does and does not give you, and ``anonymise_to_k`` to generalise a table until it
+    passes.
+
+    Example:
+        >>> from openbtk.data.ehr.schemas import Demographics, PatientRecord
+        >>> cohort = [
+        ...     PatientRecord(
+        ...         patient_id=f"pt-{i}",
+        ...         demographics=Demographics(gender="female"),
+        ...         source_system="fhir-r4",
+        ...     )
+        ...     for i in range(6)
+        ... ]
+        >>> guardrail = CohortKAnonymityGuardrail(k=5, quasi_identifiers=["gender"])
+        >>> guardrail.check(cohort).passed
+        True
+        >>> guardrail.check(cohort[:2]).passed
+        False
+    """
+
+    def __init__(
+        self,
+        *,
+        k: int = 5,
+        quasi_identifiers: Sequence[str] = (
+            "birth_year",
+            "gender",
+            "race",
+            "ethnicity",
+        ),
+        as_of: date | str | None = None,
+    ) -> None:
+        self._k = k
+        self._fields = list(quasi_identifiers)
+        self._as_of = as_of
+
+    def provenance(self) -> ComponentProvenance:
+        """Records the threshold and the attributes used."""
+        return (
+            super()
+            .provenance()
+            .model_copy(
+                update={
+                    "config": {
+                        "k": self._k,
+                        "quasi_identifiers": list(self._fields),
+                        "as_of": str(self._as_of) if self._as_of else None,
+                    }
+                }
+            )
+        )
+
+    def _result(
+        self,
+        passed: bool,
+        severity: GuardrailSeverity,
+        message: str,
+        details: dict[str, Any] | None = None,
+    ) -> GuardrailResult:
+        return GuardrailResult(
+            passed=passed,
+            severity=severity,
+            guardrail_key=self.registry_key,
+            message=message,
+            details=details or {},
+        )
+
+    def check(self, payload: Any) -> GuardrailResult:
+        if isinstance(payload, (str, bytes, Mapping)) or not isinstance(
+            payload, Iterable
+        ):
+            return self._result(True, GuardrailSeverity.INFO, "Not a cohort.")
+        records = iter(payload)
+        first = next(records, None)
+        if first is None:
+            return self._result(True, GuardrailSeverity.INFO, "The cohort is empty.")
+        if not _looks_like_patient_record(first):
+            return self._result(
+                True, GuardrailSeverity.INFO, "Not a cohort of PatientRecords."
+            )
+        try:
+            if self._k < 1:
+                raise ValueError("k must be at least 1")
+            as_of = (
+                date.fromisoformat(self._as_of)
+                if isinstance(self._as_of, str)
+                else self._as_of
+            )
+            rows = quasi_identifiers(
+                itertools.chain([first], records), self._fields, as_of=as_of
+            )
+            report = k_anonymity_report(rows, self._fields, k=self._k)
+        except ValueError as e:
+            return self._result(
+                False,
+                GuardrailSeverity.WARNING,
+                f"k-anonymity was not checked: {e}",
+                {"available": list(QUASI_IDENTIFIER_FIELDS)},
+            )
+        details = report.model_dump(mode="json")
+        if report.satisfied:
+            return self._result(
+                True,
+                GuardrailSeverity.INFO,
+                f"Every group has at least {self._k} patients "
+                f"(smallest: {report.k_achieved}).",
+                details,
+            )
+        return self._result(
+            False,
+            GuardrailSeverity.WARNING,
+            f"The smallest group has {report.k_achieved} patient(s), under "
+            f"k={self._k}: "
+            f"{report.n_below_k} of {report.n_records} patients are in a group that "
+            f"is too small, {report.n_unique} of them unique.",
+            details,
+        )

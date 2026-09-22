@@ -25,6 +25,8 @@ import pytest
 from openbtk.core.registry import VECTORSTORE_REGISTRY
 from openbtk.core.schemas import SearchResult
 
+from .conftest import enrolled
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -57,7 +59,7 @@ def _new_instance(key: str) -> BaseVectorStore:
     return VECTORSTORE_REGISTRY.create(key, **_CONSTRUCTOR_KWARGS_BY_KEY.get(key, {}))
 
 
-@pytest.mark.parametrize("key", VECTORSTORE_REGISTRY.list_keys())
+@pytest.mark.parametrize("key", enrolled(VECTORSTORE_REGISTRY))
 class TestVectorStoreContract:
     def test_upsert_then_query_finds_it(self, key: str) -> None:
         _skip_if_missing_dependency(key)

@@ -24,6 +24,24 @@ too for the same reason every other submodule is: so
 
 from __future__ import annotations
 
-from openbtk.llms import anthropic, huggingface, openai, openai_compatible, presets
+from openbtk.llms import (
+    anthropic,
+    azure_openai,
+    bedrock,
+    huggingface,
+    openai,
+    openai_compatible,
+    presets,
+    vertex,
+)
 
-__all__ = ["anthropic", "huggingface", "openai", "openai_compatible", "presets"]
+__all__ = [
+    "anthropic",
+    "azure_openai",
+    "bedrock",
+    "huggingface",
+    "openai",
+    "openai_compatible",
+    "presets",
+    "vertex",
+]

@@ -323,3 +323,128 @@ class TestGenerateKwargs:
         )
         pipeline.ask("question", temperature=0.2)
         assert llm.received_kwargs == {"temperature": 0.2}
+
+
+class TestHybridRetrieval:
+    """``bm25=`` fuses BM25 with the vector store's ranking (FR-R-05)."""
+
+    def _index(self) -> Any:
+        from openbtk.retrieval.hybrid import BM25Index
+
+        index = BM25Index()
+        index.upsert(
+            ["dense-hit", "exact-term-hit", "other"],
+            [
+                "The patient was seen for general follow up.",
+                "Started hydroxychloroquine for rheumatoid arthritis.",
+                "Discussed diet and exercise.",
+            ],
+            [
+                {"record_id": "n1", "chunk_id": "c1"},
+                {"record_id": "n2", "chunk_id": "c2"},
+                {"record_id": "n3", "chunk_id": "c3"},
+            ],
+        )
+        return index
+
+    def _dense_only(self) -> list[SearchResult]:
+        # The embedding model ranks the generic chunk first and never surfaces the
+        # chunk that names the drug: the failure BM25 exists to repair.
+        return [
+            _chunk_result(
+                "dense-hit", "n1", "c1", "The patient was seen for general follow up."
+            ),
+            _chunk_result("other", "n3", "c3", "Discussed diet and exercise."),
+        ]
+
+    def test_without_bm25_an_exact_term_the_embedding_missed_is_absent(self) -> None:
+        pipeline = RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=_FakeVectorStore(self._dense_only()),
+            llm=_FakeLLMProvider(),
+            top_k=3,
+        )
+        answer = pipeline.ask("hydroxychloroquine")
+        assert SourceRef(record_id="n2", chunk_id="c2") not in answer.sources
+
+    def test_with_bm25_the_exact_term_hit_is_retrieved(self) -> None:
+        pipeline = RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=_FakeVectorStore(self._dense_only()),
+            llm=_FakeLLMProvider(),
+            bm25=self._index(),
+            top_k=3,
+        )
+        answer = pipeline.ask("hydroxychloroquine")
+        assert SourceRef(record_id="n2", chunk_id="c2") in answer.sources
+
+    def test_a_chunk_found_by_both_retrievers_ranks_first(self) -> None:
+        dense = [
+            _chunk_result("other", "n3", "c3", "Discussed diet and exercise."),
+            _chunk_result(
+                "exact-term-hit",
+                "n2",
+                "c2",
+                "Started hydroxychloroquine for rheumatoid arthritis.",
+            ),
+        ]
+        llm = _FakeLLMProvider()
+        pipeline = RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=_FakeVectorStore(dense),
+            llm=llm,
+            bm25=self._index(),
+            top_k=3,
+        )
+        answer = pipeline.ask("hydroxychloroquine")
+        assert answer.sources[0] == SourceRef(record_id="n2", chunk_id="c2")
+
+    def test_the_pool_is_widened_and_reranking_still_runs_after_fusion(self) -> None:
+        vectorstore = _FakeVectorStore(self._dense_only())
+        reranker = _FakeReranker()
+        pipeline = RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=vectorstore,
+            llm=_FakeLLMProvider(),
+            reranker=reranker,
+            bm25=self._index(),
+            top_k=2,
+        )
+        pipeline.ask("hydroxychloroquine")
+        assert vectorstore.last_query_top_k == 8  # top_k * 4
+        assert reranker.last_top_k == 2
+
+    def test_bm25_alone_widens_the_pool(self) -> None:
+        vectorstore = _FakeVectorStore(self._dense_only())
+        RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=vectorstore,
+            llm=_FakeLLMProvider(),
+            bm25=self._index(),
+            top_k=2,
+        ).ask("q")
+        assert vectorstore.last_query_top_k == 8
+
+    def test_an_explicit_pool_size_is_respected(self) -> None:
+        vectorstore = _FakeVectorStore(self._dense_only())
+        RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=vectorstore,
+            llm=_FakeLLMProvider(),
+            bm25=self._index(),
+            candidate_pool_size=5,
+        ).ask("q")
+        assert vectorstore.last_query_top_k == 5
+
+    def test_sources_come_from_bm25_metadata_when_the_store_did_not_return_the_chunk(
+        self,
+    ) -> None:
+        pipeline = RAGPipeline(
+            embedding=_FakeEmbeddingProvider(),
+            vectorstore=_FakeVectorStore([]),
+            llm=_FakeLLMProvider(),
+            bm25=self._index(),
+            top_k=3,
+        )
+        answer = pipeline.ask("hydroxychloroquine")
+        assert answer.sources == [SourceRef(record_id="n2", chunk_id="c2")]

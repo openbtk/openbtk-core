@@ -140,3 +140,114 @@ assert evaluate_detector(judged).f1 == 1.0
     `is_supported` (an entailment model or an LLM judge) for a stronger check, and
     run `evaluate_detector` on your own labelled examples before trusting any
     faithfulness number.
+
+## Model cards
+
+A model card is the short document that travels with a model: what it is, what it is for,
+how well it does, where it fails. OpenBTK already records the facts a card needs, so it
+assembles them: the exact model and pinned revision a component used, and the scores an
+evaluation produced.
+
+```python
+from datetime import UTC, datetime
+
+from openbtk.eval.manifest import EvalManifest
+from openbtk.eval.model_card import ModelCard
+from openbtk.retrieval.cross_encoder import CrossEncoderReranker
+
+card = ModelCard.for_component(
+    CrossEncoderReranker(),
+    intended_use="Reordering retrieved passages for clinical question answering.",
+    limitations="Not evaluated on non-English text or on notes over 512 tokens.",
+)
+
+# A score reaches a card only from an evaluation run's manifest.
+run = EvalManifest(
+    eval_id="retrieval-2026-09",
+    kind="retrieval",
+    started_at=datetime(2026, 9, 1, tzinfo=UTC),
+    ended_at=datetime(2026, 9, 1, tzinfo=UTC),
+    report={"recall_at_5": 0.5},
+)
+card = card.with_evaluation(run, "recall_at_5", name="Recall@5")
+
+text = card.to_markdown()
+assert "ncbi/MedCPT-Cross-Encoder" in text
+assert "| Recall@5 | 0.5 | `retrieval-2026-09` (retrieval) |" in text
+assert "## Training data\n\nNot provided." in text  # nothing invented
+```
+
+What is written for you, and what is not:
+
+- The **identity** (model, pinned revision, source, the OpenBTK component and its
+  settings) comes from the component's provenance, and the **evaluation table** from
+  `EvalManifest`s you attach, each with its id and input digests.
+- Everything that needs judgement (intended use, out-of-scope use, training data,
+  limitations, ethical considerations) is text *you* provide. A section you leave out
+  reads "Not provided." A card never describes a model's training data, invents
+  limitations or praises it.
+- **There is no way to type a score into a card.** `with_evaluation` reads a number from a
+  manifest's report and refuses one that is not there, so no figure appears without the
+  run that produced it. A card with no evaluation says so.
+- For a whole run, `cards_from_run(manifest)` writes one card per distinct model the run
+  used. For a model you fine-tuned, build a `ModelCard` from its `ModelIdentity` and say
+  what you trained it on.
+
+## Summaries: ROUGE and BERTScore
+
+For a discharge summary or similar, `evaluate_summaries` compares each candidate with a
+reference on ROUGE (word, word-pair and longest-common-subsequence overlap) and, if you
+give it a scorer, BERTScore (similarity in a language model's embedding space, which credits
+a paraphrase that ROUGE misses).
+
+```python
+from openbtk.eval.summarisation import SummaryPair, evaluate_summaries
+
+pairs = [
+    SummaryPair(
+        example_id="d1",
+        reference="the patient is stable today",
+        candidate="the patient is stable",
+    ),
+]
+report = evaluate_summaries(pairs, use_stemmer=False)
+
+# The candidate has 4 of the reference's 5 words and nothing extra:
+assert report.rouge["rouge1"].precision == 1.0
+assert report.rouge["rouge1"].recall == 0.8
+assert report.as_dict()["n"] == 1
+```
+
+Read these numbers for what they are:
+
+- They measure **similarity to a reference, not correctness.** A fluent summary that
+  leaves out the one abnormal result can score well, and a faithful paraphrase can score
+  badly. Compare systems on your own data with them, next to the groundedness check above;
+  do not use them as a safety measure.
+- ROUGE wraps Google's `rouge-score` (the `eval` extra). Its tokenizer keeps only `a-z`
+  and `0-9`, so accented letters and symbols such as `%` or `>` are dropped before
+  scoring, a real limit for clinical text.
+- **BERTScore needs choices OpenBTK will not make for you.** You give the model, its
+  pinned commit *and* the layer, and it downloads nothing until first use:
+
+```python
+from openbtk.eval.summarisation import BertScorer
+
+scorer = BertScorer(
+    model="distilbert-base-uncased",
+    revision="12040accade4e8a0f71eabdb258fecc2e7e948be",  # pragma: allowlist secret
+    layer=5,
+)
+assert scorer.provenance().model_identity.revision.startswith("12040acc")
+# evaluate_summaries(pairs, bertscorer=scorer)  # downloads the model, needs torch
+```
+
+  OpenBTK implements BERTScore itself rather than wrapping the `bert-score` package,
+  because that package fetches its model by name with no way to pin a revision. The
+  implementation reproduces the reference package's raw scores (five sentence pairs agree
+  to within 1e-7; the test that checks this carries the recorded values), but supports
+  neither idf weighting nor baseline rescaling, so its numbers are comparable only with
+  other *raw* scores from the same model and layer.
+- The report holds scores and counts, never text. `summarisation_manifest(report,
+  bertscorer=scorer)` records when it ran, the scores, and the BERTScore model, so a score
+  can go on a [model card](#model-cards) through its manifest.

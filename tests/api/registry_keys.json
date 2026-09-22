@@ -13,23 +13,29 @@
   "feature_extractor": [],
   "guardrail": [
     "guardrail.ehr.code_validity",
+    "guardrail.ehr.k_anonymity",
     "guardrail.ehr.referential",
     "guardrail.ehr.units",
+    "guardrail.general.dose_plausibility",
     "guardrail.general.groundedness",
     "guardrail.general.phi_leakage",
     "guardrail.general.terminology"
   ],
   "llm": [
     "llm.general.anthropic",
+    "llm.general.azure_openai",
+    "llm.general.bedrock",
     "llm.general.huggingface_local",
     "llm.general.openai",
-    "llm.general.openai_compatible"
+    "llm.general.openai_compatible",
+    "llm.general.vertex"
   ],
   "loader": [
     "loader.clinical_text.jsonl",
     "loader.clinical_text.mimic_notes",
     "loader.clinical_text.plain_text",
     "loader.ehr.fhir",
+    "loader.ehr.hl7v2",
     "loader.ehr.omop"
   ],
   "preprocessor": [
@@ -38,7 +44,8 @@
     "preprocessor.general.deidentify"
   ],
   "reranker": [
-    "reranker.general.concept_overlap"
+    "reranker.general.concept_overlap",
+    "reranker.general.cross_encoder"
   ],
   "segmenter": [],
   "terminology": [

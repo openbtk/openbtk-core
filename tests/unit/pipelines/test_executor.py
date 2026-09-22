@@ -344,50 +344,8 @@ class TestGuardrails:
 
 
 class TestUnsupportedShapes:
-    def test_fan_out_step_fails_the_run(self) -> None:
-        """Two steps both declaring the same predecessor -- this executor
-        drains exactly one leaf and cannot broadcast to two branches."""
-        config = PipelineConfig(
-            name="bad",
-            steps=[
-                StepConfig(
-                    id="a",
-                    type="loader.general.pipeline_test_lines",
-                    params={"source": []},
-                ),
-                StepConfig(
-                    id="b", type="preprocessor.general.pipeline_test_upper", after=["a"]
-                ),
-                StepConfig(
-                    id="c", type="preprocessor.general.pipeline_test_upper", after=["a"]
-                ),
-            ],
-        )
-        manifest = Pipeline.from_config(config).run()
-        assert manifest.status == "failed"
-        assert "dependent step" in (manifest.error or "")
-
-    def test_multiple_independent_chains_fail_the_run(self) -> None:
-        """Two separate single-step chains with no relationship to each
-        other -- more than one leaf, which this executor also rejects."""
-        config = PipelineConfig(
-            name="bad",
-            steps=[
-                StepConfig(
-                    id="a",
-                    type="loader.general.pipeline_test_lines",
-                    params={"source": []},
-                ),
-                StepConfig(
-                    id="b",
-                    type="loader.general.pipeline_test_lines",
-                    params={"source": []},
-                ),
-            ],
-        )
-        manifest = Pipeline.from_config(config).run()
-        assert manifest.status == "failed"
-        assert "independent branches" in (manifest.error or "")
+    """What is still refused. (Fan-out, fan-in and several leaves are supported now;
+    see ``test_dag.py``.)"""
 
     def test_loader_step_with_a_predecessor_fails_the_run(self) -> None:
         config = PipelineConfig(
@@ -427,31 +385,6 @@ class TestUnsupportedShapes:
         manifest = Pipeline.from_config(config).run()
         assert manifest.status == "failed"
         assert "predecessor" in (manifest.error or "")
-
-    def test_multi_predecessor_step_fails_the_run(self) -> None:
-        config = PipelineConfig(
-            name="bad",
-            steps=[
-                StepConfig(
-                    id="a",
-                    type="loader.general.pipeline_test_lines",
-                    params={"source": []},
-                ),
-                StepConfig(
-                    id="b",
-                    type="loader.general.pipeline_test_lines",
-                    params={"source": []},
-                ),
-                StepConfig(
-                    id="c",
-                    type="preprocessor.general.pipeline_test_upper",
-                    after=["a", "b"],
-                ),
-            ],
-        )
-        manifest = Pipeline.from_config(config).run()
-        assert manifest.status == "failed"
-        assert "predecessor" in (manifest.error or "").lower()
 
     def test_non_executable_category_fails_the_run(self) -> None:
         """A guardrail-category component used as a STEP (not a guard()

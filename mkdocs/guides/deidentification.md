@@ -110,6 +110,72 @@ If you hold the i2b2/n2c2 2014 corpus under its data use agreement,
 same scorer over it. That harness is tested on hand-built files in the corpus's
 format and has not been run against the real corpus.
 
+## Structured data: k-anonymity
+
+Removing names does not make a table of patients anonymous: a birth year, a sex and a
+ZIP prefix together can single someone out. A table is **k-anonymous** over the columns
+you name when every combination of their values is shared by at least `k` records.
+
+```python
+from openbtk.deid.kanonymity import anonymise_to_k, k_anonymity_report
+
+table = [
+    {"patient": f"p{i}", "birth_year": 1960 + i % 30, "gender": "f" if i % 2 else "m"}
+    for i in range(120)
+]
+columns = ["birth_year", "gender"]
+
+before = k_anonymity_report(table, columns, k=5)
+print(before.k_achieved, before.n_unique, before.satisfied)
+
+result = anonymise_to_k(table, columns, k=5, keep=["patient"])
+print(result.report.satisfied, result.levels, result.n_suppressed)
+print(result.rows[0])
+```
+
+The report holds **counts only**, never a value, so it is safe to log. `anonymise_to_k`
+generalises the column with the most distinct values one step at a time (a year becomes a
+5-year band, then a 10-year band, then `*`) and, only if a few records are still too rare,
+suppresses them (`max_suppression`, default 5%). It returns exactly which steps it took.
+Only the columns you name, plus any in `keep`, are exported; an unlisted column cannot
+leak through. Ages are top-coded at 90, as Safe Harbor requires, and
+`zip_ladder()` shortens a ZIP code.
+
+For an EHR cohort, `quasi_identifiers` builds the table from `PatientRecord`s and
+`guardrail.ehr.k_anonymity` checks a cohort directly:
+
+```python
+from openbtk.data.ehr.cohort import quasi_identifiers
+from openbtk.data.ehr.schemas import Demographics, PatientRecord
+from openbtk.guardrails.ehr import CohortKAnonymityGuardrail
+
+cohort = [
+    PatientRecord(
+        patient_id=f"pt-{i}",
+        demographics=Demographics(gender="female" if i % 2 else "male"),
+        source_system="fhir-r4",
+    )
+    for i in range(12)
+]
+rows = quasi_identifiers(cohort, ["gender"])
+print(k_anonymity_report(rows, ["gender"], k=5).satisfied)
+
+check = CohortKAnonymityGuardrail(k=5, quasi_identifiers=["gender"]).check(cohort)
+print(check.passed, check.message)
+```
+
+What this does **not** give you, and you should not claim it does:
+
+- It protects only against linking on the columns you named. A rare diagnosis or a
+  free-text note that you did not list is not protected.
+- It says nothing about what a group *shares*: if every patient in a group has the same
+  diagnosis, the diagnosis is disclosed.
+- It does not choose `k`. Five is a common floor; the right value is a policy decision.
+- The ZIP ladder does not know which three-digit prefixes are too small to publish (Safe
+  Harbor lists them); apply that rule yourself.
+
+It is evidence for an expert to weigh, not a de-identification determination.
+
 ## From the command line
 
 `openbtk deid notes/ --out clean/` de-identifies a directory of notes without a
