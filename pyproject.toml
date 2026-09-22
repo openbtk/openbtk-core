@@ -13,7 +13,7 @@ readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
-authors = [{ name = "OpenBTK Contributors" }]
+authors = [{ name = "Prashant Mulay" }]
 keywords = [
     "biomedical", "healthcare", "clinical-nlp", "de-identification",
     "phi", "ehr", "fhir", "omop", "llm", "rag", "hipaa",
