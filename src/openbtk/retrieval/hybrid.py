@@ -77,7 +77,8 @@ class BM25Index:
         ...     ["a", "b", "c"],
         ...     ["metformin for diabetes", "aspirin for pain", "insulin for diabetes"],
         ... )
-        >>> [hit.id for hit in index.search("metformin")]
+        >>> ids = [hit.id for hit in index.search("metformin")]
+        >>> ids
         ['a']
     """
 
@@ -241,7 +242,8 @@ def reciprocal_rank_fusion(
     Example:
         >>> dense = [SearchResult(id="a", score=0.9), SearchResult(id="b", score=0.8)]
         >>> sparse = [SearchResult(id="b", score=12.0), SearchResult(id="c", score=3.0)]
-        >>> [hit.id for hit in reciprocal_rank_fusion([dense, sparse])]
+        >>> ids = [hit.id for hit in reciprocal_rank_fusion([dense, sparse])]
+        >>> ids
         ['b', 'a', 'c']
     """
     if k < 0:

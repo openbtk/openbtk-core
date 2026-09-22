@@ -172,7 +172,8 @@ def join_notes_to_events(
         ...     patient_ref="pt-1", timestamp=noon.replace(hour=18),
         ... )
         >>> (joined,) = join_notes_to_events([note], index_patients([patient]))
-        >>> [(e.kind, e.matched_by) for e in joined.events]
+        >>> matches = [(e.kind, e.matched_by) for e in joined.events]
+        >>> matches
         [('observation', 'window')]
     """
     if before < timedelta(0) or after < timedelta(0):

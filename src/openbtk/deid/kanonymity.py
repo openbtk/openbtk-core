@@ -155,7 +155,8 @@ def zip_ladder(length: int = 5) -> tuple[Generaliser, ...]:
     """A ladder for a ZIP code: the full code, then ever shorter prefixes, then ``*``.
 
     Example:
-        >>> [level("90210") for level in zip_ladder(5)]
+        >>> levels = [level("90210") for level in zip_ladder(5)]
+        >>> levels
         ['90210', '9021*', '902**', '90***', '9****', '*']
     """
     return (identity, *(prefix(d) for d in range(length - 1, 0, -1)), star)

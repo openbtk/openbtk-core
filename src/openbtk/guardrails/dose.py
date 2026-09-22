@@ -140,21 +140,6 @@ drug name, never past the end of the clause."""
 class DoseLimit(BaseModel):
     """One drug's reference limits, with the source they came from.
 
-    Args:
-        drug: The drug's name as it should appear in results.
-        aliases: Other names to match (brand names, abbreviations).
-        unit: The unit the limits are written in (``mg``, ``g``, ``mcg``, ``mL``,
-            ``units``, ...).
-        min_single: The lowest plausible single dose, if any.
-        max_single: The highest single dose, if any.
-        max_daily: The highest total in a day, if any. Checked only when the text
-            gives a frequency.
-        routes: Routes this drug may be given by (``oral``, ``intravenous``,
-            ``intramuscular``, ``subcutaneous``, ``sublingual``, ``rectal``,
-            ``topical``, ``inhaled``). Empty means the route is not checked.
-        source: Where these limits come from (a formulary, label or guideline, with
-            its version). Required: a limit nobody can trace is not usable.
-
     Example:
         >>> limit = DoseLimit(
         ...     drug="examplamine", unit="mg", max_single=100,
@@ -166,14 +151,51 @@ class DoseLimit(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
-    drug: str = Field(..., min_length=1)
-    aliases: list[str] = Field(default_factory=list)
-    unit: str = Field("mg", min_length=1)
-    min_single: float | None = Field(None, ge=0)
-    max_single: float | None = Field(None, ge=0)
-    max_daily: float | None = Field(None, ge=0)
-    routes: list[str] = Field(default_factory=list)
-    source: str = Field(..., min_length=1)
+    drug: str = Field(
+        ..., min_length=1, description="The drug's name as it should appear in results."
+    )
+    aliases: list[str] = Field(
+        default_factory=list,
+        description="Other names to match (brand names, abbreviations).",
+    )
+    unit: str = Field(
+        "mg",
+        min_length=1,
+        description=(
+            "The unit the limits are written in (``mg``, ``g``, ``mcg``, ``mL``, "
+            "``units``, ...)."
+        ),
+    )
+    min_single: float | None = Field(
+        None, ge=0, description="The lowest plausible single dose, if any."
+    )
+    max_single: float | None = Field(
+        None, ge=0, description="The highest single dose, if any."
+    )
+    max_daily: float | None = Field(
+        None,
+        ge=0,
+        description=(
+            "The highest total in a day, if any. Checked only when the text gives a "
+            "frequency."
+        ),
+    )
+    routes: list[str] = Field(
+        default_factory=list,
+        description=(
+            "Routes this drug may be given by (``oral``, ``intravenous``, "
+            "``intramuscular``, ``subcutaneous``, ``sublingual``, ``rectal``, "
+            "``topical``, ``inhaled``). Empty means the route is not checked."
+        ),
+    )
+    source: str = Field(
+        ...,
+        min_length=1,
+        description=(
+            "Where these limits come from (a formulary, label or guideline, with "
+            "its version). Required: a limit nobody can trace is not usable."
+        ),
+    )
 
     @model_validator(mode="after")
     def _limits_are_consistent(self) -> DoseLimit:
