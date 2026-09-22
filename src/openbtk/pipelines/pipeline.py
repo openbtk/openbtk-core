@@ -149,7 +149,12 @@ class Pipeline:
             issues.append(ValidationIssue(severity="error", message=str(e)))
         return issues
 
-    def run(self) -> RunManifest:
+    def run(
+        self,
+        *,
+        checkpoint_path: str | Path | None = None,
+        checkpoint_interval: int = 1000,
+    ) -> RunManifest:
         """Execute this pipeline, streaming records through every step.
 
         Always returns a ``RunManifest`` -- success or failure (ADR-0005:
@@ -158,5 +163,18 @@ class Pipeline:
         or execution is caught and reported as
         ``RunManifest.status == "failed"`` with a PHI-free
         ``RunManifest.error`` instead.
+
+        Args:
+            checkpoint_path: When given (FR-L-05), resume from this file if it
+                already holds a checkpoint for this pipeline, and periodically
+                write how far each root loader has read. A successful run
+                deletes the file; a failed one leaves it for the next attempt.
+                See ``openbtk.pipelines.checkpoint`` for exactly what this
+                guarantees -- at-least-once, not exactly-once or a real seek.
+            checkpoint_interval: Records between checkpoint saves.
         """
-        return _Executor(self.to_config()).run()
+        return _Executor(
+            self.to_config(),
+            checkpoint_path=checkpoint_path,
+            checkpoint_interval=checkpoint_interval,
+        ).run()

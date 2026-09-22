@@ -135,10 +135,16 @@ def _write_manifest(manifest: RunManifest, path: Path) -> Path:
 
 
 def _run_config(
-    config: PipelineConfig, manifest_arg: str | None
+    config: PipelineConfig,
+    manifest_arg: str | None,
+    *,
+    checkpoint_path: str | None = None,
+    checkpoint_interval: int = 1000,
 ) -> tuple[RunManifest, Path]:
     pipeline = Pipeline.from_config(config)
-    manifest = pipeline.run()
+    manifest = pipeline.run(
+        checkpoint_path=checkpoint_path, checkpoint_interval=checkpoint_interval
+    )
     path = (
         Path(manifest_arg)
         if manifest_arg
@@ -153,6 +159,11 @@ def cmd_run(args: argparse.Namespace) -> Result:
     A config with validation errors is refused before anything runs (exit 2).
     The manifest goes to ``--manifest``, else
     ``<provenance.manifest_dir>/<run_id>.json``.
+
+    ``--checkpoint PATH`` resumes from that file if it already holds one for this
+    pipeline, and periodically records how far each root loader has read (FR-L-05);
+    a successful run deletes it, a failed one leaves it for the next attempt. See
+    ``openbtk.pipelines.checkpoint`` for exactly what this guarantees.
     """
     load_components()
     config = PipelineConfig.from_yaml(args.config)
@@ -165,7 +176,12 @@ def cmd_run(args: argparse.Namespace) -> Result:
             2,
             f"{body}\nrefusing to run an invalid config (see `openbtk validate`).\n",
         )
-    manifest, path = _run_config(config, args.manifest)
+    manifest, path = _run_config(
+        config,
+        args.manifest,
+        checkpoint_path=args.checkpoint,
+        checkpoint_interval=args.checkpoint_interval,
+    )
     if args.json:
         return (0 if manifest.status == "success" else 1), manifest.model_dump_json(
             indent=2

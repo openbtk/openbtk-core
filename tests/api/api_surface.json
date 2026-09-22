@@ -365,6 +365,7 @@
         "error": false,
         "records_in": true,
         "records_out": true,
+        "resumed_from": false,
         "status": true,
         "step_id": true
       },
@@ -1582,6 +1583,25 @@
         "structured": "(messages: list[Message], schema: type[BaseModel], **kwargs: Any) -> BaseModel"
       }
     },
+    "openbtk.pipelines.checkpoint.Checkpoint": {
+      "fields": {
+        "checkpoint_version": false,
+        "loader_counts": true,
+        "pipeline_name": true,
+        "run_id": true,
+        "saved_at": true
+      },
+      "kind": "class",
+      "members": {}
+    },
+    "openbtk.pipelines.checkpoint.load_checkpoint": {
+      "kind": "function",
+      "signature": "(path: str | Path) -> Checkpoint"
+    },
+    "openbtk.pipelines.checkpoint.save_checkpoint": {
+      "kind": "function",
+      "signature": "(path: str | Path, checkpoint: Checkpoint) -> None"
+    },
     "openbtk.pipelines.join.MatchedEvent": {
       "fields": {
         "event": true,
@@ -1616,7 +1636,7 @@
         "from_config": "class(config: PipelineConfig) -> Pipeline",
         "from_yaml": "class(path: str | Path) -> Pipeline",
         "guard": "(guardrail_type: str, *, at: str | list[str], on_violation: Literal['block', 'warn'] = 'block') -> Pipeline",
-        "run": "() -> RunManifest",
+        "run": "(*, checkpoint_path: str | Path | None = None, checkpoint_interval: int = 1000) -> RunManifest",
         "to_config": "() -> PipelineConfig",
         "validate": "() -> list[ValidationIssue]"
       }
@@ -1806,6 +1826,8 @@
       "manifest"
     ],
     "run": [
+      "--checkpoint",
+      "--checkpoint-interval",
       "--json",
       "--manifest",
       "config"

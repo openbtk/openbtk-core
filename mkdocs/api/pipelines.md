@@ -22,6 +22,18 @@ manifest = pipeline.run()
 
 ::: openbtk.pipelines.pipeline.Step
 
+## Checkpoint and resume
+
+`Pipeline.run(checkpoint_path=...)` resumes a long run instead of restarting it; see
+the [CLI guide](../guides/cli.md#checkpoint-and-resume-long-runs) for what this does and
+does not guarantee before relying on it.
+
+::: openbtk.pipelines.checkpoint.Checkpoint
+
+::: openbtk.pipelines.checkpoint.save_checkpoint
+
+::: openbtk.pipelines.checkpoint.load_checkpoint
+
 ## Cross-modal joins
 
 Attach a patient's structured events to their notes; see the

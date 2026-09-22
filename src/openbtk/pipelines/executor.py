@@ -18,6 +18,10 @@ anything more complex than a data pipeline (ADR-0001).
     twice, once by each path; that is the topology asked for, not a bug.
   * A step's outputs are still discarded at the leaves: the run's product is its
     manifest, and the steps' own side effects.
+  * ``run(checkpoint_path=...)`` (FR-L-05) periodically records how far each root
+    loader has read, so a rerun with the same path resumes instead of restarting.
+    See ``openbtk.pipelines.checkpoint`` for exactly what that does and does not
+    guarantee -- in short, at-least-once, by re-reading and discarding, not a seek.
   * Only ``loader``, ``preprocessor``, ``chunker`` and ``segmenter`` steps
     are executable. No real ``embedding``/``vectorstore`` component exists
     in this repository yet to validate an execution path against --
@@ -69,6 +73,7 @@ from openbtk.core.provenance import (
 )
 from openbtk.core.registry import get_registry
 from openbtk.core.schemas import GuardrailSeverity
+from openbtk.pipelines.checkpoint import CheckpointState
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
@@ -128,7 +133,14 @@ class _Counts:
 
 
 class _StepRecord:
-    __slots__ = ("component", "counts", "digest_sha", "digest_uri", "step_id")
+    __slots__ = (
+        "component",
+        "counts",
+        "digest_sha",
+        "digest_uri",
+        "resumed_from",
+        "step_id",
+    )
 
     def __init__(self, step_id: str, component: Component, counts: _Counts) -> None:
         self.step_id = step_id
@@ -136,6 +148,7 @@ class _StepRecord:
         self.counts = counts
         self.digest_uri: str | None = None
         self.digest_sha: str | None = None
+        self.resumed_from = 0
 
 
 class _GuardrailTally:
@@ -264,6 +277,26 @@ def _run_source(
         ) from e
 
 
+def _checkpointed(
+    step_id: str,
+    produce: Callable[[], Iterator[Any]],
+    start: int,
+    state: CheckpointState,
+) -> Callable[[], Iterator[Any]]:
+    """Wrap a loader's ``produce`` so its first ``start`` items are read and
+    discarded (FR-L-05: resume is "skip and re-read", not a real seek), and the
+    checkpoint advances -- and periodically saves -- as each item is yielded."""
+
+    def wrapped() -> Iterator[Any]:
+        position = start
+        for item in itertools.islice(produce(), start, None):
+            position += 1
+            yield item
+            state.advance(step_id, position)
+
+    return wrapped
+
+
 def _run_per_record(
     step_id: str,
     upstream: Iterator[Any],
@@ -297,8 +330,17 @@ def _run_per_record(
 
 
 class _Executor:
-    def __init__(self, config: PipelineConfig) -> None:
+    def __init__(
+        self,
+        config: PipelineConfig,
+        *,
+        checkpoint_path: str | Path | None = None,
+        checkpoint_interval: int = 1000,
+    ) -> None:
         self._config = config
+        self._checkpoint_path = checkpoint_path
+        self._checkpoint_interval = checkpoint_interval
+        self._checkpoint: CheckpointState | None = None
 
     def run(self) -> RunManifest:
         run_id = uuid.uuid4().hex
@@ -318,6 +360,13 @@ class _Executor:
                     "Pipeline config failed registry validation: "
                     + "; ".join(i.message for i in issues),
                     context={"pipeline": self._config.name},
+                )
+            if self._checkpoint_path is not None:
+                self._checkpoint = CheckpointState.load_or_start(
+                    self._checkpoint_path,
+                    pipeline_name=self._config.name,
+                    run_id=run_id,
+                    interval=self._checkpoint_interval,
                 )
             _validate_shape(self._config.steps)
             order = _topological_order(self._config.steps)
@@ -375,6 +424,16 @@ class _Executor:
             # executor didn't anticipate, not just the documented error types above.
             status, error_message = "failed", f"Unexpected error: {e}"
 
+        if self._checkpoint is not None:
+            if status == "success":
+                # Nothing is left to resume; a stale file would only risk a future
+                # run skipping records that a fresh source no longer starts with.
+                self._checkpoint.clear()
+            else:
+                # Capture progress since the last periodic save, so a retry redoes
+                # at most checkpoint_interval records, not everything since start.
+                self._checkpoint.save()
+
         ended = datetime.now(UTC)
         steps = [
             StepProvenance(
@@ -384,6 +443,7 @@ class _Executor:
                 records_out=r.counts.output_count,
                 status="failed" if r.step_id == failed[0] else "success",
                 error=error_message if r.step_id == failed[0] else None,
+                resumed_from=r.resumed_from,
             )
             for r in step_records
         ]
@@ -471,9 +531,13 @@ class _Executor:
             digest = _digest_source(source)
             if digest is not None:
                 record.digest_uri, record.digest_sha = digest
-            stream = _run_source(
-                step.id, lambda: component.load(source), counts, failed
-            )
+            load_fn: Callable[[], Iterator[Any]] = lambda: component.load(source)  # noqa: E731
+            if self._checkpoint is not None:
+                record.resumed_from = self._checkpoint.start_position(step.id)
+                load_fn = _checkpointed(
+                    step.id, load_fn, record.resumed_from, self._checkpoint
+                )
+            stream = _run_source(step.id, load_fn, counts, failed)
             return stream, record
 
         component = registry.create(

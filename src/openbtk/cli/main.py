@@ -65,6 +65,19 @@ def build_parser() -> argparse.ArgumentParser:
         help="where to write the manifest (default: the config's manifest_dir)",
     )
     p.add_argument("--json", action="store_true", help="print the manifest as JSON")
+    p.add_argument(
+        "--checkpoint",
+        help=(
+            "resume from this file if it exists, and periodically save how far each "
+            "loader has read (FR-L-05); deleted on a successful run"
+        ),
+    )
+    p.add_argument(
+        "--checkpoint-interval",
+        type=int,
+        default=1000,
+        help="records between checkpoint saves (default: 1000)",
+    )
 
     p = add(
         "deid", "de-identify a directory of notes or a .jsonl file", commands.cmd_deid

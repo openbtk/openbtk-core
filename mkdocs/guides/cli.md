@@ -55,6 +55,80 @@ that fails still writes its manifest, with the failure recorded. Manifests hold
 counts, component identity and input digests, never content, and API keys are
 redacted from the config they snapshot.
 
+## Checkpoint and resume long runs
+
+```bash
+openbtk run pipeline.yaml --checkpoint state.json
+openbtk run pipeline.yaml --checkpoint state.json --checkpoint-interval 5000
+```
+
+With `--checkpoint`, a run periodically records how far each root loader has read; a
+rerun with the same file resumes from there instead of the beginning. A completed run
+deletes the file, since there is nothing left to resume:
+
+```python
+import contextlib
+import io
+import pathlib
+import tempfile
+
+with contextlib.redirect_stdout(io.StringIO()):  # registry logs, not errors
+    from openbtk.core.base import BaseLoader
+    from openbtk.core.config import PipelineConfig, StepConfig
+    from openbtk.core.errors import LoaderError
+    from openbtk.core.registry import LOADER_REGISTRY
+    from openbtk.pipelines import Pipeline, load_checkpoint
+
+    @LOADER_REGISTRY.register("loader.general.cli_guide_flaky_source")
+    class FlakySource(BaseLoader):
+        def load(self, source):
+            for i in range(source):
+                if i == 7 and not FlakySource.fixed:
+                    raise LoaderError("a transient failure", context={"at": i})
+                yield {"i": i}
+
+    FlakySource.fixed = False
+
+folder = tempfile.TemporaryDirectory()
+state = pathlib.Path(folder.name) / "state.json"
+config = PipelineConfig(
+    name="ingest",
+    steps=[
+        StepConfig(
+            id="load",
+            type="loader.general.cli_guide_flaky_source",
+            params={"source": 20},
+        ),
+    ],
+)
+first = Pipeline.from_config(config).run(checkpoint_path=state, checkpoint_interval=3)
+assert first.status == "failed"
+assert load_checkpoint(state).loader_counts["load"] == 7  # records 0-6 were read
+
+FlakySource.fixed = True  # whatever broke is fixed; retry
+second = Pipeline.from_config(config).run(checkpoint_path=state, checkpoint_interval=3)
+assert second.status == "success"
+assert second.steps[0].resumed_from == 7
+assert second.steps[0].records_out == 13  # 20 - 7: the 7 already read are never redone
+assert not state.exists()  # a completed run leaves nothing to resume
+folder.cleanup()
+```
+
+What this does and does not guarantee:
+
+- **Only root loader steps are tracked** -- "record 4,512,003 of this source has been
+  read" -- not whether every downstream step finished with it. Resuming re-loads from
+  that position and runs it through the *whole* pipeline again. That is safe because
+  every step here is a pure function of its input, never because the executor remembers
+  partial downstream progress -- it does not.
+- **At-least-once, not exactly-once.** A checkpoint is saved every `--checkpoint-interval`
+  records (default 1000, shown here as 3 to make the example concrete), so a crash
+  between saves reprocesses up to that many records again; it never skips one that was
+  not genuinely already read.
+- **Resuming re-reads and discards the skipped records; it does not seek.** This is
+  correct only when the source yields the same items in the same order across attempts
+  -- a stable file, not a query against data that changes between runs.
+
 ## Fan-out and fan-in
 
 A pipeline is a DAG, not only a chain. A step with **several dependents** feeds each of
