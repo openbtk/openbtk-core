@@ -262,8 +262,14 @@ jobs:
       - name: Build the docs (strict)
         shell: bash
         run: |
+          # GitHub's default `bash` invocation already runs with `-eo pipefail`, so
+          # without `set +e` here a failing `mkdocs` aborts the script at the pipe
+          # itself -- before `status=` or the annotation below ever runs. This is
+          # exactly why earlier docs-build failures reported no detail at all.
+          set +e
           mkdocs build --strict 2>&1 | tee mkdocs.out
           status=${PIPESTATUS[0]}
+          set -e
           if [ "$status" != "0" ]; then
             echo "::error title=docs-build failed::$(tail -c 1500 mkdocs.out | tr '\n%' '||')"
           fi
@@ -361,7 +367,14 @@ jobs:
       - name: Providers against the real SDKs (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
+          set +e
           pytest "${{ github.workspace }}/tests/unit/llms/test_cloud_sdk_shapes.py" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" != "0" ]; then
+            echo "::error title=test-cloud-sdks::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
           if grep -Eq "skipped" pytest.out; then
             echo "::error title=test-cloud-sdks::a check was skipped, so an SDK is not installed"
             exit 1
@@ -369,7 +382,14 @@ jobs:
       - name: Summarisation metrics against the real rouge-score (from outside the repository)
         working-directory: ${{ runner.temp }}
         run: |
+          set +e
           pytest "${{ github.workspace }}/tests/unit/eval/test_summarisation.py" -m "not slow" -rs -q -p no:cacheprovider 2>&1 | tee pytest.out
+          status=${PIPESTATUS[0]}
+          set -e
+          if [ "$status" != "0" ]; then
+            echo "::error title=test-cloud-sdks::$(tail -c 1500 pytest.out | tr '\n' '|')"
+            exit "$status"
+          fi
           if grep -Eq "skipped" pytest.out; then
             echo "::error title=test-cloud-sdks::a summarisation check was skipped, so rouge-score is not installed"
             exit 1
