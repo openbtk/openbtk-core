@@ -11,9 +11,20 @@ recorded here.
 
 **M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism and
 the security review are done. The PRD's v1.0 gate also asks for "all P2 requirements";
-an audit found twelve of them unbuilt, and all twelve are below. The remaining M11
-items -- three named production users, and an independent evaluation of the de-id
-stack -- need people outside this repository and are not claimed.
+an audit found twelve of them unbuilt, and all twelve are below.
+
+**Two gates are explicitly skipped for now, by maintainer decision (2026-09-22), not
+silently dropped:**
+- **11.5, independent evaluation of the de-id stack**, and **the published i2b2/n2c2
+  de-identification benchmark (M8/M9 task 9.6)** both need a party outside this
+  repository -- an independent evaluator, and someone holding a Data Use Agreement
+  for the n2c2 corpus, respectively. Neither is available right now. The n2c2 harness
+  and dataset adapter are built and tested against hand-built files in the corpus's
+  format (see `mkdocs/benchmarks.md`); nothing about either gate is faked or assumed
+  met -- `tests/release/test_v05_gates.py` keeps the n2c2 gate a strict `xfail` so it
+  cannot silently start passing.
+- **11.4, three named production users, stays open and is still being pursued** --
+  it is not part of this skip decision.
 
 ### Added — repo metrics on the README
 - **PyPI version and download-count badges** (live from PyPI/pypistats.org, no
@@ -25,10 +36,15 @@ stack -- need people outside this repository and are not claimed.
 
 ### Added — repository ruleset on `main`
 - Force-pushes and branch deletion on `main` are now rejected outright.
-- Merging into `main` requires a pull request, one approving review, and all 20 CI
-  checks green on a branch that is up to date with `main` -- with no bypass for
-  anyone, including repo admins. Direct pushes to `main` (including by a maintainer)
-  are no longer possible; this is the first change merged under the new rule.
+- Merging into `main` requires a pull request and all 20 CI checks green on a branch
+  that is up to date with `main` -- with no bypass for anyone, including repo admins.
+  Direct pushes to `main` (including by a maintainer) are no longer possible; PR #3
+  was the first change merged under the new rule.
+- The ruleset briefly also required one approving review, which turned out to
+  deadlock a solo-maintained repo: GitHub never allows a PR author to approve their
+  own pull request, regardless of permissions, so PR #3 could not be merged at all
+  until the requirement was dropped to zero. Everything else in the ruleset is
+  unchanged.
 
 ### Added — P2 requirements (PRD section 7, "v1.0 — Adoption")
 - **`DosePlausibilityGuardrail`** (`guardrail.general.dose_plausibility`, FR-G-05).
