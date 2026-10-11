@@ -19,7 +19,7 @@ def _read(*parts: str) -> str:
 _RELEASES = [
     # (version, the heading that ends the "read this first" section)
     ("0.5.0", "### What is new since 0.1.1"),
-    ("0.6.0", "### What is new since 0.5.0"),
+    ("0.7.0", "### What is new since 0.5.0"),
 ]
 
 

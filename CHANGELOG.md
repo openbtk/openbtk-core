@@ -9,22 +9,137 @@ recorded here.
 
 ## [Unreleased]
 
-**M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism and
-the security review are done. The PRD's v1.0 gate also asks for "all P2 requirements";
-an audit found twelve of them unbuilt, and all twelve are below.
+Nothing yet.
 
-**Two gates are explicitly skipped for now, by maintainer decision (2026-09-22), not
-silently dropped:**
-- **11.5, independent evaluation of the de-id stack**, and **the published i2b2/n2c2
-  de-identification benchmark (M8/M9 task 9.6)** both need a party outside this
-  repository -- an independent evaluator, and someone holding a Data Use Agreement
-  for the n2c2 corpus, respectively. Neither is available right now. The n2c2 harness
-  and dataset adapter are built and tested against hand-built files in the corpus's
-  format (see `mkdocs/benchmarks.md`); nothing about either gate is faked or assumed
-  met -- `tests/release/test_v05_gates.py` keeps the n2c2 gate a strict `xfail` so it
-  cannot silently start passing.
-- **11.4, three named production users, stays open and is still being pursued** --
-  it is not part of this skip decision.
+## [0.7.0] — 2026-09-22
+
+A tag `v0.6.0` was created for the content below on 2026-09-20, but its release
+run failed at the TestPyPI install-verification step and was never retried; by
+the time it was revisited, `main` had moved on nearly 30 commits, including all
+of M11. Rather than resurrect a stale tag, everything ships together as `0.7.0`.
+**`v0.6.0` was never published to PyPI and never will be.**
+
+### Read this first
+
+**The de-identification benchmark on i2b2/n2c2 still has not been run.** The
+harness and adapter ship and are tested, but that corpus is released only under a
+Data Use Agreement and was not available. Every de-identification number
+published (F1 0.933 rule-only, 0.922 with NER) is on a **synthetic** corpus: a
+regression gate, not evidence of real-world accuracy. The default `DeidEngine`
+**does not detect names or street addresses**; enable the opt-in NER recognizer
+for those. Providers are tested against mocked SDKs and models in CI (including
+the new Azure/Bedrock/Vertex providers below -- none has been run against a live
+account); the UMLS `map()` call is unverified against the live service; the
+groundedness check is a word-overlap heuristic. See `mkdocs/benchmarks.md`.
+
+**Behaviour changes since 0.5.0 that can change your output** (all fix defects
+except the last, which is additive; see "Fixed" below):
+- `TerminologyValidityGuardrail` / `EHRCodeValidityGuardrail` with the default
+  bundled backend now return a **WARNING ("unverifiable")** for a code the bundled
+  subset cannot confirm, where 0.5.0 returned a **BLOCK ("does not exist")**. A
+  BLOCK now requires a backend that is authoritative for that system. If you
+  relied on the old BLOCK, inject a complete vocabulary.
+- `DeidMode.DATE_SHIFT` now redacts non-date identifiers found beside dates; in
+  0.5.0 such a document raised `DeidError`.
+- Run manifests now record token-count settings such as `max_tokens` instead of
+  `[REDACTED]`; credentials (`api_key`, `access_token`, ...) are still redacted.
+- `PipelineConfig.validate_registry()` now reports unknown or missing step
+  parameters and off-site components under a local-only policy; previously these
+  surfaced only when the run tried to construct the component.
+- Fan-out and fan-in in the streaming executor now run instead of being refused
+  with a `ConfigError`: a step may feed several dependents, or read several
+  predecessors' interleaved streams. See "P2 requirements" below.
+
+### What is new since 0.5.0
+
+The `openbtk` command line, clinical QA and groundedness evaluation with eval
+manifests, guides plus a full API reference, eight tutorial notebooks executed in
+CI, an API freeze with a registry-key snapshot test, a documented deprecation
+mechanism, an internal security review with its findings fixed, and twelve
+previously-unbuilt P2 requirements from the v1.0 PRD gate: a dose-plausibility
+guardrail, k-anonymity, an HL7v2 loader, cross-modal note/event joins, fuzzy
+concept normalisation, a cross-encoder reranker, hybrid BM25 retrieval, three
+cloud LLM providers, model cards, summarisation metrics, and fan-out/fan-in and
+checkpoint/resume in the pipeline executor. The six-dependency core is unchanged;
+everything else is an optional extra (new: `notebooks`, `bedrock`, `vertex`).
+
+**M10 — Eval, CLI, docs — complete.** Writing the tutorials against the real
+code found three genuine defects, fixed below; none of them was visible to the
+existing test suite.
+
+**M11 — v1.0 readiness, in progress.** The API freeze, the deprecation mechanism
+and the security review are done, and all twelve audited P2 requirements are
+built (listed below). Two gates remain and are **explicitly skipped for now, by
+maintainer decision (2026-09-22), not silently dropped:** 11.5 (independent
+evaluation of the de-id stack) and the published i2b2/n2c2 benchmark above both
+need a party outside this repository -- an independent evaluator, and someone
+holding a Data Use Agreement for the n2c2 corpus, respectively -- and neither is
+available right now. `tests/release/test_v05_gates.py` keeps the n2c2 gate a
+strict `xfail` so it cannot silently start passing. 11.4 (three named production
+users) stays open and is still being pursued; it is not part of this skip
+decision.
+
+### Added — M10
+- **`openbtk` command line** (`list`, `validate`, `run`, `deid`, `replay`,
+  `doctor`; also `python -m openbtk`). Built on `argparse`, not Typer: a CLI
+  framework would be a seventh runtime dependency for a core held at six, and it
+  works from a plain `pip install openbtk`. A command's result is the only thing
+  on stdout (library logging goes to stderr), so `--json` is pure JSON. Exit
+  codes: `0` ok, `1` it ran and failed or a check found a problem, `2` the
+  invocation was wrong.
+  - `validate` (and `PipelineConfig.validate_registry`) now checks each step's
+    parameters against its constructor signature (unknown or missing) and the
+    off-site policy, without instantiating anything; `Pipeline.validate()` adds
+    the executor's single-linear-chain rule.
+  - `replay` rebuilds a pipeline from a manifest's recorded config, re-runs it and
+    reports divergence in input content (SHA-256), per-step counts and status. A
+    directory input has no content hash, so only its record count is compared and
+    the report says so. A manifest with redacted secrets is refused, not replayed
+    with a placeholder.
+  - `doctor` reports installed extras, the spaCy model, and credentials **by name
+    only** (a value is never read into the report).
+- **Clinical QA evaluation** (`openbtk.eval.qa`): readers for the MedQA and
+  MedMCQA file formats (verified against the datasets' Hub cards; a hidden or
+  ambiguous answer key is refused, never guessed), a conservative answer parser,
+  `evaluate_qa` with a Wilson 95% interval, per-subject counts, token accounting,
+  and an `EvalManifest`. No dataset and no benchmark score ships (rule 14).
+- **Groundedness scoring** (`openbtk.eval.groundedness`): claim-level
+  faithfulness, and `evaluate_detector` to score the checker itself against human
+  labels. States plainly that the default checker is a word-overlap heuristic.
+- **`EvalManifest`** (FR-X-06): which component, which data (SHA-256), when, and
+  counts; never question, answer or note text.
+- **Documentation**: four guides (clinical text, de-identification, EHR,
+  evaluation) plus a command-line guide; API reference pages for EHR, providers,
+  retrieval, guardrails, terminology, evaluation and the LangChain adapter; a
+  tutorials page. Every guide code block is executed, every pipeline YAML block
+  validated, every `openbtk ...` command parsed, every API directive resolved, by
+  `tests/docsite`.
+- **Eight tutorial notebooks** (`notebooks/`), offline and synthetic-only, executed
+  top to bottom in fresh kernels by `tests/notebooks`. New optional `notebooks`
+  extra (nbclient, nbformat, ipykernel).
+- **CI**: `docs-build` (`mkdocs build --strict` on every branch), `test-docs` and
+  `test-notebooks` (all extras installed; fail on any skip). The docs build is now
+  strict; four doctests whose list-of-strings output tripped mkdocs autorefs were
+  rewritten.
+- `openbtk.core.logging.set_log_level()` / `OPENBTK_LOG_LEVEL`: quiet OpenBTK's own
+  log lines. The default is unchanged (every line).
+- `BaseTerminologyService.is_authoritative(system)` (default `True`).
+
+### Fixed — M10 (found by writing the tutorials)
+- **The default terminology guardrail blocked valid data.** The bundled backend is
+  a small ICD-10-CM *subset*, yet `validate()` returning `False` for anything
+  outside it made `TerminologyValidityGuardrail` (and so `EHRCodeValidityGuardrail`)
+  report real SNOMED, LOINC and most ICD-10-CM codes as "do not exist" with
+  severity **BLOCK**. A partial vocabulary can fail to confirm a code, not call it
+  invalid: those codes are now a WARNING ("unverifiable"). A BLOCK requires an
+  authoritative backend (a complete vocabulary).
+- **`max_tokens` was redacted from run manifests** (the credential pattern matched
+  "token"), erasing a chunker's size limit from the audit record and making any
+  pipeline with a chunker impossible to replay. Token-count keys are now exempt;
+  `access_token`, `hf_token` and the like are still redacted.
+- **`DeidMode.DATE_SHIFT` failed the whole document** if it contained any non-date
+  identifier (a phone number beside a date), because every detection was fed to the
+  date parser. Dates are shifted; every other identifier is now redacted.
 
 ### Added — repo metrics on the README
 - **PyPI version and download-count badges** (live from PyPI/pypistats.org, no
@@ -152,109 +267,6 @@ An internal review is not an independent audit, and the page says so.
 - `count_tokens_exact(..., revision=)` (additive).
 - **CI `security` job** (bandit medium+, detect-secrets, pip-audit on the core install
   and the light extras) and a weekly `audit.yml`; `tests/security/test_redos.py`.
-
-## [0.6.0] — 2026-09-20
-
-### Read this first
-
-**The de-identification benchmark on i2b2/n2c2 still has not been run.** The
-harness and adapter ship and are tested, but that corpus is released only under a
-Data Use Agreement and was not available. Every de-identification number
-published (F1 0.933 rule-only, 0.922 with NER) is on a **synthetic** corpus: a
-regression gate, not evidence of real-world accuracy. The default `DeidEngine`
-**does not detect names or street addresses**; enable the opt-in NER recognizer
-for those. Providers are tested against mocked SDKs and models in CI; the UMLS
-`map()` call is unverified against the live service; the groundedness check is a
-word-overlap heuristic. See `mkdocs/benchmarks.md`.
-
-**Behaviour changes since 0.5.0 that can change your output** (all fix defects; see
-"Fixed" below):
-- `TerminologyValidityGuardrail` / `EHRCodeValidityGuardrail` with the default
-  bundled backend now return a **WARNING ("unverifiable")** for a code the bundled
-  subset cannot confirm, where 0.5.0 returned a **BLOCK ("does not exist")**. A
-  BLOCK now requires a backend that is authoritative for that system. If you
-  relied on the old BLOCK, inject a complete vocabulary.
-- `DeidMode.DATE_SHIFT` now redacts non-date identifiers found beside dates; in
-  0.5.0 such a document raised `DeidError`.
-- Run manifests now record token-count settings such as `max_tokens` instead of
-  `[REDACTED]`; credentials (`api_key`, `access_token`, ...) are still redacted.
-- `PipelineConfig.validate_registry()` now reports unknown or missing step
-  parameters and off-site components under a local-only policy; previously these
-  surfaced only when the run tried to construct the component.
-
-### What is new since 0.5.0
-
-The `openbtk` command line, clinical QA and groundedness evaluation with eval
-manifests, four guides plus a CLI guide, a full API reference, and eight
-tutorial notebooks that are executed in CI. The six-dependency core is unchanged;
-everything else is an optional extra (a new `notebooks` extra runs the
-tutorials).
-
-**M10 — Eval, CLI, docs — complete.** Writing the tutorials against the real
-code found three genuine defects, fixed below; none of them was visible to the
-existing test suite.
-
-### Added — M10
-- **`openbtk` command line** (`list`, `validate`, `run`, `deid`, `replay`,
-  `doctor`; also `python -m openbtk`). Built on `argparse`, not Typer: a CLI
-  framework would be a seventh runtime dependency for a core held at six, and it
-  works from a plain `pip install openbtk`. A command's result is the only thing
-  on stdout (library logging goes to stderr), so `--json` is pure JSON. Exit
-  codes: `0` ok, `1` it ran and failed or a check found a problem, `2` the
-  invocation was wrong.
-  - `validate` (and `PipelineConfig.validate_registry`) now checks each step's
-    parameters against its constructor signature (unknown or missing) and the
-    off-site policy, without instantiating anything; `Pipeline.validate()` adds
-    the executor's single-linear-chain rule.
-  - `replay` rebuilds a pipeline from a manifest's recorded config, re-runs it and
-    reports divergence in input content (SHA-256), per-step counts and status. A
-    directory input has no content hash, so only its record count is compared and
-    the report says so. A manifest with redacted secrets is refused, not replayed
-    with a placeholder.
-  - `doctor` reports installed extras, the spaCy model, and credentials **by name
-    only** (a value is never read into the report).
-- **Clinical QA evaluation** (`openbtk.eval.qa`): readers for the MedQA and
-  MedMCQA file formats (verified against the datasets' Hub cards; a hidden or
-  ambiguous answer key is refused, never guessed), a conservative answer parser,
-  `evaluate_qa` with a Wilson 95% interval, per-subject counts, token accounting,
-  and an `EvalManifest`. No dataset and no benchmark score ships (rule 14).
-- **Groundedness scoring** (`openbtk.eval.groundedness`): claim-level
-  faithfulness, and `evaluate_detector` to score the checker itself against human
-  labels. States plainly that the default checker is a word-overlap heuristic.
-- **`EvalManifest`** (FR-X-06): which component, which data (SHA-256), when, and
-  counts; never question, answer or note text.
-- **Documentation**: four guides (clinical text, de-identification, EHR,
-  evaluation) plus a command-line guide; API reference pages for EHR, providers,
-  retrieval, guardrails, terminology, evaluation and the LangChain adapter; a
-  tutorials page. Every guide code block is executed, every pipeline YAML block
-  validated, every `openbtk ...` command parsed, every API directive resolved, by
-  `tests/docsite`.
-- **Eight tutorial notebooks** (`notebooks/`), offline and synthetic-only, executed
-  top to bottom in fresh kernels by `tests/notebooks`. New optional `notebooks`
-  extra (nbclient, nbformat, ipykernel).
-- **CI**: `docs-build` (`mkdocs build --strict` on every branch), `test-docs` and
-  `test-notebooks` (all extras installed; fail on any skip). The docs build is now
-  strict; four doctests whose list-of-strings output tripped mkdocs autorefs were
-  rewritten.
-- `openbtk.core.logging.set_log_level()` / `OPENBTK_LOG_LEVEL`: quiet OpenBTK's own
-  log lines. The default is unchanged (every line).
-- `BaseTerminologyService.is_authoritative(system)` (default `True`).
-
-### Fixed — M10 (found by writing the tutorials)
-- **The default terminology guardrail blocked valid data.** The bundled backend is
-  a small ICD-10-CM *subset*, yet `validate()` returning `False` for anything
-  outside it made `TerminologyValidityGuardrail` (and so `EHRCodeValidityGuardrail`)
-  report real SNOMED, LOINC and most ICD-10-CM codes as "do not exist" with
-  severity **BLOCK**. A partial vocabulary can fail to confirm a code, not call it
-  invalid: those codes are now a WARNING ("unverifiable"). A BLOCK requires an
-  authoritative backend (a complete vocabulary).
-- **`max_tokens` was redacted from run manifests** (the credential pattern matched
-  "token"), erasing a chunker's size limit from the audit record and making any
-  pipeline with a chunker impossible to replay. Token-count keys are now exempt;
-  `access_token`, `hf_token` and the like are still redacted.
-- **`DeidMode.DATE_SHIFT` failed the whole document** if it contained any non-date
-  identifier (a phone number beside a date), because every detection was fed to the
-  date parser. Dates are shifted; every other identifier is now redacted.
 
 ## [0.5.0] — 2026-09-19
 
