@@ -1,3 +1,8 @@
+<p align="center">
+  <img alt="Openbtk" src="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-dark.svg#gh-light-mode-only" width="320">
+  <img alt="Openbtk" src="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-light.svg#gh-dark-mode-only" width="320">
+</p>
+
 # Openbtk — Open Toolkit for Biomedical AI
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
