@@ -25,7 +25,7 @@
     
     
       
-        <title>LangChain adapter - OpenBTK</title>
+        <title>LangChain adapter - Openbtk</title>
       
     
     
@@ -98,7 +98,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -112,7 +112,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -234,13 +234,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1625,7 +1625,7 @@ OpenBTKEmbeddings(Fixed()).embed_query("hello")
 
     <div class="doc doc-contents ">
 
-        <p>The wrapped OpenBTK provider.</p>
+        <p>The wrapped Openbtk provider.</p>
 
     </div>
 
@@ -1746,7 +1746,7 @@ does not allow it.</p>
         <p>Expose a <code>BaseLLMProvider</code> as a LangChain chat model.</p>
 <p>Only system, user and assistant messages with plain-text content are
 supported -- anything else raises <code>ProviderError</code> rather than being
-flattened into a lossy prompt. Streaming is not overridden: OpenBTK's
+flattened into a lossy prompt. Streaming is not overridden: Openbtk's
 <code>BaseLLMProvider.stream</code> takes a prompt string, not a message list, so
 <code>.stream()</code> here falls back to LangChain's default of yielding the
 complete response as a single chunk.</p>
@@ -1822,7 +1822,7 @@ OpenBTKChatModel(provider=Echo()).invoke("hi").content
 
         <p>Expose a <code>BaseVectorStore</code> and an <code>Embeddings</code> as a LangChain
 <code>VectorStore</code>.</p>
-<p>OpenBTK stores hold vectors and metadata, not documents, so each text is
+<p>Openbtk stores hold vectors and metadata, not documents, so each text is
 kept in the metadata under <code>text_key</code> (<code>"text"</code> -- the same key
 :class:<code>~openbtk.pipelines.rag.RAGPipeline</code> reads, so one index serves both
 APIs). A caller's own metadata may not use that key.</p>
@@ -1853,7 +1853,7 @@ unsupported rather than guessed at.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>The OpenBTK vector store.</p>
+                <p>The Openbtk vector store.</p>
               </div>
             </td>
             <td>
@@ -1869,7 +1869,7 @@ unsupported rather than guessed at.</p>
             </td>
             <td>
               <div class="doc-md-description">
-                <p>Embeds documents and queries. Wrap an OpenBTK provider with
+                <p>Embeds documents and queries. Wrap an Openbtk provider with
 :class:<code>~openbtk.integrations.langchain.OpenBTKEmbeddings</code>.</p>
               </div>
             </td>
@@ -1981,7 +1981,7 @@ vs.similarity_search("anything")[0].page_content
 
     <div class="doc doc-contents ">
 
-        <p>The wrapped OpenBTK store.</p>
+        <p>The wrapped Openbtk store.</p>
 
     </div>
 
@@ -2706,7 +2706,7 @@ True</p>
 
     <div class="doc doc-contents first">
 
-        <p>Wrap a text-to-text <code>Runnable</code> as an OpenBTK record preprocessor.</p>
+        <p>Wrap a text-to-text <code>Runnable</code> as an Openbtk record preprocessor.</p>
 
 
             <details class="mkdocstrings-source">
@@ -2714,7 +2714,7 @@ True</p>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">135</span>
 <span class="normal">136</span>
 <span class="normal">137</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">from_runnable</span><span class="p">(</span><span class="n">runnable</span><span class="p">:</span> <span class="n">Runnable</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">RunnablePreprocessor</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Wrap a text-to-text ``Runnable`` as an OpenBTK record preprocessor."""</span>
+<span class="w">    </span><span class="sd">"""Wrap a text-to-text ``Runnable`` as an Openbtk record preprocessor."""</span>
     <span class="k">return</span> <span class="n">RunnablePreprocessor</span><span class="p">(</span><span class="n">runnable</span><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
             </details>

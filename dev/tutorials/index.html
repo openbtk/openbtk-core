@@ -27,7 +27,7 @@
     
     
       
-        <title>Tutorials - OpenBTK</title>
+        <title>Tutorials - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1151,7 +1151,8 @@
 <p>Eight Jupyter notebooks, in order. Each one runs <strong>offline</strong>, downloads no model,
 uses only synthetic data, and is <strong>executed in CI on every change</strong> — a tutorial
 that stopped working would fail the build.</p>
-<p>The notebooks need OpenBTK 0.6.0 or later.</p>
+<p>The notebooks need Openbtk 0.7.0 or later (the tagged 0.6.0 that first added them
+was never published).</p>
 <p>To run them yourself:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[text,ehr,langchain,langgraph,notebooks]"</span><span class="w"> </span>faiss-cpu
 jupyter<span class="w"> </span>lab<span class="w"> </span>notebooks/
@@ -1203,12 +1204,12 @@ jupyter<span class="w"> </span>lab<span class="w"> </span>notebooks/
 <tr>
 <td>8</td>
 <td><a href="https://github.com/openbtk/openbtk-core/blob/main/notebooks/08_langchain_and_langgraph.ipynb">LangChain and LangGraph</a></td>
-<td>use OpenBTK components as Runnables, a vector store and a graph node</td>
+<td>use Openbtk components as Runnables, a vector store and a graph node</td>
 </tr>
 </tbody>
 </table>
 <p>The notebooks stand in for real models with two tiny offline providers (a hashing
-"encoder" and an extractive "LLM") that implement OpenBTK's real interfaces, so
+"encoder" and an extractive "LLM") that implement Openbtk's real interfaces, so
 swapping in a real model changes a line or two. They demonstrate the <em>plumbing</em>;
 they make no claim about retrieval or answer quality. For the numbers this
 project does publish, and what they do not show, see <a href="../benchmarks/">Benchmarks</a>.</p>

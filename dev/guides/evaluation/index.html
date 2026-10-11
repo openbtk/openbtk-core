@@ -27,7 +27,7 @@
     
     
       
-        <title>Evaluation - OpenBTK</title>
+        <title>Evaluation - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1305,7 +1305,7 @@
 
 
 <h1 id="evaluation">Evaluation<a class="headerlink" href="#evaluation" title="Permanent link">&para;</a></h1>
-<p>OpenBTK ships harnesses, not scores. Every number this project publishes comes
+<p>Openbtk ships harnesses, not scores. Every number this project publishes comes
 from a harness in the repository (see <a href="../../benchmarks/">Benchmarks</a>); the
 harnesses below let you produce the same kind of number for <em>your</em> model and
 <em>your</em> data. Reports hold counts and identifiers, never text, so they are safe
@@ -1456,7 +1456,7 @@ faithfulness number.</p>
 </div>
 <h2 id="model-cards">Model cards<a class="headerlink" href="#model-cards" title="Permanent link">&para;</a></h2>
 <p>A model card is the short document that travels with a model: what it is, what it is for,
-how well it does, where it fails. OpenBTK already records the facts a card needs, so it
+how well it does, where it fails. Openbtk already records the facts a card needs, so it
 assembles them: the exact model and pinned revision a component used, and the scores an
 evaluation produced.</p>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">UTC</span><span class="p">,</span> <span class="n">datetime</span>
@@ -1488,7 +1488,7 @@ evaluation produced.</p>
 </code></pre></div>
 <p>What is written for you, and what is not:</p>
 <ul>
-<li>The <strong>identity</strong> (model, pinned revision, source, the OpenBTK component and its
+<li>The <strong>identity</strong> (model, pinned revision, source, the Openbtk component and its
   settings) comes from the component's provenance, and the <strong>evaluation table</strong> from
   <code>EvalManifest</code>s you attach, each with its id and input digests.</li>
 <li>Everything that needs judgement (intended use, out-of-scope use, training data,
@@ -1532,7 +1532,7 @@ a paraphrase that ROUGE misses).</p>
 <li>ROUGE wraps Google's <code>rouge-score</code> (the <code>eval</code> extra). Its tokenizer keeps only <code>a-z</code>
   and <code>0-9</code>, so accented letters and symbols such as <code>%</code> or <code>&gt;</code> are dropped before
   scoring, a real limit for clinical text.</li>
-<li><strong>BERTScore needs choices OpenBTK will not make for you.</strong> You give the model, its
+<li><strong>BERTScore needs choices Openbtk will not make for you.</strong> You give the model, its
   pinned commit <em>and</em> the layer, and it downloads nothing until first use:</li>
 </ul>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">openbtk.eval.summarisation</span><span class="w"> </span><span class="kn">import</span> <span class="n">BertScorer</span>
@@ -1545,7 +1545,7 @@ a paraphrase that ROUGE misses).</p>
 <span class="k">assert</span> <span class="n">scorer</span><span class="o">.</span><span class="n">provenance</span><span class="p">()</span><span class="o">.</span><span class="n">model_identity</span><span class="o">.</span><span class="n">revision</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"12040acc"</span><span class="p">)</span>
 <span class="c1"># evaluate_summaries(pairs, bertscorer=scorer)  # downloads the model, needs torch</span>
 </code></pre></div>
-<p>OpenBTK implements BERTScore itself rather than wrapping the <code>bert-score</code> package,
+<p>Openbtk implements BERTScore itself rather than wrapping the <code>bert-score</code> package,
   because that package fetches its model by name with no way to pin a revision. The
   implementation reproduces the reference package's raw scores (five sentence pairs agree
   to within 1e-7; the test that checks this carries the recorded values), but supports

@@ -27,7 +27,7 @@
     
     
       
-        <title>Stability policy - OpenBTK</title>
+        <title>Stability policy - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1325,12 +1325,12 @@
 
 
 <h1 id="stability-policy">Stability policy<a class="headerlink" href="#stability-policy" title="Permanent link">&para;</a></h1>
-<p>From <strong>1.0</strong>, OpenBTK follows <a href="https://semver.org/">Semantic Versioning</a> and this
+<p>From <strong>1.0</strong>, Openbtk follows <a href="https://semver.org/">Semantic Versioning</a> and this
 policy. Before 1.0, any minor release may break things; every break is recorded in
 the <a href="https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md">CHANGELOG</a>.</p>
 <p>The policy is enforced, not aspirational: <code>tests/api/</code> compares the public API,
 the registry keys, the command line and the manifest schema versions against
-checked-in snapshots, and OpenBTK's own test suite turns its deprecation warning
+checked-in snapshots, and Openbtk's own test suite turns its deprecation warning
 into an error. A change that breaks the promise fails CI.</p>
 <h2 id="what-is-public">What is public<a class="headerlink" href="#what-is-public" title="Permanent link">&para;</a></h2>
 <p><strong>Public API is what the <a href="../api/core/">API reference</a> documents</strong> — and only that.
@@ -1413,12 +1413,12 @@ python<span class="w"> </span>-W<span class="w"> </span>error::openbtk.core.depr
 announced in the release before, and never before it is end-of-life upstream.
 The six core dependencies keep their current lower bounds within a major;
 optional-extra ranges may widen freely and narrow only in a minor with a note.</p>
-<p><code>openbtk.integrations.langchain</code> is stable <em>as an OpenBTK API</em>, but it adapts to
+<p><code>openbtk.integrations.langchain</code> is stable <em>as an Openbtk API</em>, but it adapts to
 <code>langchain-core</code>, whose own changes are outside our control (<a href="https://github.com/openbtk/openbtk-core/blob/main/docs/adr/0001-langchain-interop-not-fork.md">ADR-0001</a>):
 a LangChain release may require an adapter update in a minor.</p>
 <h2 id="reading-manifests-across-versions">Reading manifests across versions<a class="headerlink" href="#reading-manifests-across-versions" title="Permanent link">&para;</a></h2>
 <p>A manifest records the schema version it was written with. Read a manifest with the
-<strong>same or a newer</strong> OpenBTK: readers reject fields they do not know (an older library
+<strong>same or a newer</strong> Openbtk: readers reject fields they do not know (an older library
 cannot read a newer minor's additions). Newer readers read every older manifest of the
 same major.</p>
 <h2 id="for-contributors">For contributors<a class="headerlink" href="#for-contributors" title="Permanent link">&para;</a></h2>

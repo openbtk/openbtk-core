@@ -27,7 +27,7 @@
     
     
       
-        <title>Security review - OpenBTK</title>
+        <title>Security review - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1425,12 +1425,12 @@
 
 
 <h1 id="security-review">Security review<a class="headerlink" href="#security-review" title="Permanent link">&para;</a></h1>
-<p>An <strong>internal</strong> review of OpenBTK's own code and build, done for the 1.0 milestone
+<p>An <strong>internal</strong> review of Openbtk's own code and build, done for the 1.0 milestone
 (M11, task 11.2) by the maintainers' tooling and reading of the source. It is <strong>not</strong> an
 independent audit or a penetration test, and this page does not claim to be one; see
 <a href="#what-this-review-did-not-do">what this review did not do</a>. To report a
 vulnerability, use <a href="https://github.com/openbtk/openbtk-core/blob/main/SECURITY.md">SECURITY.md</a>.</p>
-<p>OpenBTK handles protected health information, so the questions asked were the ones
+<p>Openbtk handles protected health information, so the questions asked were the ones
 that matter for it: can PHI or a credential reach a log, an error, a manifest or a
 cache; can untrusted input stall or crash a worker; and what does installing and
 releasing the package trust.</p>
@@ -1473,7 +1473,7 @@ without the fix.</p>
 <td>S-4</td>
 <td>Two more quadratic patterns: the QA answer parser and the sentence splitter</td>
 <td>Availability</td>
-<td>splitter: every release since 0.1.0rc1; QA parser: 0.6.0</td>
+<td>splitter: every release since 0.1.0rc1; QA parser: 0.7.0 (the tagged 0.6.0 that introduced it was never published)</td>
 <td>Unambiguous pattern; backwards scan</td>
 </tr>
 <tr>
@@ -1562,14 +1562,14 @@ and trusted publishing (no long-lived token).</p>
   (the six core dependencies) and the light extras (<code>ehr</code>, <code>langchain</code>, <code>langgraph</code>)
   found none at the time of review. Auditing a full development environment, with the
   heavy extras, did report advisories in two third-party packages, neither of which
-  has a fixed release, and neither of which OpenBTK's use reaches:<ul>
+  has a fixed release, and neither of which Openbtk's use reaches:<ul>
 <li><strong><code>chromadb</code></strong> (five advisories, all about the Chroma <em>server</em>: authorisation
   between tenants, and remote code through a server API that loads a model
-  repository). OpenBTK uses only the in-process client (<code>Client</code> and
+  repository). Openbtk uses only the in-process client (<code>Client</code> and
   <code>PersistentClient</code>), never <code>HttpClient</code>, never runs a Chroma server, and never
   passes <code>trust_remote_code</code>. If you run a Chroma server yourself, that exposure is
   yours; keep it off untrusted networks.</li>
-<li><strong><code>nltk</code></strong> (a model-path validation advisory). OpenBTK does not depend on it; it
+<li><strong><code>nltk</code></strong> (a model-path validation advisory). Openbtk does not depend on it; it
   arrives through <code>medspacy_quickumls</code> when that optional package is installed.</li>
 </ul>
 </li>
@@ -1599,7 +1599,7 @@ here:</p>
   their parsing libraries and standard-library readers, and were read but not fuzzed.</li>
 <li><strong>Third-party models and services are outside its scope.</strong> Model weights (spaCy,
   Hugging Face), LLM providers and the UMLS service are the operator's trust
-  decisions. OpenBTK's controls are the off-site policy, pinning where it loads a model
+  decisions. Openbtk's controls are the off-site policy, pinning where it loads a model
   itself, and never logging content.</li>
 <li><strong>The heavy extras are not audited in CI</strong> (torch, transformers, spaCy, FAISS,
   Chroma and similar): their advisories change often, and the ones found in the

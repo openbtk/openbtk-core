@@ -27,7 +27,7 @@
     
     
       
-        <title>Command line - OpenBTK</title>
+        <title>Command line - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1375,7 +1375,7 @@
 The library's own log lines go to <strong>stderr</strong>; a command's result is the only
 thing on <strong>stdout</strong>, so <code>--json</code> output can be piped straight into <code>jq</code> or a
 script.</p>
-<p>OpenBTK's library log lines are verbose by default (every registration is a
+<p>Openbtk's library log lines are verbose by default (every registration is a
 <code>debug</code> line). Quiet them with <code>OPENBTK_LOG_LEVEL=warning</code> in the environment, or
 <code>openbtk.core.logging.set_log_level("warning")</code> in code.</p>
 <table>
@@ -1566,11 +1566,11 @@ detected; see the <a href="../deidentification/">de-identification guide</a>.</p
 <div class="highlight"><pre><span></span><code>openbtk<span class="w"> </span>doctor
 openbtk<span class="w"> </span>doctor<span class="w"> </span>--require<span class="w"> </span>text,ehr<span class="w">    </span><span class="c1"># exit 1 unless those extras are ready (useful in CI)</span>
 </code></pre></div>
-<p>It reports Python and OpenBTK versions, the six core dependencies, which optional
+<p>It reports Python and Openbtk versions, the six core dependencies, which optional
 extras are complete, whether the spaCy model is present, and which conventional
 credential variables (<code>OPENAI_API_KEY</code>, <code>ANTHROPIC_API_KEY</code>, <code>HF_TOKEN</code>,
 <code>UMLS_API_KEY</code>) are set or not. <strong>Credentials are reported by name only; a value
-is never read into the report.</strong> OpenBTK does not read these variables implicitly:
+is never read into the report.</strong> Openbtk does not read these variables implicitly:
 a config opts in with <code>${NAME}</code>, or a provider's own SDK does.</p>
 
 

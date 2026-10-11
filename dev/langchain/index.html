@@ -27,7 +27,7 @@
     
     
       
-        <title>LangChain & LangGraph - OpenBTK</title>
+        <title>LangChain & LangGraph - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href=".." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href=".." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -1305,22 +1305,22 @@
 
 
 <h1 id="langchain-and-langgraph">LangChain and LangGraph<a class="headerlink" href="#langchain-and-langgraph" title="Permanent link">&para;</a></h1>
-<p>OpenBTK does not depend on LangChain and does not fork it
+<p>Openbtk does not depend on LangChain and does not fork it
 (<a href="https://github.com/openbtk/openbtk-core/blob/main/docs/adr/0001-langchain-interop-not-fork.md">ADR-0001</a>).
 Interoperation is an <strong>optional adapter</strong>, <code>openbtk.integrations.langchain</code>,
-which is the only package in OpenBTK allowed to import LangChain:</p>
+which is the only package in Openbtk allowed to import LangChain:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[langchain]"</span><span class="w">            </span><span class="c1"># embeddings, chat model, vector store, runnables</span>
 pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"openbtk[langchain,langgraph]"</span><span class="w">  </span><span class="c1"># plus a real LangGraph, to run graphs</span>
 </code></pre></div>
 <p>Without <code>langchain-core</code> installed, importing the adapter raises a
-<code>MissingDependencyError</code> that names this extra, and nothing else in OpenBTK is
+<code>MissingDependencyError</code> that names this extra, and nothing else in Openbtk is
 affected. CI checks both halves: the adapter is tested against the real
 <code>langchain-core</code> and <code>langgraph</code>, and the rest of the suite is run with them
 absent.</p>
 <table>
 <thead>
 <tr>
-<th>OpenBTK</th>
+<th>Openbtk</th>
 <th>LangChain</th>
 <th>Notes</th>
 </tr>
@@ -1381,7 +1381,7 @@ record, or run <code>DeidEngine</code> as a step (below).</p>
 <span class="k">assert</span> <span class="n">document_to_chunk</span><span class="p">(</span><span class="n">document</span><span class="p">)</span> <span class="o">==</span> <span class="n">chunk</span>  <span class="c1"># nothing is lost</span>
 </code></pre></div>
 <p>A <code>Document</code> that did not come from a chunk has no exact token count, and
-OpenBTK will not guess one: pass <code>token_counter=</code> (a real tokenizer's count)
+Openbtk will not guess one: pass <code>token_counter=</code> (a real tokenizer's count)
 to <code>document_to_chunk</code>, or the conversion raises.</p>
 <h2 id="de-identification-inside-a-langchain-chain">De-identification inside a LangChain chain<a class="headerlink" href="#de-identification-inside-a-langchain-chain" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">langchain_core.runnables</span><span class="w"> </span><span class="kn">import</span> <span class="n">RunnableLambda</span>
@@ -1400,7 +1400,7 @@ and dates. It does <strong>not</strong> detect names; add <code>"ner"</code> to 
 that. See <a href="../benchmarks/">Benchmarks</a> for what each configuration measurably
 catches.</p>
 <h2 id="a-vector-store-langchain-can-search">A vector store LangChain can search<a class="headerlink" href="#a-vector-store-langchain-can-search" title="Permanent link">&para;</a></h2>
-<p>OpenBTK stores hold vectors and metadata, so the adapter keeps each text in
+<p>Openbtk stores hold vectors and metadata, so the adapter keeps each text in
 the metadata under <code>"text"</code> — the same key <code>RAGPipeline</code> reads. The two
 classes below are tiny stand-ins so the example runs without downloading a
 model; substitute a real provider and a FAISS/Chroma/Qdrant store.</p>
@@ -1487,7 +1487,7 @@ model; substitute a real provider and a FAISS/Chroma/Qdrant store.</p>
 </code></pre></div>
 <h2 id="limits-worth-knowing">Limits worth knowing<a class="headerlink" href="#limits-worth-knowing" title="Permanent link">&para;</a></h2>
 <ul>
-<li><code>OpenBTKChatModel</code> does not stream token-by-token: OpenBTK's provider
+<li><code>OpenBTKChatModel</code> does not stream token-by-token: Openbtk's provider
   <code>stream()</code> takes a prompt string, not a message list.</li>
 <li><code>OpenBTKVectorStore.delete()</code> needs explicit ids (there is no delete-all on
   <code>BaseVectorStore</code>), and <code>from_texts()</code> needs an explicit <code>store=</code>.</li>

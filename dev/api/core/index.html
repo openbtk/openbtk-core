@@ -27,7 +27,7 @@
     
     
       
-        <title>Core - OpenBTK</title>
+        <title>Core - Openbtk</title>
       
     
     
@@ -100,7 +100,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="OpenBTK" class="md-header__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-header__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -114,7 +114,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            OpenBTK
+            Openbtk
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -236,13 +236,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="OpenBTK" class="md-nav__button md-logo" aria-label="OpenBTK" data-md-component="logo">
+    <a href="../.." title="Openbtk" class="md-nav__button md-logo" aria-label="Openbtk" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    OpenBTK
+    Openbtk
   </label>
   
     <div class="md-nav__source">
@@ -4050,7 +4050,7 @@
 
 <h1 id="core-framework">Core framework<a class="headerlink" href="#core-framework" title="Permanent link">&para;</a></h1>
 <p>The registry, base classes, configuration, and provenance primitives every
-other part of OpenBTK builds on. <code>import openbtk.core</code> (or its submodules)
+other part of Openbtk builds on. <code>import openbtk.core</code> (or its submodules)
 never requires an optional dependency.</p>
 <p>Everything on this page is under the <a href="../../stability/">stability policy</a>: it is
 what you write custom components and plugins against.</p>
@@ -5270,7 +5270,7 @@ True</p>
 
         <p>Introspective summary of one registered component.</p>
 <p>Deliberately does not attempt a full JSON Schema of constructor
-parameters: OpenBTK components take plain keyword arguments, not a
+parameters: Openbtk components take plain keyword arguments, not a
 single Pydantic config object, so a fabricated "schema" for an arbitrary
 <code>__init__</code> signature would often be misleading (a default value that
 is not itself a JSON type, for instance). <code>signature</code> gives the same
@@ -5325,7 +5325,7 @@ usable from a config file, the CLI and a pipeline.</p>
 
 
 
-        <p>Root of every OpenBTK component. Supplies identity and provenance.</p>
+        <p>Root of every Openbtk component. Supplies identity and provenance.</p>
 <p>Subclasses are never instantiated directly through this class -- always
 through one of the role base classes below, via a registry.</p>
 
@@ -5730,7 +5730,7 @@ connection string, depending on the implementation.</p>
 <details class="warning" open>
   <summary>Warning</summary>
   <p>Memory hazard -- O(corpus), not O(batch). Never used in
-OpenBTK's own code, docs, or examples (ADR-0004; enforced by a
+Openbtk's own code, docs, or examples (ADR-0004; enforced by a
 grep gate in CI). Provided only for interactive/notebook use on
 small sources.</p>
 </details>
@@ -5751,7 +5751,7 @@ small sources.</p>
 
 <span class="sd">    Warning:</span>
 <span class="sd">        Memory hazard -- O(corpus), not O(batch). Never used in</span>
-<span class="sd">        OpenBTK's own code, docs, or examples (ADR-0004; enforced by a</span>
+<span class="sd">        Openbtk's own code, docs, or examples (ADR-0004; enforced by a</span>
 <span class="sd">        grep gate in CI). Provided only for interactive/notebook use on</span>
 <span class="sd">        small sources.</span>
 <span class="sd">    """</span>
@@ -10933,7 +10933,7 @@ pydantic_core._pydantic_core.ValidationError: ...revision is a floating tag</p>
 <p>Use <code>__name__</code> as <code>name</code>, matching every other logging convention in
 this codebase. The returned logger's processor chain is fixed at
 creation and independent of any global <code>structlog.configure()</code> call --
-by a host application or by OpenBTK itself, since OpenBTK never makes
+by a host application or by Openbtk itself, since Openbtk never makes
 one.</p>
 
 
@@ -10981,7 +10981,7 @@ log.info("probe.event", safe_field=1)  # doctest: +SKIP</p>
 <span class="sd">    Use ``__name__`` as ``name``, matching every other logging convention in</span>
 <span class="sd">    this codebase. The returned logger's processor chain is fixed at</span>
 <span class="sd">    creation and independent of any global ``structlog.configure()`` call --</span>
-<span class="sd">    by a host application or by OpenBTK itself, since OpenBTK never makes</span>
+<span class="sd">    by a host application or by Openbtk itself, since Openbtk never makes</span>
 <span class="sd">    one.</span>
 
 <span class="sd">    Example:</span>
@@ -11142,7 +11142,7 @@ configure_logging(allow_phi=False)  # restore the safe default</p>
 
     <div class="doc doc-contents first">
 
-        <p>Set the minimum level of OpenBTK's own log lines, process-wide.</p>
+        <p>Set the minimum level of Openbtk's own log lines, process-wide.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
@@ -11235,7 +11235,7 @@ set_log_level("debug")  # restore the default</p>
 <span class="normal">237</span>
 <span class="normal">238</span>
 <span class="normal">239</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">set_log_level</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">"""Set the minimum level of OpenBTK's own log lines, process-wide.</span>
+<span class="w">    </span><span class="sd">"""Set the minimum level of Openbtk's own log lines, process-wide.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        level: ``"debug"`` (the default: everything), ``"info"``, ``"warning"``,</span>
@@ -11984,7 +11984,7 @@ True</p>
 
 
 
-        <p>Raised (as a warning) when a deprecated OpenBTK API is used.</p>
+        <p>Raised (as a warning) when a deprecated Openbtk API is used.</p>
 
 
 
@@ -11997,7 +11997,7 @@ True</p>
     </div>
 
 </div><h2 id="errors">Errors<a class="headerlink" href="#errors" title="Permanent link">&para;</a></h2>
-<p>Every OpenBTK error derives from <code>OpenBTKError</code>, carries a <code>context</code> dict of
+<p>Every Openbtk error derives from <code>OpenBTKError</code>, carries a <code>context</code> dict of
 identifiers only (never content), and is safe to log.</p>
 
 
@@ -12019,7 +12019,7 @@ identifiers only (never content), and is safe to log.</p>
 
 
 
-        <p>Root of every exception raised by OpenBTK.</p>
+        <p>Root of every exception raised by Openbtk.</p>
 
 
 <p><span class="doc-section-title">Parameters:</span></p>
