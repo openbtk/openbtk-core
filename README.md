@@ -6,11 +6,13 @@
 <p align="center"><strong>The open-source toolkit for biomedical AI.</strong></p>
 
 
-[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
-[![PyPI](https://img.shields.io/pypi/v/openbtk)](https://pypi.org/project/openbtk/)
-[![PyPI downloads](https://img.shields.io/pypi/dm/openbtk)](https://pypistats.org/packages/openbtk)
-[![Repo views](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fviews.json)](https://github.com/openbtk/openbtk-core/pulse)
-[![Repo clones](https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fclones.json)](https://github.com/openbtk/openbtk-core/pulse)
+<p align="center">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-Apache%202.0-blue.svg"></a>
+  <a href="https://pypi.org/project/openbtk/"><img alt="PyPI" src="https://img.shields.io/pypi/v/openbtk"></a>
+  <a href="https://pypistats.org/packages/openbtk"><img alt="PyPI downloads" src="https://img.shields.io/pypi/dm/openbtk"></a>
+  <a href="https://github.com/openbtk/openbtk-core/pulse"><img alt="Repo views" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fviews.json"></a>
+  <a href="https://github.com/openbtk/openbtk-core/pulse"><img alt="Repo clones" src="https://img.shields.io/endpoint?url=https%3A%2F%2Fraw.githubusercontent.com%2Fopenbtk%2Fopenbtk-core%2Fmetrics-data%2Fbadges%2Fclones.json"></a>
+</p>
 
 <sub>PyPI badges are live from PyPI/pypistats.org. GitHub only shows clone and
 view counts to maintainers and only for a rolling 14 days, so the repo badges
