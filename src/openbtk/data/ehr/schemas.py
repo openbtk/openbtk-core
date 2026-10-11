@@ -60,7 +60,7 @@ class Demographics(BaseModel):
     ``race``/``ethnicity`` are free text here, not an enum: FHIR's US Core
     extensions and OMOP's ``race_concept_id``/``ethnicity_concept_id`` both
     ultimately resolve to a categorical value from their own vocabularies
-    (OMB categories, in practice), but OpenBTK does not bundle either
+    (OMB categories, in practice), but Openbtk does not bundle either
     vocabulary (docs/09_CODING_STANDARDS.md section 7 -- ``openbtk.terminology``
     is the right home for that resolution, and it is not built yet, M7).
     Loaders populate the human-readable display text they already have

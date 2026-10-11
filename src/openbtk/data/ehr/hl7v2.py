@@ -63,7 +63,7 @@ log = get_logger(__name__)
 
 _SOURCE_SYSTEM = "hl7v2"
 
-# HL7 table 0396 names that denote exactly one CodeSystem OpenBTK models.
+# HL7 table 0396 names that denote exactly one CodeSystem Openbtk models.
 _SYSTEMS: dict[str, CodeSystem] = {
     "SCT": CodeSystem.SNOMED,
     "LN": CodeSystem.LOINC,

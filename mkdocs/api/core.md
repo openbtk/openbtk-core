@@ -1,7 +1,7 @@
 # Core framework
 
 The registry, base classes, configuration, and provenance primitives every
-other part of OpenBTK builds on. `import openbtk.core` (or its submodules)
+other part of Openbtk builds on. `import openbtk.core` (or its submodules)
 never requires an optional dependency.
 
 Everything on this page is under the [stability policy](../stability.md): it is
@@ -124,7 +124,7 @@ usable from a config file, the CLI and a pipeline.
 
 ## Errors
 
-Every OpenBTK error derives from `OpenBTKError`, carries a `context` dict of
+Every Openbtk error derives from `OpenBTKError`, carries a `context` dict of
 identifiers only (never content), and is safe to log.
 
 ::: openbtk.core.errors.OpenBTKError

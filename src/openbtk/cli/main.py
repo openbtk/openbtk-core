@@ -139,7 +139,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             code, text = args.handler(args)
         except OpenBTKError as e:
-            # OpenBTK errors carry identifiers and messages, never PHI.
+            # Openbtk errors carry identifiers and messages, never PHI.
             sys.stderr.write(f"error: {e}\n")
             code = 2 if isinstance(e, _USAGE_ERRORS) else 1
     real_stdout.write(text)

@@ -47,7 +47,7 @@ CORE_DEPENDENCIES = (
     "typing-extensions",
 )
 
-# Conventional names, checked by name only. OpenBTK reads none of them
+# Conventional names, checked by name only. Openbtk reads none of them
 # implicitly: a config opts in with ${NAME}, or the provider's own SDK does.
 CREDENTIAL_ENV_VARS = (
     "OPENAI_API_KEY",

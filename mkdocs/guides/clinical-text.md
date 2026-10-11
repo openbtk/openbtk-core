@@ -95,4 +95,4 @@ Check it, then run it, with the [CLI](cli.md): `openbtk validate pipeline.yaml`,
   [de-identification guide](deidentification.md) for what to enable and what the
   [benchmarks](../benchmarks.md) do and do not show.
 * `MIMICNotesLoader` reads MIMIC-shaped CSV you already hold under your own data
-  use agreement; OpenBTK never downloads credentialed data.
+  use agreement; Openbtk never downloads credentialed data.

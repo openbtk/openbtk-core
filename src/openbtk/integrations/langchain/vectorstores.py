@@ -1,4 +1,4 @@
-"""An OpenBTK vector store as a ``langchain_core`` ``VectorStore``."""
+"""An Openbtk vector store as a ``langchain_core`` ``VectorStore``."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ class OpenBTKVectorStore(VectorStore):
     """Expose a ``BaseVectorStore`` and an ``Embeddings`` as a LangChain
     ``VectorStore``.
 
-    OpenBTK stores hold vectors and metadata, not documents, so each text is
+    Openbtk stores hold vectors and metadata, not documents, so each text is
     kept in the metadata under ``text_key`` (``"text"`` -- the same key
     :class:`~openbtk.pipelines.rag.RAGPipeline` reads, so one index serves both
     APIs). A caller's own metadata may not use that key.
@@ -38,8 +38,8 @@ class OpenBTKVectorStore(VectorStore):
     unsupported rather than guessed at.
 
     Args:
-        store: The OpenBTK vector store.
-        embedding: Embeds documents and queries. Wrap an OpenBTK provider with
+        store: The Openbtk vector store.
+        embedding: Embeds documents and queries. Wrap an Openbtk provider with
             :class:`~openbtk.integrations.langchain.OpenBTKEmbeddings`.
         text_key: Metadata key holding each document's text.
 
@@ -79,7 +79,7 @@ class OpenBTKVectorStore(VectorStore):
 
     @property
     def store(self) -> BaseVectorStore:
-        """The wrapped OpenBTK store."""
+        """The wrapped Openbtk store."""
         return self._store
 
     def add_texts(

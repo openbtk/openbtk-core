@@ -121,7 +121,7 @@ decision.
   `test-notebooks` (all extras installed; fail on any skip). The docs build is now
   strict; four doctests whose list-of-strings output tripped mkdocs autorefs were
   rewritten.
-- `openbtk.core.logging.set_log_level()` / `OPENBTK_LOG_LEVEL`: quiet OpenBTK's own
+- `openbtk.core.logging.set_log_level()` / `OPENBTK_LOG_LEVEL`: quiet Openbtk's own
   log lines. The default is unchanged (every line).
 - `BaseTerminologyService.is_authoritative(system)` (default `True`).
 
@@ -164,7 +164,7 @@ decision.
 ### Added — P2 requirements (PRD section 7, "v1.0 — Adoption")
 - **`DosePlausibilityGuardrail`** (`guardrail.general.dose_plausibility`, FR-G-05).
   Finds drug, dose, frequency and route statements in generated text and checks them
-  against limits **you supply**; OpenBTK ships no dose limits, and every limit must name
+  against limits **you supply**; Openbtk ships no dose limits, and every limit must name
   its source. Blocks a dose or computed daily total over a limit. Says plainly when
   nothing was checked. A pass never means a dose is safe.
 - **k-anonymity** (FR-D-11): `openbtk.deid.kanonymity` measures it (counts-only report)
@@ -262,7 +262,7 @@ An internal review is not an independent audit, and the page says so.
   retry, deprecation and every error.
 - **Deprecation mechanism**: `openbtk.core.deprecation` (`deprecated`,
   `warn_deprecated`, `OpenBTKDeprecationWarning`) and
-  `Registry.register_alias(old, new, since=, removal=)`. OpenBTK's own tests turn the
+  `Registry.register_alias(old, new, since=, removal=)`. Openbtk's own tests turn the
   warning into an error, so nothing inside the library may call a deprecated API.
 - `count_tokens_exact(..., revision=)` (additive).
 - **CI `security` job** (bandit medium+, detect-secrets, pip-audit on the core install
@@ -1292,8 +1292,8 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.6.0...HEAD
-[0.6.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.6.0
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.7.0
 [0.5.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.5.0
 [0.1.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.1
 [0.0.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.0.1

@@ -1,6 +1,6 @@
 # Evaluation
 
-OpenBTK ships harnesses, not scores. Every number this project publishes comes
+Openbtk ships harnesses, not scores. Every number this project publishes comes
 from a harness in the repository (see [Benchmarks](../benchmarks.md)); the
 harnesses below let you produce the same kind of number for *your* model and
 *your* data. Reports hold counts and identifiers, never text, so they are safe
@@ -144,7 +144,7 @@ assert evaluate_detector(judged).f1 == 1.0
 ## Model cards
 
 A model card is the short document that travels with a model: what it is, what it is for,
-how well it does, where it fails. OpenBTK already records the facts a card needs, so it
+how well it does, where it fails. Openbtk already records the facts a card needs, so it
 assembles them: the exact model and pinned revision a component used, and the scores an
 evaluation produced.
 
@@ -179,7 +179,7 @@ assert "## Training data\n\nNot provided." in text  # nothing invented
 
 What is written for you, and what is not:
 
-- The **identity** (model, pinned revision, source, the OpenBTK component and its
+- The **identity** (model, pinned revision, source, the Openbtk component and its
   settings) comes from the component's provenance, and the **evaluation table** from
   `EvalManifest`s you attach, each with its id and input digests.
 - Everything that needs judgement (intended use, out-of-scope use, training data,
@@ -227,7 +227,7 @@ Read these numbers for what they are:
 - ROUGE wraps Google's `rouge-score` (the `eval` extra). Its tokenizer keeps only `a-z`
   and `0-9`, so accented letters and symbols such as `%` or `>` are dropped before
   scoring, a real limit for clinical text.
-- **BERTScore needs choices OpenBTK will not make for you.** You give the model, its
+- **BERTScore needs choices Openbtk will not make for you.** You give the model, its
   pinned commit *and* the layer, and it downloads nothing until first use:
 
 ```python
@@ -242,7 +242,7 @@ assert scorer.provenance().model_identity.revision.startswith("12040acc")
 # evaluate_summaries(pairs, bertscorer=scorer)  # downloads the model, needs torch
 ```
 
-  OpenBTK implements BERTScore itself rather than wrapping the `bert-score` package,
+  Openbtk implements BERTScore itself rather than wrapping the `bert-score` package,
   because that package fetches its model by name with no way to pin a revision. The
   implementation reproduces the reference package's raw scores (five sentence pairs agree
   to within 1e-7; the test that checks this carries the recorded values), but supports

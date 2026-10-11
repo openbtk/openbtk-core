@@ -1,7 +1,7 @@
 """``DosePlausibilityGuardrail`` (FR-G-05).
 
 Every limit here belongs to a made-up drug ("examplamine") and is a test value, not
-clinical information: OpenBTK ships no dose limits, and these tests must not read
+clinical information: Openbtk ships no dose limits, and these tests must not read
 like a formulary.
 """
 

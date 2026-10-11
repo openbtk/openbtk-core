@@ -1,4 +1,4 @@
-"""An OpenBTK LLM provider as a ``langchain_core`` chat model."""
+"""An Openbtk LLM provider as a ``langchain_core`` chat model."""
 
 from __future__ import annotations
 
@@ -30,7 +30,7 @@ def _to_openbtk(messages: list[BaseMessage]) -> list[Message]:
             role = "system"
         else:
             raise ProviderError(
-                f"OpenBTKChatModel cannot send a {type(m).__name__}: OpenBTK "
+                f"OpenBTKChatModel cannot send a {type(m).__name__}: Openbtk "
                 "providers take only system/user/assistant messages.",
                 context={"message_type": type(m).__name__},
             )
@@ -49,7 +49,7 @@ class OpenBTKChatModel(BaseChatModel):
 
     Only system, user and assistant messages with plain-text content are
     supported -- anything else raises ``ProviderError`` rather than being
-    flattened into a lossy prompt. Streaming is not overridden: OpenBTK's
+    flattened into a lossy prompt. Streaming is not overridden: Openbtk's
     ``BaseLLMProvider.stream`` takes a prompt string, not a message list, so
     ``.stream()`` here falls back to LangChain's default of yielding the
     complete response as a single chunk.

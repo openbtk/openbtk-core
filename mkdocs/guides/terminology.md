@@ -1,7 +1,7 @@
 # Terminology
 
 Clinical text says "CBC", "HTN" or "hypertenson"; the codes downstream want `58410-2`,
-`I10`. OpenBTK's terminology layer does three jobs, and is careful about what it may
+`I10`. Openbtk's terminology layer does three jobs, and is careful about what it may
 ship.
 
 | Job | Class | Needs |
@@ -10,7 +10,7 @@ ship.
 | Match a free-text **term** to a concept | `ConceptNormalizer` | a vocabulary you supply |
 | Cache lookups for offline use | `CachedTerminologyService` | a directory |
 
-**OpenBTK bundles no licensed vocabulary.** The one that ships is a small ICD-10-CM
+**Openbtk bundles no licensed vocabulary.** The one that ships is a small ICD-10-CM
 subset, which is public domain. LOINC, SNOMED CT and the rest are licensed, so they come
 from you: as a CSV extract, or through your own UMLS account.
 

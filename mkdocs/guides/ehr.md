@@ -158,7 +158,7 @@ What it reads and how, so you can judge whether it fits your feed:
   number, class, admit and discharge times), `DG1`, `OBX`, `RXE`/`RXA` and `PR1`.
   Everything else is ignored, and **names, addresses and phone numbers are never read**.
 - A code is mapped only through coding-system names HL7 defines for the code sets
-  OpenBTK models: `SCT` (SNOMED CT), `LN` (LOINC), `I10C` (ICD-10-CM), `RXNORM`, `C4`
+  Openbtk models: `SCT` (SNOMED CT), `LN` (LOINC), `I10C` (ICD-10-CM), `RXNORM`, `C4`
   (CPT-4). Plain `I10` is the WHO ICD-10, a different code set, and is *not* treated as
   ICD-10-CM. An event with no mappable code is skipped and counted in a log line, not
   raised.

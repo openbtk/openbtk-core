@@ -1,4 +1,4 @@
-"""An OpenBTK embedding provider as a ``langchain_core`` ``Embeddings``."""
+"""An Openbtk embedding provider as a ``langchain_core`` ``Embeddings``."""
 
 from __future__ import annotations
 
@@ -58,7 +58,7 @@ class OpenBTKEmbeddings(Embeddings):
 
     @property
     def provider(self) -> BaseEmbeddingProvider:
-        """The wrapped OpenBTK provider."""
+        """The wrapped Openbtk provider."""
         return self._provider
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:

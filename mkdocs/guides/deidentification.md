@@ -13,7 +13,7 @@ and returns a `DeidReport` you can audit. Two things to read first:
     [benchmarks](../benchmarks.md) page has the measured numbers and their limits.
 
 !!! note "Not a compliance guarantee"
-    OpenBTK provides technical controls. It does not make you HIPAA-compliant,
+    Openbtk provides technical controls. It does not make you HIPAA-compliant,
     and the published figures are on a synthetic corpus, not real clinical text.
 
 ## Detect, transform, report

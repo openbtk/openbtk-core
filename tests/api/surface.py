@@ -1,4 +1,4 @@
-"""Extract OpenBTK's public API surface as plain data, for the freeze.
+"""Extract Openbtk's public API surface as plain data, for the freeze.
 
 **What is public.** Exactly what the API reference documents: every
 ``::: dotted.path`` directive under ``mkdocs/api/``, plus the registry keys and
@@ -11,7 +11,7 @@ The snapshot records, for each documented object:
 * a **function**: its signature;
 * a **class**: its constructor signature and every public member (methods with
   signatures, properties, class-level constants), including members inherited
-  from other OpenBTK classes but not from the standard library or pydantic;
+  from other Openbtk classes but not from the standard library or pydantic;
 * a **pydantic model**: its field names and whether each is required (not the
   annotations, whose ``repr`` differs between Python versions);
 * an **enum**: its member names and values.
@@ -102,7 +102,7 @@ def _pydantic_fields(cls: type) -> dict[str, bool] | None:
 
 
 def _members(cls: type) -> dict[str, str]:
-    """Public members declared on ``cls`` or on an OpenBTK base of it."""
+    """Public members declared on ``cls`` or on an Openbtk base of it."""
     out: dict[str, str] = {}
     for klass in reversed(cls.__mro__):
         if not _is_openbtk(klass):

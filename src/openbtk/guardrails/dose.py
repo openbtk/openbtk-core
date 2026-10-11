@@ -1,7 +1,7 @@
 """``DosePlausibilityGuardrail``: flags a drug dose, daily total or route in generated
 text that falls outside a reference table the caller supplies (FR-G-05).
 
-**OpenBTK ships no dose limits, on purpose.** A table of "safe" doses recalled from
+**Openbtk ships no dose limits, on purpose.** A table of "safe" doses recalled from
 memory, or copied without its source, is a patient-safety hazard: it looks
 authoritative and nobody can audit it. So this guardrail is the *engine* -- it finds
 dose statements and compares them to limits **you** provide, from a formulary,

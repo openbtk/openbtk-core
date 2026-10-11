@@ -21,7 +21,7 @@ ROUGE misses. It is implemented here on ``transformers`` instead of wrapping the
 ``bert-score`` package, because that package fetches its model by name with no way to
 pin a revision, and an unpinned download is not something an auditable pipeline should
 do (security review finding S-3). **Both the model and its commit are required, and so
-is the layer**: OpenBTK does not pick a model or a layer for you, because the right ones
+is the layer**: Openbtk does not pick a model or a layer for you, because the right ones
 are a choice you should be able to defend. The implementation follows the reference
 greedy matching and was checked against the ``bert-score`` package (see the tests); it
 does not support idf weighting or baseline rescaling, so its numbers are the *raw*

@@ -2,7 +2,7 @@
 
 Same shape as :class:`openbtk.llms.openai.OpenAIProvider`: the SDK does
 all the real work (HTTP, auth), this module translates its
-request/response/exception shapes to OpenBTK's, and applies
+request/response/exception shapes to Openbtk's, and applies
 :func:`openbtk.core.retry.retry_with_backoff` around the call.
 """
 

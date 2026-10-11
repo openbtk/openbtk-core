@@ -65,7 +65,7 @@ assert "bm25" in inspect.signature(RAGPipeline).parameters
 - The default tokenizer lowercases and splits on anything that is not a letter or digit
   (`58410-2` becomes `58410`, `2`), with no stemming: "diabetic" does not match
   "diabetes". Pass `tokenizer=` to change it.
-- It is implemented in OpenBTK rather than wrapping `rank_bm25`, whose idf is negative
+- It is implemented in Openbtk rather than wrapping `rank_bm25`, whose idf is negative
   for a term in over half the documents and is patched with a floor that can itself be
   negative on a small corpus. This index uses the never-negative idf Lucene uses; the
   scoring is checked against hand-computed values.

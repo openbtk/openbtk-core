@@ -12,7 +12,7 @@ loader's own docstring in this project):
 * **No vocabulary resolution.** A real OMOP CDM stores clinical codes as
   an integer ``*_concept_id`` into the standard OHDSI vocabulary, which
   requires the (multi-gigabyte, separately licensed-ish) ``concept``
-  table to resolve to a real ``(system, code)`` pair -- OpenBTK does not
+  table to resolve to a real ``(system, code)`` pair -- Openbtk does not
   bundle it (docs/09_CODING_STANDARDS.md section 7; that resolution
   belongs in ``openbtk.terminology``, unbuilt, M7). This loader reads the
   ``*_source_value`` column instead -- the original source-vocabulary

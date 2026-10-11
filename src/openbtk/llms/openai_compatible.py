@@ -98,8 +98,8 @@ class OpenAICompatibleProvider(BaseLLMProvider):
 
     def _call_with_retry(self, func: Callable[[], Any]) -> Any:
         """Run ``func`` (an HTTP call), translating status/connection
-        errors to OpenBTK's exceptions before retry_with_backoff sees them
-        -- it only recognises OpenBTK's own ``RateLimitError``."""
+        errors to Openbtk's exceptions before retry_with_backoff sees them
+        -- it only recognises Openbtk's own ``RateLimitError``."""
 
         def wrapped() -> Any:
             try:

@@ -1,4 +1,4 @@
-"""OpenBTK components as LangChain ``Runnable`` s, and back.
+"""Openbtk components as LangChain ``Runnable`` s, and back.
 
 ``as_runnable`` turns a component into a ``Runnable`` with the input and output
 shown in the table below; ``from_runnable`` turns a text-to-text ``Runnable``
@@ -133,5 +133,5 @@ class RunnablePreprocessor(BasePreprocessor[ClinicalTextRecord]):
 
 
 def from_runnable(runnable: Runnable[str, str]) -> RunnablePreprocessor:
-    """Wrap a text-to-text ``Runnable`` as an OpenBTK record preprocessor."""
+    """Wrap a text-to-text ``Runnable`` as an Openbtk record preprocessor."""
     return RunnablePreprocessor(runnable)

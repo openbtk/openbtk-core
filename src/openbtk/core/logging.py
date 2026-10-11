@@ -1,8 +1,8 @@
 """PHI-safe structured logging.
 
-OpenBTK is a library, not an application -- a host application may already
+Openbtk is a library, not an application -- a host application may already
 call ``structlog.configure()`` for its own purposes (centralised JSON
-logging, a log aggregator, whatever). If OpenBTK also called
+logging, a log aggregator, whatever). If Openbtk also called
 ``structlog.configure()`` at import time, it would silently clobber that
 configuration, which is exactly the kind of surprising global side effect a
 library should not have.
@@ -10,13 +10,13 @@ library should not have.
 So instead of touching global structlog state at all, :func:`get_logger`
 wraps each logger individually via ``structlog.wrap_logger()`` with its own,
 fixed processor chain. This guarantees PHI-safe redaction on every log call
-OpenBTK's own code makes, regardless of what a host application does with
-structlog -- verified directly: an OpenBTK logger built this way keeps
+Openbtk's own code makes, regardless of what a host application does with
+structlog -- verified directly: an Openbtk logger built this way keeps
 redacting even after a host application calls ``structlog.configure()`` with
 a completely different chain, and the host's own loggers are correspondingly
 unaffected by anything here.
 
-Use this everywhere in OpenBTK's own code instead of raw ``structlog``:
+Use this everywhere in Openbtk's own code instead of raw ``structlog``:
 
     from openbtk.core.logging import get_logger
     log = get_logger(__name__)
@@ -77,7 +77,7 @@ _TRUNCATED_SUFFIX = "...[truncated]"
 # created before configure_logging() runs must still respect a later change.
 _allow_phi: bool = False
 
-# Minimum level an OpenBTK log line must have to be emitted. The default is
+# Minimum level an Openbtk log line must have to be emitted. The default is
 # "debug" -- every line, unchanged from before this control existed. Quiet it
 # with OPENBTK_LOG_LEVEL=warning in the environment (read once, at import) or
 # set_log_level("warning") at any time; like _allow_phi it is consulted on every
@@ -168,7 +168,7 @@ def get_logger(name: str) -> Any:
     Use ``__name__`` as ``name``, matching every other logging convention in
     this codebase. The returned logger's processor chain is fixed at
     creation and independent of any global ``structlog.configure()`` call --
-    by a host application or by OpenBTK itself, since OpenBTK never makes
+    by a host application or by Openbtk itself, since Openbtk never makes
     one.
 
     Example:
@@ -218,7 +218,7 @@ def configure_logging(*, allow_phi: bool = False) -> None:
 
 
 def set_log_level(level: str) -> None:
-    """Set the minimum level of OpenBTK's own log lines, process-wide.
+    """Set the minimum level of Openbtk's own log lines, process-wide.
 
     Args:
         level: ``"debug"`` (the default: everything), ``"info"``, ``"warning"``,

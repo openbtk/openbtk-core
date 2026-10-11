@@ -1,6 +1,6 @@
 """Third-party plugin discovery via Python entry points.
 
-A third-party package registers new components without OpenBTK ever
+A third-party package registers new components without Openbtk ever
 importing it directly, by declaring an entry point in its own
 ``pyproject.toml``:
 

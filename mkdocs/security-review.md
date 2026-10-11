@@ -1,12 +1,12 @@
 # Security review
 
-An **internal** review of OpenBTK's own code and build, done for the 1.0 milestone
+An **internal** review of Openbtk's own code and build, done for the 1.0 milestone
 (M11, task 11.2) by the maintainers' tooling and reading of the source. It is **not** an
 independent audit or a penetration test, and this page does not claim to be one; see
 [what this review did not do](#what-this-review-did-not-do). To report a
 vulnerability, use [SECURITY.md](https://github.com/openbtk/openbtk-core/blob/main/SECURITY.md).
 
-OpenBTK handles protected health information, so the questions asked were the ones
+Openbtk handles protected health information, so the questions asked were the ones
 that matter for it: can PHI or a credential reach a log, an error, a manifest or a
 cache; can untrusted input stall or crash a worker; and what does installing and
 releasing the package trust.
@@ -21,7 +21,7 @@ without the fix.
 | S-1 | The UMLS API key was printed in tracebacks | Credential disclosure | 0.5.0 | Chained error is now the exception type and HTTP status only |
 | S-2 | Email pattern was quadratic in the input length | Availability | every release since 0.1.0rc1 | Match may only start where a run of local-part characters starts |
 | S-3 | The exact tokenizer was downloaded from a moving Hub branch | Supply chain | every release since 0.1.0rc1 | Default model pinned to a commit; other models warn until pinned |
-| S-4 | Two more quadratic patterns: the QA answer parser and the sentence splitter | Availability | splitter: every release since 0.1.0rc1; QA parser: 0.6.0 | Unambiguous pattern; backwards scan |
+| S-4 | Two more quadratic patterns: the QA answer parser and the sentence splitter | Availability | splitter: every release since 0.1.0rc1; QA parser: 0.7.0 (the tagged 0.6.0 that introduced it was never published) | Unambiguous pattern; backwards scan |
 | S-5 | Emails on multi-label domains were only partly redacted | PHI left in output | every release since 0.1.0rc1 | Domain accepts dot-separated labels |
 | S-6 | CI and release actions were pinned by mutable tag | Supply chain | all | Pinned to commit SHAs, updated by Dependabot |
 
@@ -106,14 +106,14 @@ and trusted publishing (no long-lived token).
   (the six core dependencies) and the light extras (`ehr`, `langchain`, `langgraph`)
   found none at the time of review. Auditing a full development environment, with the
   heavy extras, did report advisories in two third-party packages, neither of which
-  has a fixed release, and neither of which OpenBTK's use reaches:
+  has a fixed release, and neither of which Openbtk's use reaches:
     - **`chromadb`** (five advisories, all about the Chroma *server*: authorisation
       between tenants, and remote code through a server API that loads a model
-      repository). OpenBTK uses only the in-process client (`Client` and
+      repository). Openbtk uses only the in-process client (`Client` and
       `PersistentClient`), never `HttpClient`, never runs a Chroma server, and never
       passes `trust_remote_code`. If you run a Chroma server yourself, that exposure is
       yours; keep it off untrusted networks.
-    - **`nltk`** (a model-path validation advisory). OpenBTK does not depend on it; it
+    - **`nltk`** (a model-path validation advisory). Openbtk does not depend on it; it
       arrives through `medspacy_quickumls` when that optional package is installed.
 - **No secrets in the repository.** `detect-secrets` over every tracked file.
 - **Off-site policy.** A component that would send text off the machine is refused
@@ -142,7 +142,7 @@ here:
   their parsing libraries and standard-library readers, and were read but not fuzzed.
 - **Third-party models and services are outside its scope.** Model weights (spaCy,
   Hugging Face), LLM providers and the UMLS service are the operator's trust
-  decisions. OpenBTK's controls are the off-site policy, pinning where it loads a model
+  decisions. Openbtk's controls are the off-site policy, pinning where it loads a model
   itself, and never logging content.
 - **The heavy extras are not audited in CI** (torch, transformers, spaCy, FAISS,
   Chroma and similar): their advisories change often, and the ones found in the

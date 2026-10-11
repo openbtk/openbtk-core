@@ -1,6 +1,6 @@
 # Benchmarks
 
-OpenBTK's rule 14: **no accuracy number without a harness in the repository
+Openbtk's rule 14: **no accuracy number without a harness in the repository
 that reproduces it.** This page lists every published de-identification
 number, the exact command that regenerates it, and — just as importantly —
 what has **not** been measured.

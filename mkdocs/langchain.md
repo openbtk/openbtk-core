@@ -1,9 +1,9 @@
 # LangChain and LangGraph
 
-OpenBTK does not depend on LangChain and does not fork it
+Openbtk does not depend on LangChain and does not fork it
 ([ADR-0001](https://github.com/openbtk/openbtk-core/blob/main/docs/adr/0001-langchain-interop-not-fork.md)).
 Interoperation is an **optional adapter**, `openbtk.integrations.langchain`,
-which is the only package in OpenBTK allowed to import LangChain:
+which is the only package in Openbtk allowed to import LangChain:
 
 ```bash
 pip install "openbtk[langchain]"            # embeddings, chat model, vector store, runnables
@@ -11,12 +11,12 @@ pip install "openbtk[langchain,langgraph]"  # plus a real LangGraph, to run grap
 ```
 
 Without `langchain-core` installed, importing the adapter raises a
-`MissingDependencyError` that names this extra, and nothing else in OpenBTK is
+`MissingDependencyError` that names this extra, and nothing else in Openbtk is
 affected. CI checks both halves: the adapter is tested against the real
 `langchain-core` and `langgraph`, and the rest of the suite is run with them
 absent.
 
-| OpenBTK | LangChain | Notes |
+| Openbtk | LangChain | Notes |
 |---|---|---|
 | `BaseEmbeddingProvider` | `Embeddings` (`OpenBTKEmbeddings`) | batches by the provider's own `batch_size` |
 | `BaseLLMProvider` | `BaseChatModel` (`OpenBTKChatModel`) | system/user/assistant text only; `.stream()` yields one chunk |
@@ -50,7 +50,7 @@ assert document_to_chunk(document) == chunk  # nothing is lost
 ```
 
 A `Document` that did not come from a chunk has no exact token count, and
-OpenBTK will not guess one: pass `token_counter=` (a real tokenizer's count)
+Openbtk will not guess one: pass `token_counter=` (a real tokenizer's count)
 to `document_to_chunk`, or the conversion raises.
 
 ## De-identification inside a LangChain chain
@@ -75,7 +75,7 @@ catches.
 
 ## A vector store LangChain can search
 
-OpenBTK stores hold vectors and metadata, so the adapter keeps each text in
+Openbtk stores hold vectors and metadata, so the adapter keeps each text in
 the metadata under `"text"` — the same key `RAGPipeline` reads. The two
 classes below are tiny stand-ins so the example runs without downloading a
 model; substitute a real provider and a FAISS/Chroma/Qdrant store.
@@ -169,7 +169,7 @@ assert "010-2345" not in state["result"].text
 
 ## Limits worth knowing
 
-* `OpenBTKChatModel` does not stream token-by-token: OpenBTK's provider
+* `OpenBTKChatModel` does not stream token-by-token: Openbtk's provider
   `stream()` takes a prompt string, not a message list.
 * `OpenBTKVectorStore.delete()` needs explicit ids (there is no delete-all on
   `BaseVectorStore`), and `from_texts()` needs an explicit `store=`.

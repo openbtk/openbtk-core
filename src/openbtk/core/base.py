@@ -1,6 +1,6 @@
-"""OpenBTK abstract base classes -- every extension point, in one file.
+"""Openbtk abstract base classes -- every extension point, in one file.
 
-Read this file to understand every way OpenBTK can be extended. Third-party
+Read this file to understand every way Openbtk can be extended. Third-party
 modalities, providers and guardrails all subclass something defined here and
 register it with a category registry (openbtk.core.registry).
 
@@ -85,7 +85,7 @@ def _openbtk_version() -> str:
 class Component(ABC):  # noqa: B024 -- intentionally abstract-in-spirit only;
     # every concrete role subclass below adds real @abstractmethods. See
     # docs/04_API_DESIGN.md section 3, which defines Component this way.
-    """Root of every OpenBTK component. Supplies identity and provenance.
+    """Root of every Openbtk component. Supplies identity and provenance.
 
     Subclasses are never instantiated directly through this class -- always
     through one of the role base classes below, via a registry.
@@ -162,7 +162,7 @@ class BaseLoader(Component, Generic[InputT, RecordT]):
 
         Warning:
             Memory hazard -- O(corpus), not O(batch). Never used in
-            OpenBTK's own code, docs, or examples (ADR-0004; enforced by a
+            Openbtk's own code, docs, or examples (ADR-0004; enforced by a
             grep gate in CI). Provided only for interactive/notebook use on
             small sources.
         """

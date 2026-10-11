@@ -4,7 +4,8 @@ Eight Jupyter notebooks, in order. Each one runs **offline**, downloads no model
 uses only synthetic data, and is **executed in CI on every change** — a tutorial
 that stopped working would fail the build.
 
-The notebooks need OpenBTK 0.6.0 or later.
+The notebooks need Openbtk 0.7.0 or later (the tagged 0.6.0 that first added them
+was never published).
 
 To run them yourself:
 
@@ -22,10 +23,10 @@ jupyter lab notebooks/
 | 5 | [Retrieval with provenance](https://github.com/openbtk/openbtk-core/blob/main/notebooks/05_rag_with_provenance.ipynb) | index chunks in FAISS, rerank by shared concepts, and answer with a `SourceRef` to every source |
 | 6 | [Guardrails and terminology](https://github.com/openbtk/openbtk-core/blob/main/notebooks/06_guardrails_and_terminology.ipynb) | check output for PHI and unsupported claims, and see what a partial vocabulary can and cannot say |
 | 7 | [Evaluation](https://github.com/openbtk/openbtk-core/blob/main/notebooks/07_evaluation.ipynb) | measure retrieval, clinical QA accuracy and groundedness, and check the checker |
-| 8 | [LangChain and LangGraph](https://github.com/openbtk/openbtk-core/blob/main/notebooks/08_langchain_and_langgraph.ipynb) | use OpenBTK components as Runnables, a vector store and a graph node |
+| 8 | [LangChain and LangGraph](https://github.com/openbtk/openbtk-core/blob/main/notebooks/08_langchain_and_langgraph.ipynb) | use Openbtk components as Runnables, a vector store and a graph node |
 
 The notebooks stand in for real models with two tiny offline providers (a hashing
-"encoder" and an extractive "LLM") that implement OpenBTK's real interfaces, so
+"encoder" and an extractive "LLM") that implement Openbtk's real interfaces, so
 swapping in a real model changes a line or two. They demonstrate the *plumbing*;
 they make no claim about retrieval or answer quality. For the numbers this
 project does publish, and what they do not show, see [Benchmarks](benchmarks.md).

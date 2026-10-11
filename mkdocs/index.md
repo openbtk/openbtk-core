@@ -1,18 +1,22 @@
-# OpenBTK
+# Openbtk
 
 **The open-source layer between biomedical data and modern AI.**
 
-OpenBTK turns clinical text into model-ready, **de-identified**, **auditable**
+Openbtk turns clinical text into model-ready, **de-identified**, **auditable**
 inputs — de-identification you can audit and benchmark, and run provenance
 every pipeline execution emits automatically. It runs on your laptop or
 behind your firewall, works with any LLM provider, and streams corpora far
 larger than memory.
 
-!!! note "Status: v0.5 — pre-1.0, real, and honestly scoped"
-    Milestones **M1–M10** are built, tested, and released: core framework,
-    de-identification, clinical text, EHR loading, providers and retrieval,
-    guardrails and terminology, benchmarks, and LangChain interop.
-    `pip install openbtk` gives you `0.6.0`. See [Quick start](quickstart.md).
+!!! note "Status: v0.7 — pre-1.0, real, and honestly scoped"
+    Milestones **M1–M10** and most of **M11** are built, tested, and released: core
+    framework, de-identification, clinical text, EHR loading, providers and
+    retrieval, guardrails and terminology, benchmarks, LangChain interop, the CLI,
+    clinical-QA and groundedness evaluation, an API freeze, a security review, and
+    twelve further v1.0 requirements. `pip install openbtk` gives you `0.7.0`. See
+    [Quick start](quickstart.md). v1.0 itself is not yet claimed -- see the
+    [CHANGELOG](https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md)
+    for what remains and why.
 
 !!! warning "The i2b2/n2c2 benchmark has not been run"
     The harness exists and is tested, but that corpus is
@@ -30,7 +34,7 @@ or pay a vendor.
 
 **Nothing open-source addresses the two things that actually gate
 deployment: is the PHI really gone, and can you prove what happened.** Those
-two are what OpenBTK is for.
+two are what Openbtk is for.
 
 ## What's built
 

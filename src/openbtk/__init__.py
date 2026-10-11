@@ -1,4 +1,4 @@
-"""OpenBTK -- the open-source layer between biomedical data and modern AI.
+"""Openbtk -- the open-source layer between biomedical data and modern AI.
 
 Turns EHR and clinical text into model-ready, de-identified, auditable inputs,
 and wraps model outputs in clinical guardrails.

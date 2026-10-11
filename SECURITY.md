@@ -11,7 +11,7 @@ Target response: acknowledgement within 48 hours, coordinated disclosure within
 
 ## What We Treat as Critical
 
-OpenBTK processes Protected Health Information. Any path by which PHI can reach
+Openbtk processes Protected Health Information. Any path by which PHI can reach
 somewhere it should not is handled as critical, specifically:
 
 - PHI written to logs, a run manifest, a `DeidReport`, a cache, or an exception
@@ -36,7 +36,7 @@ dependency audit run in CI on every change, and the dependency audit weekly.
 
 ## Scope
 
-OpenBTK is a software toolkit, not a medical device and not a clinical
+Openbtk is a software toolkit, not a medical device and not a clinical
 decision-support system. It provides technical controls that support a
 compliance programme; it does not by itself make any system HIPAA- or
 EU AI Act-compliant. Network, access and physical security of the deployment

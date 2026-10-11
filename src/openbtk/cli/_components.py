@@ -1,6 +1,6 @@
 """Make every built-in component visible to the registries.
 
-Registration is an import side effect, and OpenBTK deliberately does not import
+Registration is an import side effect, and Openbtk deliberately does not import
 every component package from ``import openbtk`` (that would slow every use of
 the library). A command that lists, validates or runs components needs them
 all registered, so the CLI imports them here. None of these packages needs an

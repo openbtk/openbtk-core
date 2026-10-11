@@ -1,4 +1,4 @@
-"""Small real implementations of OpenBTK's base classes for the adapter tests.
+"""Small real implementations of Openbtk's base classes for the adapter tests.
 They are working components (a one-hot embedding, a brute-force store, an
 echoing LLM), not mocks: the adapters are exercised end to end through them."""
 

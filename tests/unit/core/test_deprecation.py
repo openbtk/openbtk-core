@@ -43,7 +43,7 @@ class TestWarnDeprecated:
     def test_this_suite_turns_it_into_an_error_so_nothing_internal_may_use_it(
         self,
     ) -> None:
-        """pyproject's filterwarnings escalates the category. If an OpenBTK code
+        """pyproject's filterwarnings escalates the category. If an Openbtk code
         path ever called a deprecated API, its test would fail rather than pass
         with a hidden warning."""
         with pytest.raises(OpenBTKDeprecationWarning):
