@@ -5,7 +5,6 @@
 
 <p align="center"><strong>The open-source toolkit for biomedical AI.</strong></p>
 
-# Openbtk — Open Toolkit for Biomedical AI
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/openbtk)](https://pypi.org/project/openbtk/)
