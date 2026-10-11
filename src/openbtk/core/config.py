@@ -24,7 +24,7 @@ resolving:
   * ``PipelineConfig.validate_registry()``'s described checks
     (docs/03_ARCHITECTURE.md section 7.3) include "every params validates
     against that component's config model" and "stage types are
-    compatible." OpenBTK components take plain keyword arguments, not a
+    compatible." Openbtk components take plain keyword arguments, not a
     single Pydantic config object per component (see core/registry.py's
     ``ComponentInfo`` docstring for the same tension), so there is no
     per-component schema. What IS checked, from the constructor's own

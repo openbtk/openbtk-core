@@ -1,12 +1,12 @@
 # Stability policy
 
-From **1.0**, OpenBTK follows [Semantic Versioning](https://semver.org/) and this
+From **1.0**, Openbtk follows [Semantic Versioning](https://semver.org/) and this
 policy. Before 1.0, any minor release may break things; every break is recorded in
 the [CHANGELOG](https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md).
 
 The policy is enforced, not aspirational: `tests/api/` compares the public API,
 the registry keys, the command line and the manifest schema versions against
-checked-in snapshots, and OpenBTK's own test suite turns its deprecation warning
+checked-in snapshots, and Openbtk's own test suite turns its deprecation warning
 into an error. A change that breaks the promise fails CI.
 
 ## What is public
@@ -81,14 +81,14 @@ announced in the release before, and never before it is end-of-life upstream.
 The six core dependencies keep their current lower bounds within a major;
 optional-extra ranges may widen freely and narrow only in a minor with a note.
 
-`openbtk.integrations.langchain` is stable *as an OpenBTK API*, but it adapts to
+`openbtk.integrations.langchain` is stable *as an Openbtk API*, but it adapts to
 `langchain-core`, whose own changes are outside our control ([ADR-0001](https://github.com/openbtk/openbtk-core/blob/main/docs/adr/0001-langchain-interop-not-fork.md)):
 a LangChain release may require an adapter update in a minor.
 
 ## Reading manifests across versions
 
 A manifest records the schema version it was written with. Read a manifest with the
-**same or a newer** OpenBTK: readers reject fields they do not know (an older library
+**same or a newer** Openbtk: readers reject fields they do not know (an older library
 cannot read a newer minor's additions). Newer readers read every older manifest of the
 same major.
 

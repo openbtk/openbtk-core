@@ -24,7 +24,7 @@ release; Synthea and most real R4 exports validate against it cleanly).
   (SNOMED CT, LOINC, ICD-10-CM, RxNorm, CPT, UCUM -- the standard HL7
   system URIs, not fabricated). A coding in an unrecognised system is
   skipped with a logged warning rather than raising: a real bundle can
-  carry codes OpenBTK has no mapping for yet, and failing the whole
+  carry codes Openbtk has no mapping for yet, and failing the whole
   patient over one unrecognised code would be a worse outcome than
   dropping just that one event.
 * Race/ethnicity are read from the US Core ``us-core-race``/``us-core-

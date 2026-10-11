@@ -1,4 +1,4 @@
-# OpenBTK — Open Toolkit for Biomedical AI
+# Openbtk — Open Toolkit for Biomedical AI
 
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/openbtk)](https://pypi.org/project/openbtk/)
@@ -17,7 +17,7 @@ because the same visitor across different days is counted once per day.</sub>
 
 **The open-source layer between biomedical data and modern AI.**
 
-OpenBTK turns clinical text into model-ready, **de-identified**, **auditable**
+Openbtk turns clinical text into model-ready, **de-identified**, **auditable**
 inputs — de-identification you can audit and benchmark, and run provenance
 every pipeline execution emits automatically. It runs on your laptop or behind
 your firewall, works with any LLM provider, and streams corpora far larger
@@ -25,17 +25,23 @@ than memory.
 
 ---
 
-> ## Status: v0.5 — pre-1.0, real, and honestly scoped
+> ## Status: v0.7 — pre-1.0, real, and honestly scoped
 >
-> `pip install openbtk` gives you the latest PyPI release, **`0.5.0`**: the core
+> `pip install openbtk` gives you the latest PyPI release, **`0.7.0`**: the core
 > framework, de-identification, clinical text, EHR loading, providers and
-> retrieval, guardrails and terminology, benchmarks, and LangChain interop.
+> retrieval, guardrails and terminology, benchmarks, LangChain interop, the
+> `openbtk` command line, clinical-QA and groundedness evaluation, guides and
+> eight tutorial notebooks, an internal security review, an API freeze, and
+> twelve further requirements from the v1.0 gate (dose plausibility, k-anonymity,
+> HL7v2 loading, cross-modal joins, concept normalisation, hybrid retrieval,
+> three cloud LLM providers, model cards, summarisation metrics, and
+> checkpoint/resume).
 >
-> **M10 and most of M11 are built, tested and merged to `main`, but not yet
-> released** — the `openbtk` command line, clinical-QA and groundedness
-> evaluation, guides, eight tutorial notebooks, a security review and twelve
-> further requirements from the v1.0 gate. They will ship in the next PyPI
-> release, which needs an explicit maintainer go-ahead.
+> **v1.0 is not yet claimed.** Of M11's remaining gates, three named production
+> users is still being pursued; an independent evaluation of the de-identification
+> stack and the i2b2/n2c2 benchmark below are explicitly skipped for now — both
+> need a party outside this repository and neither is available. See
+> [CHANGELOG.md](CHANGELOG.md) for the dated decision.
 >
 > **The i2b2/n2c2 de-identification benchmark has not been run.** The harness
 > exists and is tested, but that corpus is released only under a Data Use
@@ -59,7 +65,7 @@ pay a vendor.
 
 **Nothing open-source addresses the two things that actually gate
 deployment: is the PHI really gone, and can you prove what happened.** Those
-two are what OpenBTK is for.
+two are what Openbtk is for.
 
 ## What's built
 
@@ -84,7 +90,7 @@ two are what OpenBTK is for.
 - **A clinical text modality**: loaders for plain text, JSON Lines and MIMIC-
   shaped CSV; rule-based and medspaCy-backed section segmentation;
   section-aware chunking that never splits mid-section (the one place
-  OpenBTK writes genuinely new logic — see
+  Openbtk writes genuinely new logic — see
   [`src/openbtk/data/clinical_text/chunking.py`](src/openbtk/data/clinical_text/chunking.py)).
 - **A streaming pipeline executor with real provenance**: compose steps with
   `Pipeline`/`Step` or a YAML config, and every run emits a `RunManifest` —
@@ -127,7 +133,7 @@ two are what OpenBTK is for.
 ## Quick start
 
 ```bash
-pip install "openbtk[text] @ git+https://github.com/openbtk/openbtk-core.git"
+pip install "openbtk[text]"
 ```
 
 ```python
@@ -286,7 +292,7 @@ Apache 2.0 — see [LICENSE](LICENSE).
 
 ## Disclaimer
 
-OpenBTK is a software toolkit. It is **not a medical device**, **not a
+Openbtk is a software toolkit. It is **not a medical device**, **not a
 clinical decision-support system**, and provides **no medical advice**. It
 does not make its users HIPAA- or EU AI Act-compliant — it provides
 technical controls supporting a compliance programme its users own.

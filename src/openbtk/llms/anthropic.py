@@ -84,7 +84,7 @@ class AnthropicProvider(BaseLLMProvider):
 
     def _call_with_retry(self, func: Callable[[], Any]) -> Any:
         """Run ``func`` (an Anthropic SDK call) with retry-on-rate-limit,
-        translating the SDK's own exceptions to OpenBTK's first -- see
+        translating the SDK's own exceptions to Openbtk's first -- see
         this module's own docstring for why translation happens here
         rather than in :func:`retry_with_backoff`."""
         anthropic = require("anthropic", extra="llms")
@@ -108,7 +108,7 @@ class AnthropicProvider(BaseLLMProvider):
         messages: list[Message],
     ) -> tuple[str | None, list[Message]]:
         """The Messages API's ``system`` is a top-level parameter, not a
-        message with ``role: "system"`` -- OpenBTK's ``Message`` still
+        message with ``role: "system"`` -- Openbtk's ``Message`` still
         allows that role (it is shared across every provider), so a
         leading one is pulled out here rather than rejected."""
         if messages and messages[0].role == "system":

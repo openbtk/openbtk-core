@@ -37,7 +37,7 @@ class PHICategory(StrEnum):
     recognizer can ever populate them:
 
     - ``FULL_FACE_PHOTO``: an imaging artefact. Detecting it is out of
-      scope for `openbtk.deid` on text input, and out of scope for OpenBTK
+      scope for `openbtk.deid` on text input, and out of scope for Openbtk
       entirely under the scope gate (CLAUDE.md rule 13) until an imaging
       modality ships.
     - ``BIOMETRIC_IDENTIFIER``: fingerprints, retinal scans, voiceprints --

@@ -1,4 +1,4 @@
-"""OpenBTK component registry.
+"""Openbtk component registry.
 
 The ``Registry[T]`` class is what makes a pipeline config-driven rather than
 code-driven: a registered class is addressed by a permanent string key, and
@@ -161,7 +161,7 @@ class ComponentInfo(BaseModel):
     """Introspective summary of one registered component.
 
     Deliberately does not attempt a full JSON Schema of constructor
-    parameters: OpenBTK components take plain keyword arguments, not a
+    parameters: Openbtk components take plain keyword arguments, not a
     single Pydantic config object, so a fabricated "schema" for an arbitrary
     ``__init__`` signature would often be misleading (a default value that
     is not itself a JSON type, for instance). ``signature`` gives the same

@@ -12,7 +12,8 @@
 | 8 | [LangChain and LangGraph](08_langchain_and_langgraph.ipynb) |
 
 Every notebook runs offline, downloads no model, and uses only fictitious data.
-They need OpenBTK 0.6.0 or later.
+They need Openbtk 0.7.0 or later (the tagged 0.6.0 that first added them was
+never published).
 
 ```bash
 pip install "openbtk[text,ehr,langchain,langgraph,notebooks]" faiss-cpu

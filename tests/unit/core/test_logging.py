@@ -142,7 +142,7 @@ class TestAllowPhiToggle:
 
 
 class TestLogLevel:
-    """set_log_level / OPENBTK_LOG_LEVEL: quiet OpenBTK's own log lines without
+    """set_log_level / OPENBTK_LOG_LEVEL: quiet Openbtk's own log lines without
     changing the default (every line) or touching the redaction chain."""
 
     @pytest.fixture(autouse=True)

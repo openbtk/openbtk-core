@@ -5,7 +5,7 @@ The library's own log lines go to **stderr**; a command's result is the only
 thing on **stdout**, so `--json` output can be piped straight into `jq` or a
 script.
 
-OpenBTK's library log lines are verbose by default (every registration is a
+Openbtk's library log lines are verbose by default (every registration is a
 `debug` line). Quiet them with `OPENBTK_LOG_LEVEL=warning` in the environment, or
 `openbtk.core.logging.set_log_level("warning")` in code.
 
@@ -205,9 +205,9 @@ openbtk doctor
 openbtk doctor --require text,ehr    # exit 1 unless those extras are ready (useful in CI)
 ```
 
-It reports Python and OpenBTK versions, the six core dependencies, which optional
+It reports Python and Openbtk versions, the six core dependencies, which optional
 extras are complete, whether the spaCy model is present, and which conventional
 credential variables (`OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `HF_TOKEN`,
 `UMLS_API_KEY`) are set or not. **Credentials are reported by name only; a value
-is never read into the report.** OpenBTK does not read these variables implicitly:
+is never read into the report.** Openbtk does not read these variables implicitly:
 a config opts in with `${NAME}`, or a provider's own SDK does.

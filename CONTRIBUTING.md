@@ -1,6 +1,6 @@
-# Contributing to OpenBTK
+# Contributing to Openbtk
 
-Thanks for considering a contribution. OpenBTK is early — milestones M1
+Thanks for considering a contribution. Openbtk is early — milestones M1
 through M3 (core framework, de-identification, clinical text + streaming
 pipelines) are built and merged; the project is still finding its shape past
 that. Please open an issue to discuss anything beyond a small fix before

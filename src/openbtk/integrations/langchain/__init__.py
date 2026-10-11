@@ -1,10 +1,10 @@
 """LangChain interoperability adapter -- OPTIONAL, installed via
 ``pip install "openbtk[langchain]"``.
 
-This is the ONLY package in OpenBTK permitted to import LangChain, enforced by
+This is the ONLY package in Openbtk permitted to import LangChain, enforced by
 an import-linter contract (ADR-0001). Importing it without ``langchain-core``
 installed raises ``MissingDependencyError`` naming the extra; nothing else in
-OpenBTK is affected, and the rest of the suite runs without it.
+Openbtk is affected, and the rest of the suite runs without it.
 
 * ``OpenBTKEmbeddings`` -- an embedding provider as ``Embeddings``
 * ``OpenBTKChatModel`` -- an LLM provider as ``BaseChatModel``

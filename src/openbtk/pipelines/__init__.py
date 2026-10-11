@@ -1,6 +1,6 @@
 """Streaming DAG executor, pipeline state, and built-in recipes.
 
-Owned by OpenBTK; requires no external orchestration framework (ADR-0001).
+Owned by Openbtk; requires no external orchestration framework (ADR-0001).
 
 ``RAGPipeline`` (task 5.8) is a separate, non-executor orchestration path
 for the query side of a RAG system -- see its own module docstring for

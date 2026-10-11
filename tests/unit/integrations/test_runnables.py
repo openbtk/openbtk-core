@@ -1,5 +1,5 @@
 """as_runnable / from_runnable against real langchain-core Runnables and real
-OpenBTK components (a guardrail, a chunker, a preprocessor, the DeidEngine)."""
+Openbtk components (a guardrail, a chunker, a preprocessor, the DeidEngine)."""
 
 from __future__ import annotations
 

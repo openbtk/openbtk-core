@@ -3,7 +3,7 @@
 Wraps, does not reinvent (docs/09_CODING_STANDARDS.md section 7): all the
 real work -- HTTP, auth, SSE streaming -- is the SDK's. This module's own
 job is translating the SDK's request/response/exception shapes to
-OpenBTK's (``Message``/``LLMResponse``/``TokenUsage``, and the
+Openbtk's (``Message``/``LLMResponse``/``TokenUsage``, and the
 ``RateLimitError``/``AuthenticationError``/``ProviderError`` hierarchy),
 and applying :func:`openbtk.llms.base.retry_with_backoff` around every
 call.
@@ -84,10 +84,10 @@ class OpenAIProvider(BaseLLMProvider):
 
     def _call_with_retry(self, func: Callable[[], Any]) -> Any:
         """Run ``func`` (an OpenAI SDK call) with retry-on-rate-limit,
-        translating the SDK's own exceptions to OpenBTK's first -- see
+        translating the SDK's own exceptions to Openbtk's first -- see
         this module's own docstring for why translation happens here
         rather than in :func:`retry_with_backoff` (which only knows
-        about OpenBTK's exception hierarchy, not any one SDK's)."""
+        about Openbtk's exception hierarchy, not any one SDK's)."""
         openai = require("openai", extra="llms")
 
         def wrapped() -> Any:

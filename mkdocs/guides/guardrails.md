@@ -26,7 +26,7 @@ print(result.passed, [r.severity.value for r in result.results])
 
 ## Dose plausibility
 
-OpenBTK **ships no dose limits, on purpose.** A table of "safe" doses that nobody can
+Openbtk **ships no dose limits, on purpose.** A table of "safe" doses that nobody can
 trace to a source is a patient-safety hazard, so the guardrail is an engine: it finds
 dose statements in text and compares them with limits you provide from a formulary,
 label or guideline you trust. Every `DoseLimit` must say where it came from.

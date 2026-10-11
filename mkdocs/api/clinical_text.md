@@ -27,7 +27,7 @@ only to actually run.
 
 ## Chunking
 
-The one place OpenBTK writes genuinely new logic, not a wrapped library —
+The one place Openbtk writes genuinely new logic, not a wrapped library —
 generic chunkers destroy clinical meaning by splitting mid-section.
 
 ::: openbtk.data.clinical_text.chunking.SectionAwareChunker

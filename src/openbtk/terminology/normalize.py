@@ -5,7 +5,7 @@ for hypertension. This maps such a term to the concepts of a vocabulary **you gi
 tolerating case, punctuation, typos and the aliases you list.
 
 **It ships no vocabulary of its own beyond the small ICD-10-CM subset that is already
-bundled.** LOINC and SNOMED CT are licensed and OpenBTK never bundles them, so whether
+bundled.** LOINC and SNOMED CT are licensed and Openbtk never bundles them, so whether
 "CBC" resolves is a property of the vocabulary you load
 (:meth:`ConceptNormalizer.from_csv` takes a licensed extract with an ``aliases``
 column), not of this code.
@@ -227,7 +227,7 @@ class ConceptNormalizer:
     def from_bundled_icd10cm(
         cls, *, threshold: float = 0.85, ambiguity_margin: float = 0.05
     ) -> ConceptNormalizer:
-        """A normaliser over the small ICD-10-CM subset that ships with OpenBTK."""
+        """A normaliser over the small ICD-10-CM subset that ships with Openbtk."""
         from openbtk.terminology.bundled import bundled_icd10cm_concepts
 
         return cls(

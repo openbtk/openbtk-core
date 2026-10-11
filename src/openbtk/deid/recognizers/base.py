@@ -9,7 +9,7 @@ institution-specific one (a novel MRN format, say) "register a class", not
 "patch the engine" (ADR-0006's stated design goal).
 
 Lives in ``openbtk.deid``, not ``openbtk.core``: recognizers are a
-de-identification-specific extension point, not a general one every OpenBTK
+de-identification-specific extension point, not a general one every Openbtk
 component needs. ``BaseRecognizer`` still subclasses ``Component``
 (``openbtk.core.base``) to get the same identity/provenance contract every
 other extension point has -- that dependency runs downward (deid depends on

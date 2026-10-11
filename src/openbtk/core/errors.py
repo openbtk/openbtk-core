@@ -1,6 +1,6 @@
-"""OpenBTK exception hierarchy.
+"""Openbtk exception hierarchy.
 
-Every exception raised by OpenBTK's own code inherits from OpenBTKError and
+Every exception raised by Openbtk's own code inherits from OpenBTKError and
 carries structured, PHI-free context. This is the framework's single error
 surface: modality modules, providers, and the pipeline layer all raise from
 here rather than defining their own hierarchies.
@@ -20,7 +20,7 @@ from typing import Any
 
 
 class OpenBTKError(Exception):
-    """Root of every exception raised by OpenBTK.
+    """Root of every exception raised by Openbtk.
 
     Args:
         message: Human-readable description of what failed, why, and what to

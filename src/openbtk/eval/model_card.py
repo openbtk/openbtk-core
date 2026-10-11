@@ -1,17 +1,17 @@
 """Model cards for the models a pipeline wraps or you fine-tuned (FR-P-06).
 
 A *model card* (Mitchell et al., 2019) is the short document that travels with a model:
-what it is, what it is for, how well it does, and where it fails. OpenBTK already
+what it is, what it is for, how well it does, and where it fails. Openbtk already
 records the facts a card needs, namely the exact model and revision a component used
 (:class:`~openbtk.core.provenance.ModelIdentity`) and the scores an evaluation produced
 (:class:`~openbtk.eval.manifest.EvalManifest`). This module assembles them.
 
 **What is written for you, and what is not.** The *identity* section (name, pinned
-revision, source, the OpenBTK component and its version) and the *evaluation* section
+revision, source, the Openbtk component and its version) and the *evaluation* section
 come from those records. Everything that needs a human judgement, namely intended use,
 out-of-scope use, training data, limitations and ethical considerations, is text **you**
 supply, and a section you leave out reads "Not provided." A card never states something
-OpenBTK does not
+Openbtk does not
 know: it does not describe a model's training data, invent limitations or praise it.
 
 **No number without its harness** (CLAUDE.md rule 14). A metric enters a card only
@@ -80,7 +80,7 @@ class ModelCard(BaseModel):
 
     model: ModelIdentity
     component_key: str | None = Field(
-        None, description="The OpenBTK registry key that used the model."
+        None, description="The Openbtk registry key that used the model."
     )
     openbtk_version: str | None = None
     settings: dict[str, JsonValue] = Field(
@@ -121,7 +121,7 @@ class ModelCard(BaseModel):
             intended_use: What it is meant for.
             out_of_scope_use: What it must not be used for.
             training_data: What it was trained on (for a fine-tune, what *you* trained
-                it on). OpenBTK cannot know this and does not guess.
+                it on). Openbtk cannot know this and does not guess.
             limitations: Known failure modes and blind spots.
             ethical_considerations: Risks, populations affected, mitigations.
             contact: Who to ask.
@@ -200,9 +200,9 @@ class ModelCard(BaseModel):
             f"- **Source:** {self.model.source}",
         ]
         if self.component_key:
-            identity.append(f"- **OpenBTK component:** `{self.component_key}`")
+            identity.append(f"- **Openbtk component:** `{self.component_key}`")
         if self.openbtk_version:
-            identity.append(f"- **OpenBTK version:** {self.openbtk_version}")
+            identity.append(f"- **Openbtk version:** {self.openbtk_version}")
         parts = [
             f"# Model card: {self.model.name}\n",
             "## Model details\n\n" + "\n".join(identity) + "\n",

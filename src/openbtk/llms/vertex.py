@@ -94,7 +94,7 @@ class VertexAIProvider(BaseLLMProvider):
 
     @staticmethod
     def _translate(errors: Any, error: Exception) -> Exception | None:
-        """OpenBTK's exception for a ``google-genai`` API error, or ``None``."""
+        """Openbtk's exception for a ``google-genai`` API error, or ``None``."""
         if not isinstance(error, errors.APIError):
             return None
         code = getattr(error, "code", None)

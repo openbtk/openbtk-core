@@ -1,4 +1,4 @@
-"""The deprecation mechanism behind OpenBTK's stability policy (M11 task 11.3).
+"""The deprecation mechanism behind Openbtk's stability policy (M11 task 11.3).
 
 The policy itself is in ``mkdocs/stability.md``. In one sentence: **a public name
 is never removed without first being deprecated, still working and warning, for at
@@ -10,8 +10,8 @@ This module is the machinery:
 * :class:`OpenBTKDeprecationWarning` -- the warning category. It subclasses
   ``DeprecationWarning``, so Python hides it by default outside ``__main__`` and
   tests; run with ``-W default::openbtk.core.deprecation.OpenBTKDeprecationWarning``
-  (or ``-W error::...``) to see or enforce it. OpenBTK's own test suite turns it
-  into an **error**, so nothing inside OpenBTK may call a deprecated API.
+  (or ``-W error::...``) to see or enforce it. Openbtk's own test suite turns it
+  into an **error**, so nothing inside Openbtk may call a deprecated API.
 * :func:`deprecated` -- a decorator for a function, method or class.
 * :func:`warn_deprecated` -- for a deprecation that is not a call (a renamed
   registry key, a config field).
@@ -34,7 +34,7 @@ _VERSION = re.compile(r"^\d+\.\d+\.\d+$")
 
 
 class OpenBTKDeprecationWarning(DeprecationWarning):
-    """Raised (as a warning) when a deprecated OpenBTK API is used."""
+    """Raised (as a warning) when a deprecated Openbtk API is used."""
 
 
 def _check_version(label: str, value: str) -> None:
@@ -44,7 +44,7 @@ def _check_version(label: str, value: str) -> None:
 
 def _message(name: str, since: str, removal: str, use: str | None) -> str:
     text = (
-        f"{name} is deprecated since OpenBTK {since} and will be removed in {removal}"
+        f"{name} is deprecated since Openbtk {since} and will be removed in {removal}"
     )
     return f"{text}; use {use} instead." if use else f"{text}."
 

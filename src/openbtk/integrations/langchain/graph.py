@@ -1,4 +1,4 @@
-"""OpenBTK components as LangGraph nodes.
+"""Openbtk components as LangGraph nodes.
 
 A LangGraph node is just a callable from the graph state to a partial state
 update, so this module needs -- and imports -- neither ``langgraph`` nor

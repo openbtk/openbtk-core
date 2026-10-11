@@ -98,7 +98,7 @@ class BedrockProvider(BaseLLMProvider):
 
     @staticmethod
     def _translate(exceptions: Any, error: Exception) -> Exception | None:
-        """OpenBTK's exception for a botocore error, or ``None`` for any other."""
+        """Openbtk's exception for a botocore error, or ``None`` for any other."""
         if isinstance(error, exceptions.ClientError):
             detail = error.response.get("Error", {})
             code = str(detail.get("Code", "Unknown"))
