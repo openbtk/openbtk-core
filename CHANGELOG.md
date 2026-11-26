@@ -26,8 +26,8 @@ for those).
 
 ### Changed
 
-- The project website and documentation moved to **openbtk.ai**; the docs now
-  live at https://openbtk.ai/openbtk-core/. The old openbtk.org domain is being
+- The project website and documentation moved to **www.openbtk.ai**; the docs now
+  live at https://www.openbtk.ai/openbtk-core/. The old openbtk.org domain is being
   retired. The package metadata gains a `Documentation` URL.
 - Brand text restyled from "OpenBTK" to "Openbtk" in docs, docstrings and
   messages (the deprecation warning now reads "deprecated since Openbtk ...").
@@ -376,7 +376,7 @@ PRD gate is open (below), and PyPI version numbers are permanent.
 
 ### Closed — MkDocs site live
 - GitHub Pages was enabled on 2026-09-19 (source `gh-pages`); the site is served at
-  <https://openbtk.ai/openbtk-core/> (the organisation's custom domain), and
+  <https://www.openbtk.ai/openbtk-core/> (the organisation's custom domain), and
   `site_url` now says so, so canonical links no longer point at a redirect.
   Checked by request: the index, quick start, benchmarks and LangChain pages
   all return 200 and the benchmarks page carries the "Not run" n2c2 statement.
