@@ -200,7 +200,7 @@ class TestDocsSite:
         openbtk.github.io/openbtk-core only redirects there, and a canonical
         link to a redirect is a broken habit."""
         config = (_ROOT / "mkdocs.yml").read_text(encoding="utf-8")
-        assert "site_url: https://openbtk.ai/openbtk-core/" in config
+        assert "site_url: https://www.openbtk.ai/openbtk-core/" in config
 
     def test_the_nav_covers_the_pages_a_v0_5_reader_needs(self) -> None:
         nav = (_ROOT / "mkdocs.yml").read_text(encoding="utf-8")

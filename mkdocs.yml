@@ -1,6 +1,6 @@
 site_name: Openbtk
 site_description: The open-source layer between biomedical data and modern AI.
-site_url: https://openbtk.ai/openbtk-core/
+site_url: https://www.openbtk.ai/openbtk-core/
 repo_url: https://github.com/openbtk/openbtk-core
 repo_name: openbtk/openbtk-core
 edit_uri: edit/main/mkdocs/

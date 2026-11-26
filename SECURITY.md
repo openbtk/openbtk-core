@@ -24,12 +24,12 @@ somewhere it should not is handled as critical, specifically:
 ## Supported Versions
 
 Pre-1.0. Only the latest release receives fixes. From 1.0 the
-[stability policy](https://openbtk.ai/openbtk-core/dev/stability/) applies; security
+[stability policy](https://www.openbtk.ai/openbtk-core/dev/stability/) applies; security
 fixes may change behaviour in a patch release.
 
 ## What has been reviewed
 
-The [security review](https://openbtk.ai/openbtk-core/dev/security-review/) lists the
+The [security review](https://www.openbtk.ai/openbtk-core/dev/security-review/) lists the
 findings, what was checked and found clean, and, as plainly, what was not done: it is
 an internal review, not an independent audit. Static analysis, a secret scan and a
 dependency audit run in CI on every change, and the dependency audit weekly.

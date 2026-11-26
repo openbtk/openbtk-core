@@ -272,11 +272,11 @@ system, or a dataset distributor.
 
 ## Documentation
 
-The site is live at <https://openbtk.ai/openbtk-core/> (the `dev` build of
+The site is live at <https://www.openbtk.ai/openbtk-core/> (the `dev` build of
 `main`).
 
 - [Tutorial notebooks](notebooks/) — eight, offline, executed in CI.
-- [Guides and API reference](https://openbtk.ai/openbtk-core/dev/) — clinical text,
+- [Guides and API reference](https://www.openbtk.ai/openbtk-core/dev/) — clinical text,
   de-identification, EHR, evaluation, the command line; every code example on the
   guides is executed by a test.
 - [Benchmarks](mkdocs/benchmarks.md) — every published number, its
