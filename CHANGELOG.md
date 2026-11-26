@@ -348,7 +348,7 @@ PRD gate is open (below), and PyPI version numbers are permanent.
 
 ### Closed — MkDocs site live
 - GitHub Pages was enabled on 2026-09-19 (source `gh-pages`); the site is served at
-  <https://openbtk.org/openbtk-core/> (the organisation's custom domain), and
+  <https://openbtk.ai/openbtk-core/> (the organisation's custom domain), and
   `site_url` now says so, so canonical links no longer point at a redirect.
   Checked by request: the index, quick start, benchmarks and LangChain pages
   all return 200 and the benchmarks page carries the "Not run" n2c2 statement.
