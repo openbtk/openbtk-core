@@ -1,6 +1,8 @@
 <p align="center">
-  <img alt="Openbtk" src="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-dark.svg#gh-light-mode-only" width="320">
-  <img alt="Openbtk" src="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-light.svg#gh-dark-mode-only" width="320">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-light.svg">
+    <img alt="Openbtk" src="https://raw.githubusercontent.com/openbtk/openbtk.github.io/main/assets/logo-dark.svg" width="320">
+  </picture>
 </p>
 
 <p align="center"><strong>The open-source toolkit for biomedical AI.</strong></p>
