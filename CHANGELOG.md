@@ -11,6 +11,34 @@ recorded here.
 
 Nothing yet.
 
+## [0.7.1] — 2026-11-27
+
+A documentation-only patch release. **No code behaviour changes:** the only
+edits under `src/` are docstrings and the brand name in messages.
+
+### Read this first
+
+Nothing about the limits stated for 0.7.0 has changed. **The de-identification
+benchmark on i2b2/n2c2 still has not been run**; every de-identification number
+published is on a **synthetic** corpus, and the default `DeidEngine`
+**does not detect names** or street addresses (enable the opt-in NER recognizer
+for those).
+
+### Changed
+
+- The project website and documentation moved to **openbtk.ai**; the docs now
+  live at https://openbtk.ai/openbtk-core/. The old openbtk.org domain is being
+  retired. The package metadata gains a `Documentation` URL.
+- Brand text restyled from "OpenBTK" to "Openbtk" in docs, docstrings and
+  messages (the deprecation warning now reads "deprecated since Openbtk ...").
+  Class names such as `OpenBTKError` are unchanged.
+- README: logo header (shows correctly in light and dark themes on GitHub and
+  on PyPI), tagline and centred badges; stale v0.5.0/v0.6.0 claims fixed.
+
+### What is new since 0.7.0
+
+Only the documentation and metadata changes above.
+
 ## [0.7.0] — 2026-09-22
 
 A tag `v0.6.0` was created for the content below on 2026-09-20, but its release
@@ -1292,7 +1320,8 @@ removed rather than repaired: it was never importable — three package names
 coexisted in one repository, and no test had ever been executed against an
 installed dependency. It is preserved on the `legacy/v1-snapshot` branch.
 
-[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/openbtk/openbtk-core/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/openbtk/openbtk-core/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.7.0
 [0.5.0]: https://github.com/openbtk/openbtk-core/releases/tag/v0.5.0
 [0.1.1]: https://github.com/openbtk/openbtk-core/releases/tag/v0.1.1
