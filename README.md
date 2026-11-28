@@ -37,7 +37,7 @@ than memory.
 
 > ## Status: v0.7 — pre-1.0, real, and honestly scoped
 >
-> `pip install openbtk` gives you the latest PyPI release, **`0.7.0`**: the core
+> `pip install openbtk` gives you the latest PyPI release, **`0.7.1`**: the core
 > framework, de-identification, clinical text, EHR loading, providers and
 > retrieval, guardrails and terminology, benchmarks, LangChain interop, the
 > `openbtk` command line, clinical-QA and groundedness evaluation, guides and

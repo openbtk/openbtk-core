@@ -13,7 +13,7 @@ larger than memory.
     framework, de-identification, clinical text, EHR loading, providers and
     retrieval, guardrails and terminology, benchmarks, LangChain interop, the CLI,
     clinical-QA and groundedness evaluation, an API freeze, a security review, and
-    twelve further v1.0 requirements. `pip install openbtk` gives you `0.7.0`. See
+    twelve further v1.0 requirements. `pip install openbtk` gives you `0.7.1`. See
     [Quick start](quickstart.md). v1.0 itself is not yet claimed -- see the
     [CHANGELOG](https://github.com/openbtk/openbtk-core/blob/main/CHANGELOG.md)
     for what remains and why.
